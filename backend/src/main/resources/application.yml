@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/mms
-    username: mms_user
-    password: your_password_here
+    username: admin
+    password: adminmms
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -19,15 +19,15 @@ spring:
 
 security:
   jwt:
-    secret: your_jwt_secret_key_here
+    secret: Vc0AdKyBIffZ5ErS4yvib99zRZkdR5eMuxzHVDLUBNk=
     expiration: 86400000 # 24 hours in milliseconds
 
 storage:
   type: minio  # or 's3'
   minio:
     endpoint: http://localhost:9000
-    accessKey: your_minio_access_key
-    secretKey: your_minio_secret_key
+    accessKey: admin
+    secretKey: adminmms
     bucket: mms-media
   s3:
     region: your_aws_region

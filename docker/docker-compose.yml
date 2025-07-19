@@ -1,46 +1,46 @@
 version: '3.8'
 
 services:
-  app:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    container_name: mms-backend
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mms
-      - SPRING_DATASOURCE_USERNAME=mms_user
-      - SPRING_DATASOURCE_PASSWORD=mms_password
-      - STORAGE_TYPE=minio
-      - STORAGE_MINIO_ENDPOINT=http://minio:9000
-      - STORAGE_MINIO_ACCESSKEY=minioadmin
-      - STORAGE_MINIO_SECRETKEY=minioadmin
-      - STORAGE_MINIO_BUCKET=mms-media
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-      - minio
-    networks:
-      - mms-network
-    restart: unless-stopped
+  # app:
+  #   build:
+  #     context: ..
+  #     dockerfile: docker/Dockerfile
+  #   container_name: mms-backend    
+  #   environment:
+  #     - SPRING_PROFILES_ACTIVE=docker
+  #     - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mms
+  #     - SPRING_DATASOURCE_USERNAME=admin
+  #     - SPRING_DATASOURCE_PASSWORD=adminmms
+  #     - STORAGE_TYPE=minio
+  #     - STORAGE_MINIO_ENDPOINT=http://minio:9000
+  #     - STORAGE_MINIO_ACCESSKEY=admin
+  #     - STORAGE_MINIO_SECRETKEY=adminmms
+  #     - STORAGE_MINIO_BUCKET=mms-media
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - db
+  #     - minio
+  #   networks:
+  #     - mms-network
+  #   restart: unless-stopped
 
   db:
     image: postgres:16-alpine
     container_name: mms-postgres
     environment:
       - POSTGRES_DB=mms
-      - POSTGRES_USER=mms_user
-      - POSTGRES_PASSWORD=mms_password
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=adminmms
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./volumes/postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     networks:
       - mms-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mms_user -d mms"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d mms"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -57,7 +57,7 @@ services:
       - "9000:9000"
       - "9001:9001"
     volumes:
-      - minio_data:/data
+      - ./volumes/minio_data:/data
     networks:
       - mms-network
     healthcheck:
@@ -71,8 +71,3 @@ networks:
   mms-network:
     driver: bridge
 
-volumes:
-  postgres_data:
-    driver: local
-  minio_data:
-    driver: local

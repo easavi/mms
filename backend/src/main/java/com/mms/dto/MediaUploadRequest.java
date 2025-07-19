@@ -3,10 +3,8 @@ package com.mms.dto;
 import com.mms.entity.MediaType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
-@Data
 public class MediaUploadRequest {
     @NotBlank
     private String title;
@@ -18,6 +16,38 @@ public class MediaUploadRequest {
     
     @NotNull
     private MultipartFile file;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public MediaType getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(MediaType mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public MultipartFile getFile() {
+        return file;
+    }
+
+    public void setFile(MultipartFile file) {
+        this.file = file;
+    }
     
     private String[] tags;
 }

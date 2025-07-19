@@ -9,7 +9,6 @@ import com.mms.exception.ApiException;
 import com.mms.repository.MediaItemRepository;
 import com.mms.repository.TagRepository;
 import com.mms.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -26,12 +25,22 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class MediaService {
     private final MediaItemRepository mediaItemRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final StorageService storageService;
+    
+    public MediaService(
+            MediaItemRepository mediaItemRepository,
+            UserRepository userRepository,
+            TagRepository tagRepository,
+            StorageService storageService) {
+        this.mediaItemRepository = mediaItemRepository;
+        this.userRepository = userRepository;
+        this.tagRepository = tagRepository;
+        this.storageService = storageService;
+    }
 
     @Transactional
     public MediaResponse uploadMedia(MediaUploadRequest request, UserDetails userDetails) {

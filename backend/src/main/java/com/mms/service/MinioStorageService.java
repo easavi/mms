@@ -2,7 +2,6 @@ package com.mms.service;
 
 import io.minio.*;
 import io.minio.http.Method;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -13,13 +12,16 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @ConditionalOnProperty(name = "storage.type", havingValue = "minio")
-@RequiredArgsConstructor
 public class MinioStorageService implements StorageService {
 
     @Value("${storage.minio.bucket}")
     private String bucket;
 
     private final MinioClient minioClient;
+
+    public MinioStorageService(MinioClient minioClient) {
+        this.minioClient = minioClient;
+    }
 
     @Override
     public String store(MultipartFile file, String path) {

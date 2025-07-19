@@ -4,7 +4,6 @@ import com.mms.dto.media.MediaResponse;
 import com.mms.dto.media.MediaUploadRequest;
 import com.mms.service.MediaService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -17,9 +16,12 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/media")
-@RequiredArgsConstructor
 public class MediaController {
     private final MediaService mediaService;
+
+    public MediaController(MediaService mediaService) {
+        this.mediaService = mediaService;
+    }
 
     @PostMapping
     public ResponseEntity<MediaResponse> uploadMedia(

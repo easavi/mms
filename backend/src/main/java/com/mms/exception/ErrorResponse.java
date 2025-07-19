@@ -1,9 +1,7 @@
 package com.mms.exception;
 
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-@Getter
 public class ErrorResponse {
     private final int status;
     private final String message;
@@ -13,5 +11,17 @@ public class ErrorResponse {
         this.status = status.value();
         this.message = message;
         this.timestamp = java.time.OffsetDateTime.now().toString();
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
     }
 }

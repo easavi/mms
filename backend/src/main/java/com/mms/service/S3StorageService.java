@@ -1,6 +1,5 @@
 package com.mms.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,6 @@ import java.time.Duration;
 
 @Service
 @ConditionalOnProperty(name = "storage.type", havingValue = "s3")
-@RequiredArgsConstructor
 public class S3StorageService implements StorageService {
 
     @Value("${storage.s3.bucket}")
@@ -26,6 +24,11 @@ public class S3StorageService implements StorageService {
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
+
+    public S3StorageService(S3Client s3Client, S3Presigner s3Presigner) {
+        this.s3Client = s3Client;
+        this.s3Presigner = s3Presigner;
+    }
 
     @Override
     public String store(MultipartFile file, String path) {

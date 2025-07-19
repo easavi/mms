@@ -129,15 +129,5 @@ public class User {
                 ", updatedAt=" + updatedAt +
                 '}';
     }
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = OffsetDateTime.now();
-        updatedAt = createdAt;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = OffsetDateTime.now();
-    }
+    
 }

@@ -17,6 +17,8 @@ public class MediaUploadRequest {
     @NotNull
     private MultipartFile file;
 
+    private String[] tags;
+
     public String getTitle() {
         return title;
     }
@@ -48,6 +50,13 @@ public class MediaUploadRequest {
     public void setFile(MultipartFile file) {
         this.file = file;
     }
-    
-    private String[] tags;
+
+    public String[] getTags() {
+        return tags;
+    }
+
+    public void setTags(String[] tags) {
+        this.tags = tags;
+    }
+        
 }

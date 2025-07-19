@@ -1,0 +1,21 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+def newBuildDir = new File(rootProject.projectDir, "../../build")
+rootProject.buildDir = newBuildDir
+
+subprojects {
+    project.buildDir = new File(newBuildDir, project.name)
+}
+
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

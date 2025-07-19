@@ -1,0 +1,27 @@
+Create the source code for an application where the main objective of the system is to create a multimedia sharing service for images (view, download, upload), videos(view, download, upload) and files (download and upload).
+
+# Frontend (create on folder frontend)
+
+1. Should be a web page, an android app and an ios app using Flutter.
+2. The user must be authenticated by a login screen.
+3. The main screen should show a search text box, filters and view format (with the options grid (default) and list) at top. The order of the itens are always from the latest added file to the older.
+4. The configuration screen will have the synchonize and logout options.
+5. The source code files should be at the folder "frontend".
+
+# Backend (create on folder backend)
+
+1. Should use Spring Boot and MVC components, written on Java 24. 
+2. Should use Postgres database to store metadata from files.
+3. All data will be accessed using rest endpoints.
+4. The endpoints must be authenticated using JWT token.
+5. The source code files should be at the folder "backend".
+
+# Database (create the sql files on folder database)
+
+1. Should use postgres database
+2. create the tables as need by backend defition
+
+# Files storage
+
+1. All the files uploaded will be stored using Minio (https://github.com/minio/minio) or AWS S3 (https://aws.amazon.com/s3/)
+2. The configuration to the minio or s3 bucket should be set on the configuration file of backend.

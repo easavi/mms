@@ -32,12 +32,13 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<void> signup(String username, String password) async {
+  Future<void> signup(String username, String email, String password) async {
     try {
       await _apiService.post(
         ApiConfig.signup,
         data: {
           'username': username,
+          'email': email,
           'password': password,
         },
       );

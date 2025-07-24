@@ -1,12 +1,13 @@
 Create the source code for an application where the main objective of the system is to create a multimedia sharing service for images (view, download, upload), videos(view, download, upload) and files (download and upload).
 
-# Frontend (create on folder frontend)
+# Frontend (create the project on root folder frontend)
 
-1. Should be a web page, an android app and an ios app using Flutter.
-2. The user must be authenticated by a login screen.
+1. Should be a web page, an android app and an ios app using Flutter and Dart.
+2. The user must be authenticated by a login screen, it must have an option to sign up. The informarion needed are username and password.
 3. The main screen should show a search text box, filters and view format (with the options grid (default) and list) at top. The order of the itens are always from the latest added file to the older.
 4. The configuration screen will have the synchonize and logout options.
-5. The source code files should be at the folder "frontend".
+5. The ui must have the dark gray backeground and text and buttons on orange (meaning danger), green lime (meaning confirm action) and cyan(colors) colors. Must be a clean UI.
+6. The application must run from the IDE.
 
 # Backend (create on folder backend)
 

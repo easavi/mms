@@ -4,10 +4,24 @@ Create the source code for an application where the main objective of the system
 
 1. Should be a web page, an android app and an ios app using Flutter and Dart.
 2. The user must be authenticated by a login screen, it must have an option to sign up. The informarion needed are username and password.
-3. The main screen should show a search text box, filters and view format (with the options grid (default) and list) at top. The order of the itens are always from the latest added file to the older.
-4. The configuration screen will have the synchonize and logout options.
-5. The ui must have the dark gray backeground and text and buttons on orange (meaning danger), green lime (meaning confirm action) and cyan(colors) colors. Must be a clean UI.
-6. The application must run from the IDE.
+3. The application must run from the IDE.
+
+# Frontend 2
+1. The application starts with the login screen, when logged successful should take the user to the main screen.
+2. In case user enter in signup screen, after signup, it should take user back to the login screen. 
+3. The main screen should be infinite scroll, always show a floating search text box at the bottom right of screen, a floating filters icon button at bottom right of the screen and a floating configuration icon button at bottom roght of the screen.
+3.1 The screen must be filled with a list of full width itens with the title of the group and a line as separator.
+3.2 Inside these groups should be filled with squares of images in grid format with 3 columns. 
+4. The configuration screen will be a list of storage itens (full width), each item separated by a line. At the bottom with the following floating icon buttons align to the right: logout, synchonize and back.
+5. All the screens must have the dark gray background and text and buttons on orange (meaning danger), green lime (meaning confirm action) and cyan(colors) colors. 
+
+Examples of data for item 3 (based in list of backend\src\main\java\com\mms\dto\MediaResponse.java):
+    - Title: January/2024 (Number of squares equals to 7)
+    - Title: February/2024 (Number of squares equals to 12)
+    - Title: April/2024 (Number of squares equals to 2)
+Examples of data for item 4:
+    - Type: AWS, Name: ABC123, Updated: 30/10/2024, Size: 345 mb, Itens: 23
+    - Type: Server, Name: home,Updated: 29/10/2024, Size: 1345 mb, Itens: 543
 
 # Backend (create on folder backend)
 

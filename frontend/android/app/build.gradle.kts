@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.mms.frontend"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // ndkVersion = flutter.ndkVersion  // Temporarily disabled
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

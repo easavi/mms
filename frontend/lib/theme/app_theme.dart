@@ -6,14 +6,20 @@ class AppTheme {
   static const greenLime = Color(0xFF7CB342);
   static const cyan = Color(0xFF00BCD4);
 
+  // Additional color getters for easier access
+  static Color get backgroundColor => darkGray;
+  static Color get cardColor => Colors.grey[900]!;
+  static Color get dangerColor => orange;
+  static Color get confirmColor => greenLime;
+  static Color get accentColor => cyan;
+
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.dark(
-      background: darkGray,
+      surface: darkGray,
       primary: cyan,
       secondary: greenLime,
       error: orange,
-      surface: darkGray,
       onSurface: Colors.white,
     ),
     scaffoldBackgroundColor: darkGray,

@@ -50,6 +50,24 @@ class ApiService {
     }
   }
 
+  Future<Response> put(String path, {dynamic data, Map<String, dynamic>? queryParameters}) async {
+    try {
+      return await _dio.put(path, data: data, queryParameters: queryParameters);
+    } on DioException catch (e) {
+      _handleError(e);
+      rethrow;
+    }
+  }
+
+  Future<Response> delete(String path, {Map<String, dynamic>? queryParameters}) async {
+    try {
+      return await _dio.delete(path, queryParameters: queryParameters);
+    } on DioException catch (e) {
+      _handleError(e);
+      rethrow;
+    }
+  }
+
   Future<Response> uploadFile(String path, FormData formData) async {
     try {
       return await _dio.post(

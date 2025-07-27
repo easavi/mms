@@ -3,7 +3,7 @@ package com.mms.entity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.time.OffsetDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -16,6 +16,13 @@ public class Tag {
 
     @Column(unique = true, nullable = false)
     private String name;
+
+    public Tag() {
+    }
+
+    public Tag(String name) {
+        this.name = name;
+    }
 
     public UUID getId() {
         return id;
@@ -33,11 +40,25 @@ public class Tag {
         this.name = name;
     }
 
-    @Column(name = "created_at")
-    private OffsetDateTime createdAt;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tag tag = (Tag) o;
+        return Objects.equals(id, tag.id) &&
+               Objects.equals(name, tag.name);
+    }
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = OffsetDateTime.now();
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
+    }
+
+    @Override
+    public String toString() {
+        return "Tag{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

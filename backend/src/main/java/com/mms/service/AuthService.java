@@ -47,14 +47,14 @@ public class AuthService {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(user);
 
         String jwt = tokenProvider.generateToken(
                 org.springframework.security.core.userdetails.User.builder()
                         .username(user.getUsername())
-                        .password(user.getPasswordHash())
+                        .password(user.getPassword())
                         .authorities("ROLE_USER")
                         .build()
         );

@@ -48,7 +48,7 @@ public class MediaService {
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
         String originalFilename = StringUtils.cleanPath(request.getFile().getOriginalFilename());
-        String storageKey = generateStorageKey(user.getId(), originalFilename);
+        String storageKey = generateStorageKey(user.getUsername(), originalFilename);
         
         String storedPath = storageService.store(request.getFile(), storageKey);
         
@@ -110,8 +110,8 @@ public class MediaService {
                 .collect(Collectors.toSet());
     }
 
-    private String generateStorageKey(UUID userId, String filename) {
-        return String.format("%s/%s/%s", userId.toString().substring(0, 2), userId, filename);
+    private String generateStorageKey(String username, String filename) {
+        return String.format("%s/%s/%s", username, "-", filename);
     }
 
     private MediaResponse convertToResponse(MediaItem mediaItem) {

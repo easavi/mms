@@ -1,7 +1,7 @@
 enum MediaType {
   image,
   video,
-  document,
+  file,
 }
 
 extension MediaTypeExtension on MediaType {
@@ -11,12 +11,29 @@ extension MediaTypeExtension on MediaType {
         return 'Image';
       case MediaType.video:
         return 'Video';
-      case MediaType.document:
-        return 'Document';
+      case MediaType.file:
+        return 'File';
     }
+  }
+
+  String get apiValue {
+    return name; // Returns lowercase string (image, video, file)
   }
 
   bool get isImage => this == MediaType.image;
   bool get isVideo => this == MediaType.video;
-  bool get isDocument => this == MediaType.document;
+  bool get isFile => this == MediaType.file;
+
+  static MediaType fromString(String value) {
+    switch (value.toLowerCase()) {
+      case 'image':
+        return MediaType.image;
+      case 'video':
+        return MediaType.video;
+      case 'file':
+        return MediaType.file;
+      default:
+        throw ArgumentError('Unknown MediaType: $value');
+    }
+  }
 }

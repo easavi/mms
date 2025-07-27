@@ -37,7 +37,7 @@ public class UserServiceNew {
         
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
         
         user = userRepository.save(user);
@@ -80,7 +80,7 @@ public class UserServiceNew {
         }
         
         if (request.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         }
         
         user = userRepository.save(user);

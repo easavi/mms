@@ -9,8 +9,8 @@ public class User {
     @Column(length = 50)
     private String username;
 
-    @Column(nullable = false)
-    private String password;
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -18,9 +18,9 @@ public class User {
     public User() {
     }
 
-    public User(String username, String password, String email) {
+    public User(String username, String passwordHash, String email) {
         this.username = username;
-        this.password = password;
+        this.passwordHash = passwordHash;
         this.email = email;
     }
 
@@ -32,12 +32,12 @@ public class User {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public String getEmail() {

@@ -25,6 +25,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                         .password(user.getPasswordHash())
                         .authorities("ROLE_USER")
                         .build())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("Authentication failed"));
     }
 }

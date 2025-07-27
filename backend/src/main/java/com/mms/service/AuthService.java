@@ -63,11 +63,16 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
 
-        String jwt = tokenProvider.generateToken((UserDetails) authentication.getPrincipal());
-        return new AuthResponse(jwt, request.getUsername());
+            String jwt = tokenProvider.generateToken((UserDetails) authentication.getPrincipal());
+            return new AuthResponse(jwt, request.getUsername());
+        } catch (Exception e) {
+            // Generic error message to avoid revealing information about user existence
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
+        }
     }
 }

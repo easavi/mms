@@ -27,6 +27,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+        // TODO: Consider implementing rate limiting to prevent brute force attacks
+        // TODO: Consider adding CAPTCHA after failed attempts
+        // TODO: Consider logging failed login attempts for security monitoring
+        
+        try {
+            AuthResponse response = authService.login(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception ex) {
+            // The GlobalExceptionHandler will catch this and return a generic error message
+            throw ex;
+        }
     }
 }

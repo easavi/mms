@@ -2,6 +2,7 @@ package com.mms.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SecurityException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -46,19 +47,55 @@ public class JwtTokenProvider {
     }
 
     public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (Exception ex) {
+            // Don't expose token parsing errors
+            return null;
+        }
+    }
+
+    public boolean isTokenExpired(String token) {
+        try {
+            Date expiration = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getExpiration();
+            return expiration.before(new Date());
+        } catch (Exception ex) {
+            // If we can't parse the token, consider it expired
+            return true;
+        }
     }
 
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (SecurityException ex) {
+            // Log security exception but don't expose details
+            return false;
+        } catch (MalformedJwtException ex) {
+            // Log malformed token but don't expose details
+            return false;
+        } catch (ExpiredJwtException ex) {
+            // Log expired token but don't expose details
+            return false;
+        } catch (UnsupportedJwtException ex) {
+            // Log unsupported token but don't expose details
+            return false;
+        } catch (IllegalArgumentException ex) {
+            // Log illegal argument but don't expose details
+            return false;
+        } catch (Exception ex) {
+            // Catch any other exception and don't expose details
             return false;
         }
     }

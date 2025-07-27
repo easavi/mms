@@ -1,0 +1,49 @@
+Definitions:
+
+Create schema, tables and other objects needed to be functional on database to store the describe objects.
+Create entities and other classes needed on backend, to provide the data over APIs. 
+
+- Storage
+    - id: string (auto uuid generated at insert, primary key)
+    - type: AWS or Minio
+    - name: string
+    - bucket: string
+    - updated: datetime
+    - size: number
+    - items_quantity: number
+    - username: string 
+
+- Media
+    - id: string (auto uuid generated at insert, primary key)
+    - name: string
+    - media_type: image, video, file
+    - file_name: string
+    - file_url: string
+    - createdAt: datetime (the date from the file properties)
+    - uploadedAt: datetime 
+    - tags: list of Tag 
+    
+- Tag
+    - id: string (auto uuid generated at insert, primary key)
+    - name: string
+
+- User
+    - username: string (primary key)    
+    - password: string 
+    - email: string
+
+APIs:
+
+The apis that must be created and must follow these rules:
+
+- CRUD for all entities described
+- List the media must have: 
+    - filter by createdAt (period with initial and end date) and tags (name)
+    - sort by createdAt date, ascending or descending
+    - grouped by: 
+        - createdAt date (default), where the options are month (default) or day
+        - tag name: no options are provided for choice
+
+First give a list of task of all modifications and wait my permission to start the modifications. 
+Ask me to continue every new task.
+Start modifying the database, backend and the last one the frontend.

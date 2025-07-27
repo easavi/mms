@@ -1,7 +1,6 @@
 package com.mms.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -10,8 +9,7 @@ import java.util.*;
 @Table(name = "media")
 public class Media {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false)

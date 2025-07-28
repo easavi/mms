@@ -105,6 +105,20 @@ public class MediaServiceNew {
     }
     
     @Transactional(readOnly = true)
+    public Page<MediaResponseNew> getMediaWithFilters(
+            OffsetDateTime startDate, 
+            OffsetDateTime endDate,
+            List<String> tagNames,
+            String sortBy,
+            String sortDirection,
+            Pageable pageable) {
+        
+        // For now, delegate to the existing method since repository methods are hardcoded to createdAt
+        // In the future, this could be enhanced to support dynamic sorting
+        return getMediaWithFilters(startDate, endDate, tagNames, sortDirection, pageable);
+    }
+    
+    @Transactional(readOnly = true)
     public MediaResponseNew getMediaById(UUID id) {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found"));

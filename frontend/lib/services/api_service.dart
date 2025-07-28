@@ -16,16 +16,17 @@ class ApiService {
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         // Add JWT token to requests if available
-        final token = await _storage.read(key: 'token');
-        if (token != null) {
+        final token = await _storage.read(key: 'auth_token');
+        if (token != null && token.isNotEmpty) {
           options.headers['Authorization'] = 'Bearer $token';
         }
         return handler.next(options);
       },
-      onError: (DioException error, handler) {
+      onError: (DioException error, handler) async {
         if (error.response?.statusCode == 401) {
-          // Handle unauthorized access
-          // You might want to logout the user or refresh the token
+          // Handle unauthorized access - clear stored token
+          await _storage.delete(key: 'auth_token');
+          await _storage.delete(key: 'username');
         }
         return handler.next(error);
       },

@@ -4,6 +4,7 @@ export 'storage.dart';
 export 'media.dart';
 export 'tag.dart';
 export 'user.dart';
+export 'media_filters.dart';
 
 // DTOs
 export 'dtos/media_dto.dart';

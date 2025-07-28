@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/config/api_config.dart';
 import 'package:provider/provider.dart';
-import 'package:frontend/services/auth_service.dart';
-import 'package:frontend/screens/auth/login_screen.dart';
-import 'package:frontend/screens/main/main_screen.dart';
-import 'package:frontend/theme/app_theme.dart';
-import 'package:frontend/config/environment.dart';
+import 'config/api_config.dart';
+import 'config/environment.dart';
+import 'providers/auth_provider.dart';
+import 'providers/media_provider.dart';
+import 'screens/login_screen.dart';
+import 'screens/signup_screen.dart';
+import 'screens/main_screen.dart';
+import 'screens/configuration_screen.dart';
+import 'theme/app_theme.dart';
 
 void main() {
-  
   setupEnvironment(env: Environment.dev);
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => MediaProvider()),
       ],
       child: const MyApp(),
     ),
@@ -29,20 +32,22 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Multimedia Sharing',
       theme: AppTheme.darkTheme,
-      home: Consumer<AuthService>(
-        builder: (context, authService, child) {
-          // Check auth status on first build
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            authService.checkAuthStatus();
-          });
-          
-          if (authService.isAuthenticated) {
-            return const MainScreen();
-          } else {
-            return const LoginScreen();
-          }
-        },
-      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => Consumer<AuthProvider>(
+          builder: (context, authProvider, child) {
+            if (authProvider.isAuthenticated) {
+              return const MainScreen();
+            } else {
+              return const LoginScreen();
+            }
+          },
+        ),
+        '/login': (context) => const LoginScreen(),
+        '/signup': (context) => const SignupScreen(),
+        '/main': (context) => const MainScreen(),
+        '/config': (context) => const ConfigurationScreen(),
+      },
       debugShowCheckedModeBanner: false,
     );
   }

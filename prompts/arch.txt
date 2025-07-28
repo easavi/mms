@@ -47,3 +47,7 @@ The apis that must be created and must follow these rules:
 First give a list of task of all modifications and wait my permission to start the modifications. 
 Ask me to continue every new task.
 Start modifying the database, backend and the last one the frontend.
+
+Adapt the frontend to work with the APIs on backend.
+After the login screen it must be redirected to the main screen, where all the media will be view.
+The configuration screen must list the storage items.

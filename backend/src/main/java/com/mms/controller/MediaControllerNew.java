@@ -109,13 +109,14 @@ public class MediaControllerNew {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate,
             @RequestParam(required = false) List<String> tagNames,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         
         Pageable pageable = PageRequest.of(page, size);
         Page<MediaResponseNew> media = mediaService.getMediaWithFilters(
-                startDate, endDate, tagNames, sortDirection, pageable);
+                startDate, endDate, tagNames, sortBy, sortDirection, pageable);
         return ResponseEntity.ok(media);
     }
     

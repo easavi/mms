@@ -13,9 +13,9 @@ class ApiConfig {
   static String get baseUrl {
     switch (_environment) {
       case Environment.dev:
-        return 'http://localhost:8080/api';
+        return 'http://localhost:8080';
       case Environment.prod:
-        return 'https://your-production-domain.com/api'; // Replace with your production API domain
+        return 'https://your-production-domain.com'; // Replace with your production API domain
     }
   }
   
@@ -24,42 +24,42 @@ class ApiConfig {
   static const String signup = '/auth/signup';
   
   // Media endpoints
-  static const String media = '/media';
-  static const String mediaById = '/media/'; // Append ID when using
-  static const String mediaFilter = '/media/filter';
-  static const String mediaFilterPaged = '/media/filter/paged';
-  static const String mediaGrouped = '/media/grouped';
-  static const String mediaGroupedPaged = '/media/grouped/paged';
-  static const String mediaByTags = '/media/by-tags';
-  static const String mediaByTagsPaged = '/media/by-tags/paged';
-  static const String mediaSearch = '/media/search';
-  static const String mediaSearchPaged = '/media/search/paged';
-  static const String mediaStats = '/media/stats';
-  static const String mediaUpload = '/media/upload';
+  static const String media = '/api/media';
+  static const String mediaById = '/api/media/'; // Append ID when using
+  static const String mediaFilter = '/api/media/filter';
+  static const String mediaFilterPaged = '/api/media/filter/paged';
+  static const String mediaGrouped = '/api/media/grouped';
+  static const String mediaGroupedPaged = '/api/media/grouped/paged';
+  static const String mediaByTags = '/api/media/by-tags';
+  static const String mediaByTagsPaged = '/api/media/by-tags/paged';
+  static const String mediaSearch = '/api/media/search';
+  static const String mediaSearchPaged = '/api/media/search/paged';
+  static const String mediaStats = '/api/media/stats';
+  static const String mediaUpload = '/api/media/upload';
 
   // Storage endpoints
-  static const String storage = '/storage';
-  static const String storageById = '/storage/'; // Append ID when using
-  static const String storageTest = '/storage/test/'; // Append ID when using
+  static const String storage = '/api/storage';
+  static const String storageById = '/api/storage/'; // Append ID when using
+  static const String storageTest = '/api/storage/test/'; // Append ID when using
 
   // Tag endpoints
-  static const String tags = '/tags';
-  static const String tagById = '/tags/'; // Append ID when using
-  static const String tagByName = '/tags/name/'; // Append name when using
+  static const String tags = '/api/tags';
+  static const String tagById = '/api/tags/'; // Append ID when using
+  static const String tagByName = '/api/tags/name/'; // Append name when using
 
   // User endpoints
-  static const String users = '/users';
-  static const String userById = '/users/'; // Append ID when using
-  static const String userByEmail = '/users/email/'; // Append email when using
+  static const String users = '/api/users';
+  static const String userById = '/api/users/'; // Append ID when using
+  static const String userByEmail = '/api/users/email/'; // Append email when using
 
   // System endpoints
-  static const String validation = '/validation';
-  static const String validationHealth = '/validation/health';
-  static const String validationFeatures = '/validation/features';
-  static const String demo = '/demo';
-  static const String demoCreate = '/demo/create';
-  static const String demoClear = '/demo/clear';
-  static const String apiInfo = '/info';
+  static const String validation = '/api/validation';
+  static const String validationHealth = '/api/validation/health';
+  static const String validationFeatures = '/api/validation/features';
+  static const String demo = '/api/demo';
+  static const String demoCreate = '/api/demo/create';
+  static const String demoClear = '/api/demo/clear';
+  static const String apiInfo = '/api/info';
 
   static String getFullUrl(String endpoint) {
     return baseUrl + endpoint;

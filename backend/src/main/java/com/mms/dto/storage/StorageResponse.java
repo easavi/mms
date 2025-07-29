@@ -7,13 +7,15 @@ public class StorageResponse {
     private String name;
     private String bucket;
     private String updated;
+    private Long size;
+    private Integer itemsQuantity;
     private String username;
     
     public StorageResponse() {
     }
     
     public StorageResponse(String id, String type, String name, String bucket, 
-                          String updated, String username) {
+                          String updated, Long size, Integer itemsQuantity, String username) {
         this.id = id;
         this.type = type;
         this.name = name;
@@ -68,5 +70,21 @@ public class StorageResponse {
     
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
+
+    public Integer getItemsQuantity() {
+        return itemsQuantity;
+    }
+
+    public void setItemsQuantity(Integer itemsQuantity) {
+        this.itemsQuantity = itemsQuantity;
     }
 }

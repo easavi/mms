@@ -12,37 +12,7 @@ class ConfigurationScreen extends StatefulWidget {
 }
 
 class _ConfigurationScreenState extends State<ConfigurationScreen> {
-  // Mock storage data matching the examples from requirements
-  final List<StorageItem> _storageItems = [
-    StorageItem(
-      type: 'AWS',
-      name: 'ABC123',
-      updated: '30/10/2024',
-      size: '345 mb',
-      items: 23,
-    ),
-    StorageItem(
-      type: 'Server',
-      name: 'home',
-      updated: '29/10/2024',
-      size: '1345 mb',
-      items: 543,
-    ),
-    StorageItem(
-      type: 'Minio',
-      name: 'local-storage',
-      updated: '28/10/2024',
-      size: '2456 mb',
-      items: 127,
-    ),
-    StorageItem(
-      type: 'AWS',
-      name: 'backup-bucket',
-      updated: '27/10/2024',
-      size: '892 mb',
-      items: 98,
-    ),
-  ];
+  final List<StorageItem> _storageItems = [];
 
   void _logout() async {
     try {

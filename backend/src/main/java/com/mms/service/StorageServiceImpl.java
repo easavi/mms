@@ -105,6 +105,8 @@ public class StorageServiceImpl {
         response.setBucket(storage.getBucket());
         response.setUpdated(storage.getUpdated().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         response.setUsername(storage.getUsername());
+        response.setSize(0L);
+        response.setItemsQuantity(0);
         return response;
     }
 }

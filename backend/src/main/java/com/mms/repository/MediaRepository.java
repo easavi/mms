@@ -1,16 +1,16 @@
 package com.mms.repository;
 
-import com.mms.entity.Media;
-import com.mms.entity.MediaType;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
+import com.mms.entity.Media;
 
 public interface MediaRepository extends JpaRepository<Media, UUID> {
     
@@ -20,9 +20,9 @@ public interface MediaRepository extends JpaRepository<Media, UUID> {
     Page<Media> findAllByOrderByCreatedAtAsc(Pageable pageable);
     
     // Filter by media type
-    Page<Media> findByMediaTypeOrderByCreatedAtDesc(MediaType mediaType, Pageable pageable);
+    Page<Media> findByMediaTypeOrderByCreatedAtDesc(String mediaType, Pageable pageable);
     
-    Page<Media> findByMediaTypeOrderByCreatedAtAsc(MediaType mediaType, Pageable pageable);
+    Page<Media> findByMediaTypeOrderByCreatedAtAsc(String mediaType, Pageable pageable);
     
     // Filter by date range
     @Query("SELECT m FROM Media m WHERE m.createdAt BETWEEN :startDate AND :endDate ORDER BY m.createdAt DESC")

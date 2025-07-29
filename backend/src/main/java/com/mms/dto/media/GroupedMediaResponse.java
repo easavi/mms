@@ -7,7 +7,7 @@ public class GroupedMediaResponse {
     private String groupKey;
     private String groupType; // "month", "day", "tag"
     private Long count;
-    private List<MediaResponseNew> items;
+    private List<MediaResponse> items;
     
     public GroupedMediaResponse() {
     }
@@ -18,7 +18,7 @@ public class GroupedMediaResponse {
         this.count = count;
     }
     
-    public GroupedMediaResponse(String groupKey, String groupType, Long count, List<MediaResponseNew> items) {
+    public GroupedMediaResponse(String groupKey, String groupType, Long count, List<MediaResponse> items) {
         this.groupKey = groupKey;
         this.groupType = groupType;
         this.count = count;
@@ -49,11 +49,11 @@ public class GroupedMediaResponse {
         this.count = count;
     }
     
-    public List<MediaResponseNew> getItems() {
+    public List<MediaResponse> getItems() {
         return items;
     }
     
-    public void setItems(List<MediaResponseNew> items) {
+    public void setItems(List<MediaResponse> items) {
         this.items = items;
     }
 }

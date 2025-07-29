@@ -2,10 +2,10 @@ package com.mms.controller;
 
 import com.mms.dto.media.MediaCreateRequest;
 import com.mms.dto.media.MediaFilterRequest;
-import com.mms.dto.media.MediaResponseNew;
+import com.mms.dto.media.MediaResponse;
 import com.mms.dto.media.MediaUpdateRequest;
 import com.mms.dto.media.GroupedMediaResponse;
-import com.mms.service.MediaServiceNew;
+import com.mms.service.MediaService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,50 +23,50 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/media")
-public class MediaControllerNew {
+public class MediaController {
     
-    private final MediaServiceNew mediaService;
+    private final MediaService mediaService;
     
-    public MediaControllerNew(MediaServiceNew mediaService) {
+    public MediaController(MediaService mediaService) {
         this.mediaService = mediaService;
     }
     
     @PostMapping
-    public ResponseEntity<MediaResponseNew> createMedia(@Valid @RequestBody MediaCreateRequest request) {
-        MediaResponseNew response = mediaService.createMedia(request);
+    public ResponseEntity<MediaResponse> createMedia(@Valid @RequestBody MediaCreateRequest request) {
+        MediaResponse response = mediaService.createMedia(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
     
     @GetMapping
-    public ResponseEntity<Page<MediaResponseNew>> getMedia(
+    public ResponseEntity<Page<MediaResponse>> getMedia(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate,
             @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "desc") String sort,
             @PageableDefault(size = 20) Pageable pageable) {
         
-        Page<MediaResponseNew> media = mediaService.getMediaWithFilters(
+        Page<MediaResponse> media = mediaService.getMediaWithFilters(
                 startDate, endDate, tags, sort, pageable);
         return ResponseEntity.ok(media);
     }
     
     @GetMapping("/all")
-    public ResponseEntity<List<MediaResponseNew>> getAllMedia() {
-        List<MediaResponseNew> media = mediaService.getAllMedia();
+    public ResponseEntity<List<MediaResponse>> getAllMedia() {
+        List<MediaResponse> media = mediaService.getAllMedia();
         return ResponseEntity.ok(media);
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<MediaResponseNew> getMediaById(@PathVariable UUID id) {
-        MediaResponseNew media = mediaService.getMediaById(id);
+    public ResponseEntity<MediaResponse> getMediaById(@PathVariable UUID id) {
+        MediaResponse media = mediaService.getMediaById(id);
         return ResponseEntity.ok(media);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<MediaResponseNew> updateMedia(
+    public ResponseEntity<MediaResponse> updateMedia(
             @PathVariable UUID id,
             @Valid @RequestBody MediaUpdateRequest request) {
-        MediaResponseNew response = mediaService.updateMedia(id, request);
+        MediaResponse response = mediaService.updateMedia(id, request);
         return ResponseEntity.ok(response);
     }
     
@@ -77,10 +77,10 @@ public class MediaControllerNew {
     }
     
     @GetMapping("/search")
-    public ResponseEntity<Page<MediaResponseNew>> searchMedia(
+    public ResponseEntity<Page<MediaResponse>> searchMedia(
             @RequestParam String query,
             @PageableDefault(size = 20) Pageable pageable) {
-        Page<MediaResponseNew> media = mediaService.searchMedia(query, pageable);
+        Page<MediaResponse> media = mediaService.searchMedia(query, pageable);
         return ResponseEntity.ok(media);
     }
     
@@ -105,7 +105,7 @@ public class MediaControllerNew {
     
     // Advanced filtering endpoint that combines all options
     @GetMapping("/filter")
-    public ResponseEntity<Page<MediaResponseNew>> getFilteredMedia(
+    public ResponseEntity<Page<MediaResponse>> getFilteredMedia(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate,
             @RequestParam(required = false) List<String> tagNames,
@@ -115,7 +115,7 @@ public class MediaControllerNew {
             @RequestParam(defaultValue = "20") int size) {
         
         Pageable pageable = PageRequest.of(page, size);
-        Page<MediaResponseNew> media = mediaService.getMediaWithFilters(
+        Page<MediaResponse> media = mediaService.getMediaWithFilters(
                 startDate, endDate, tagNames, sortBy, sortDirection, pageable);
         return ResponseEntity.ok(media);
     }
@@ -141,11 +141,11 @@ public class MediaControllerNew {
     
     // Advanced filter endpoint with request body
     @PostMapping("/filter")
-    public ResponseEntity<Page<MediaResponseNew>> getFilteredMediaAdvanced(
+    public ResponseEntity<Page<MediaResponse>> getFilteredMediaAdvanced(
             @Valid @RequestBody MediaFilterRequest filterRequest,
             @PageableDefault(size = 20) Pageable pageable) {
         
-        Page<MediaResponseNew> media = mediaService.getMediaWithAdvancedFilter(filterRequest, pageable);
+        Page<MediaResponse> media = mediaService.getMediaWithAdvancedFilter(filterRequest, pageable);
         return ResponseEntity.ok(media);
     }
     

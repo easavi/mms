@@ -1,13 +1,12 @@
 package com.mms.dto.storage;
 
-import com.mms.entity.StorageType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class StorageCreateRequest {
     
     @NotNull(message = "Type is required")
-    private StorageType type;
+    private String type;
     
     @NotBlank(message = "Name is required")
     private String name;
@@ -21,18 +20,18 @@ public class StorageCreateRequest {
     public StorageCreateRequest() {
     }
     
-    public StorageCreateRequest(StorageType type, String name, String bucket, String username) {
+    public StorageCreateRequest(String type, String name, String bucket, String username) {
         this.type = type;
         this.name = name;
         this.bucket = bucket;
         this.username = username;
     }
     
-    public StorageType getType() {
+    public String getType() {
         return type;
     }
     
-    public void setType(StorageType type) {
+    public void setType(String type) {
         this.type = type;
     }
     

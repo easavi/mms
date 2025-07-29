@@ -1,21 +1,20 @@
 package com.mms.service;
 
-import com.mms.dto.storage.StorageCreateRequest;
-import com.mms.dto.storage.StorageResponse;
-import com.mms.dto.storage.StorageUpdateRequest;
-import com.mms.entity.Storage;
-import com.mms.entity.StorageType;
-import com.mms.exception.ApiException;
-import com.mms.repository.StorageRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.mms.dto.storage.StorageCreateRequest;
+import com.mms.dto.storage.StorageResponse;
+import com.mms.dto.storage.StorageUpdateRequest;
+import com.mms.entity.Storage;
+import com.mms.exception.ApiException;
+import com.mms.repository.StorageRepository;
 
 @Service
 public class StorageServiceImpl {
@@ -38,8 +37,6 @@ public class StorageServiceImpl {
         storage.setName(request.getName());
         storage.setBucket(request.getBucket());
         storage.setUsername(request.getUsername());
-        storage.setSize(0L);
-        storage.setItemsQuantity(0);
         
         storage = storageRepository.save(storage);
         return convertToResponse(storage);
@@ -62,7 +59,7 @@ public class StorageServiceImpl {
     }
     
     @Transactional(readOnly = true)
-    public List<StorageResponse> getStoragesByType(StorageType type) {
+    public List<StorageResponse> getStoragesByType(String type) {
         return storageRepository.findByType(type)
                 .stream()
                 .map(this::convertToResponse)
@@ -87,12 +84,6 @@ public class StorageServiceImpl {
         if (request.getBucket() != null) {
             storage.setBucket(request.getBucket());
         }
-        if (request.getSize() != null) {
-            storage.setSize(request.getSize());
-        }
-        if (request.getItemsQuantity() != null) {
-            storage.setItemsQuantity(request.getItemsQuantity());
-        }
         
         storage = storageRepository.save(storage);
         return convertToResponse(storage);
@@ -104,17 +95,7 @@ public class StorageServiceImpl {
             throw new ApiException(HttpStatus.NOT_FOUND, "Storage not found");
         }
         storageRepository.deleteById(id);
-    }
-    
-    @Transactional(readOnly = true)
-    public Long getTotalSizeByUsername(String username) {
-        return storageRepository.getTotalSizeByUsername(username);
-    }
-    
-    @Transactional(readOnly = true)
-    public Long getTotalItemsQuantityByUsername(String username) {
-        return storageRepository.getTotalItemsQuantityByUsername(username);
-    }
+    }    
     
     private StorageResponse convertToResponse(Storage storage) {
         StorageResponse response = new StorageResponse();
@@ -123,8 +104,6 @@ public class StorageServiceImpl {
         response.setName(storage.getName());
         response.setBucket(storage.getBucket());
         response.setUpdated(storage.getUpdated().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        response.setSize(storage.getSize());
-        response.setItemsQuantity(storage.getItemsQuantity());
         response.setUsername(storage.getUsername());
         return response;
     }

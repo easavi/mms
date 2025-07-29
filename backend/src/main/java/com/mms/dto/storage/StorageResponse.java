@@ -1,30 +1,24 @@
 package com.mms.dto.storage;
 
-import com.mms.entity.StorageType;
-
 public class StorageResponse {
     
     private String id;
-    private StorageType type;
+    private String type;
     private String name;
     private String bucket;
     private String updated;
-    private Long size;
-    private Integer itemsQuantity;
     private String username;
     
     public StorageResponse() {
     }
     
-    public StorageResponse(String id, StorageType type, String name, String bucket, 
-                          String updated, Long size, Integer itemsQuantity, String username) {
+    public StorageResponse(String id, String type, String name, String bucket, 
+                          String updated, String username) {
         this.id = id;
         this.type = type;
         this.name = name;
         this.bucket = bucket;
         this.updated = updated;
-        this.size = size;
-        this.itemsQuantity = itemsQuantity;
         this.username = username;
     }
     
@@ -36,11 +30,11 @@ public class StorageResponse {
         this.id = id;
     }
     
-    public StorageType getType() {
+    public String getType() {
         return type;
     }
     
-    public void setType(StorageType type) {
+    public void setType(String type) {
         this.type = type;
     }
     
@@ -66,22 +60,6 @@ public class StorageResponse {
     
     public void setUpdated(String updated) {
         this.updated = updated;
-    }
-    
-    public Long getSize() {
-        return size;
-    }
-    
-    public void setSize(Long size) {
-        this.size = size;
-    }
-    
-    public Integer getItemsQuantity() {
-        return itemsQuantity;
-    }
-    
-    public void setItemsQuantity(Integer itemsQuantity) {
-        this.itemsQuantity = itemsQuantity;
     }
     
     public String getUsername() {

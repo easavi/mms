@@ -1,13 +1,11 @@
 package com.mms.dto.media;
 
-import com.mms.entity.MediaType;
-
 import java.time.OffsetDateTime;
 
 public class MediaUpdateRequest {
     
     private String name;
-    private MediaType mediaType;
+    private String mediaType;
     private String fileName;
     private String fileUrl;
     private OffsetDateTime createdAt;
@@ -16,7 +14,7 @@ public class MediaUpdateRequest {
     public MediaUpdateRequest() {
     }
     
-    public MediaUpdateRequest(String name, MediaType mediaType, String fileName, 
+    public MediaUpdateRequest(String name, String mediaType, String fileName, 
                              String fileUrl, OffsetDateTime createdAt, String[] tagNames) {
         this.name = name;
         this.mediaType = mediaType;
@@ -34,11 +32,11 @@ public class MediaUpdateRequest {
         this.name = name;
     }
     
-    public MediaType getMediaType() {
+    public String getMediaType() {
         return mediaType;
     }
     
-    public void setMediaType(MediaType mediaType) {
+    public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }
     

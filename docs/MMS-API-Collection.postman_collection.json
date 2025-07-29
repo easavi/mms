@@ -1,0 +1,1102 @@
+{
+	"info": {
+		"_postman_id": "2b4d5e1a-8c9f-4a2e-b8d1-3f7e6c9a8b5c",
+		"name": "MMS API Collection",
+		"description": "Complete API collection for Multimedia Sharing Service (MMS) Backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12345678"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Signup",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"newuser\",\n    \"email\": \"newuser@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/signup",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "signup"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by Username",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{username}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "{{username}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by Email",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/by-email?email={{email}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "by-email"],
+							"query": [
+								{
+									"key": "email",
+									"value": "{{email}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"updated@example.com\",\n    \"password\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{username}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "{{username}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{username}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "{{username}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check User Exists",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{username}}/exists",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "{{username}}", "exists"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Email Exists",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/email-exists?email={{email}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "email-exists"],
+							"query": [
+								{
+									"key": "email",
+									"value": "{{email}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Storage",
+			"item": [
+				{
+					"name": "Create Storage",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"AWS\",\n    \"name\": \"My Storage\",\n    \"bucket\": \"my-bucket\",\n    \"username\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/storage",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "storage"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Storage",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "storage"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Storage by User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/user/{{username}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "storage", "user", "{{username}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Storage by Type",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/type/{{storageType}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "storage", "type", "{{storageType}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Storage by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/{{storageId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "storage", "{{storageId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Storage",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Storage Name\",\n    \"bucket\": \"updated-bucket\",\n    \"size\": 1000000,\n    \"itemsQuantity\": 50\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/{{storageId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "storage", "{{storageId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Storage",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/{{storageId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "storage", "{{storageId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Total Storage Size",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/user/{{username}}/total-size",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "storage", "user", "{{username}}", "total-size"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Total Items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/user/{{username}}/total-items",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "storage", "user", "{{username}}", "total-items"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Media",
+			"item": [
+				{
+					"name": "Create Media",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Sample Image\",\n    \"mediaType\": \"image\",\n    \"fileName\": \"sample.jpg\",\n    \"fileUrl\": \"https://example.com/sample.jpg\",\n    \"createdAt\": \"2025-07-28T10:00:00Z\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/media",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Media with Pagination",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media?page=0&size=10&sortBy=createdAt&sortDirection=desc",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortDirection",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Media",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/all",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "all"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Media by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/{{mediaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "{{mediaId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Media",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Media Name\",\n    \"mediaType\": \"image\",\n    \"fileName\": \"updated.jpg\",\n    \"fileUrl\": \"https://example.com/updated.jpg\",\n    \"createdAt\": \"2025-07-28T10:00:00Z\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/media/{{mediaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "{{mediaId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Media",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/{{mediaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "{{mediaId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Media",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/search?q={{searchTerm}}&page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{searchTerm}}"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Media Grouped by Month",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/grouped/month",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "grouped", "month"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Media Grouped by Day",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/grouped/day",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "grouped", "day"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Media Grouped by Tag",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/grouped/tag",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "grouped", "tag"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter Media (GET)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/filter?sortBy=createdAt&sortDirection=desc&startDate=2025-01-01&endDate=2025-12-31&mediaTypes=image,video&tags=vacation,family",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "filter"],
+							"query": [
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortDirection",
+									"value": "desc"
+								},
+								{
+									"key": "startDate",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-12-31"
+								},
+								{
+									"key": "mediaTypes",
+									"value": "image,video"
+								},
+								{
+									"key": "tags",
+									"value": "vacation,family"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Enhanced Grouped Media by Month",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/grouped/enhanced/month",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "grouped", "enhanced", "month"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Enhanced Grouped Media by Day",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/grouped/enhanced/day",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "grouped", "enhanced", "day"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Enhanced Grouped Media by Tag",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/grouped/enhanced/tag",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "grouped", "enhanced", "tag"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter Media (POST)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sortBy\": \"createdAt\",\n    \"sortDirection\": \"desc\",\n    \"startDate\": \"2025-01-01\",\n    \"endDate\": \"2025-12-31\",\n    \"mediaTypes\": [\"image\", \"video\"],\n    \"tags\": [\"vacation\", \"family\"],\n    \"page\": 0,\n    \"size\": 10\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/media/filter",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "filter"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Media Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/statistics",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "statistics"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validate Filter",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/validate-filter?sortBy=createdAt&sortDirection=desc",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "validate-filter"],
+							"query": [
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortDirection",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tags",
+			"item": [
+				{
+					"name": "Create Tag",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"vacation\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tags",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tags"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Tags",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tags",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tags"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tag Names",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tags/names",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tags", "names"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tag by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tags/{{tagId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tags", "{{tagId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Tags",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tags/search?q={{searchTerm}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tags", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{searchTerm}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Tag",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"updated-tag-name\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tags/{{tagId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tags", "{{tagId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tag",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tags/{{tagId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tags", "{{tagId}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Demo",
+			"item": [
+				{
+					"name": "Create Demo Data",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/demo/create",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "demo", "create"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Demo Data",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/demo/clear",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "demo", "clear"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Demo Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/demo/info",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "demo", "info"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "username",
+			"value": "admin",
+			"type": "string"
+		},
+		{
+			"key": "email",
+			"value": "admin@example.com",
+			"type": "string"
+		},
+		{
+			"key": "storageId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "storageType",
+			"value": "AWS",
+			"type": "string"
+		},
+		{
+			"key": "mediaId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "tagId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "searchTerm",
+			"value": "test",
+			"type": "string"
+		}
+	]
+}

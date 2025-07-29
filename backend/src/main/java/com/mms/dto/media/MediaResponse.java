@@ -1,138 +1,92 @@
 package com.mms.dto.media;
 
-import com.mms.entity.MediaType;
-import java.util.Arrays;
-
 public class MediaResponse {
+    
     private String id;
-    private String title;
-    private String description;
-    private MediaType mediaType;
-    private String url;
-    private String[] tags;
+    private String name;
+    private String mediaType;
+    private String fileName;
+    private String fileUrl;
     private String createdAt;
-    private String username;
-
+    private String uploadedAt;
+    private String[] tags;
+    
     public MediaResponse() {
     }
-
-    public MediaResponse(String id, String title, String description, MediaType mediaType, 
-                        String url, String[] tags, String createdAt, String username) {
+    
+    public MediaResponse(String id, String name, String mediaType, String fileName, 
+                           String fileUrl, String createdAt, String uploadedAt, String[] tags) {
         this.id = id;
-        this.title = title;
-        this.description = description;
+        this.name = name;
         this.mediaType = mediaType;
-        this.url = url;
-        this.tags = tags != null ? tags.clone() : null;
+        this.fileName = fileName;
+        this.fileUrl = fileUrl;
         this.createdAt = createdAt;
-        this.username = username;
+        this.uploadedAt = uploadedAt;
+        this.tags = tags != null ? tags.clone() : null;
     }
-
+    
     public String getId() {
         return id;
     }
-
+    
     public void setId(String id) {
         this.id = id;
     }
-
-    public String getTitle() {
-        return title;
+    
+    public String getName() {
+        return name;
     }
-
-    public void setTitle(String title) {
-        this.title = title;
+    
+    public void setName(String name) {
+        this.name = name;
     }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public MediaType getMediaType() {
+    
+    public String getMediaType() {
         return mediaType;
     }
-
-    public void setMediaType(MediaType mediaType) {
+    
+    public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }
-
-    public String getUrl() {
-        return url;
+    
+    public String getFileName() {
+        return fileName;
     }
-
-    public void setUrl(String url) {
-        this.url = url;
+    
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
-
-    public String[] getTags() {
-        return tags != null ? tags.clone() : null;
+    
+    public String getFileUrl() {
+        return fileUrl;
     }
-
-    public void setTags(String[] tags) {
-        this.tags = tags != null ? tags.clone() : null;
+    
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
-
+    
     public String getCreatedAt() {
         return createdAt;
     }
-
+    
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
-
-    public String getUsername() {
-        return username;
+    
+    public String getUploadedAt() {
+        return uploadedAt;
     }
-
-    public void setUsername(String username) {
-        this.username = username;
+    
+    public void setUploadedAt(String uploadedAt) {
+        this.uploadedAt = uploadedAt;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        MediaResponse that = (MediaResponse) o;
-
-        if (!id.equals(that.id)) return false;
-        if (!title.equals(that.title)) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (mediaType != that.mediaType) return false;
-        if (!url.equals(that.url)) return false;
-        if (!Arrays.equals(tags, that.tags)) return false;
-        if (!createdAt.equals(that.createdAt)) return false;
-        return username.equals(that.username);
+    
+    public String[] getTags() {
+        return tags != null ? tags.clone() : null;
     }
-
-    @Override
-    public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + title.hashCode();
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + mediaType.hashCode();
-        result = 31 * result + url.hashCode();
-        result = 31 * result + Arrays.hashCode(tags);
-        result = 31 * result + createdAt.hashCode();
-        result = 31 * result + username.hashCode();
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "MediaResponse{" +
-                "id='" + id + '\'' +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", mediaType=" + mediaType +
-                ", url='" + url + '\'' +
-                ", tags=" + Arrays.toString(tags) +
-                ", createdAt='" + createdAt + '\'' +
-                ", username='" + username + '\'' +
-                '}';
+    
+    public void setTags(String[] tags) {
+        this.tags = tags != null ? tags.clone() : null;
     }
 }

@@ -1,12 +1,10 @@
 package com.mms.dto;
 
-import com.mms.entity.MediaType;
-
 public class MediaResponse {
     private String id;
     private String title;
     private String description;
-    private MediaType mediaType;
+    private String mediaType;
     private String url;
     private String[] tags;
     private String createdAt;
@@ -36,11 +34,11 @@ public class MediaResponse {
         this.description = description;
     }
 
-    public MediaType getMediaType() {
+    public String getMediaType() {
         return mediaType;
     }
 
-    public void setMediaType(MediaType mediaType) {
+    public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }
 

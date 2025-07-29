@@ -1,10 +1,11 @@
 package com.mms.dto.media;
 
-import com.mms.entity.MediaType;
+import java.util.Arrays;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.web.multipart.MultipartFile;
-import java.util.Arrays;
 
 public class MediaUploadRequest {
     @NotBlank
@@ -13,7 +14,7 @@ public class MediaUploadRequest {
     private String description;
     
     @NotNull
-    private MediaType mediaType;
+    private String mediaType;
     
     @NotNull
     private MultipartFile file;
@@ -23,7 +24,7 @@ public class MediaUploadRequest {
     public MediaUploadRequest() {
     }
 
-    public MediaUploadRequest(String title, String description, MediaType mediaType, MultipartFile file, String[] tags) {
+    public MediaUploadRequest(String title, String description, String mediaType, MultipartFile file, String[] tags) {
         this.title = title;
         this.description = description;
         this.mediaType = mediaType;
@@ -47,11 +48,11 @@ public class MediaUploadRequest {
         this.description = description;
     }
 
-    public MediaType getMediaType() {
+    public String getMediaType() {
         return mediaType;
     }
 
-    public void setMediaType(MediaType mediaType) {
+    public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }
 

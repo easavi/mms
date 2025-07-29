@@ -13,9 +13,8 @@ public class Storage {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StorageType type;
+    private String type;
 
     @Column(nullable = false)
     private String name;
@@ -27,18 +26,12 @@ public class Storage {
     private OffsetDateTime updated;
 
     @Column(nullable = false)
-    private Long size = 0L;
-
-    @Column(name = "items_quantity", nullable = false)
-    private Integer itemsQuantity = 0;
-
-    @Column(nullable = false)
     private String username;
 
     public Storage() {
     }
 
-    public Storage(StorageType type, String name, String bucket, String username) {
+    public Storage(String type, String name, String bucket, String username) {
         this.type = type;
         this.name = name;
         this.bucket = bucket;
@@ -53,11 +46,11 @@ public class Storage {
         this.id = id;
     }
 
-    public StorageType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(StorageType type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -85,22 +78,6 @@ public class Storage {
         this.updated = updated;
     }
 
-    public Long getSize() {
-        return size;
-    }
-
-    public void setSize(Long size) {
-        this.size = size;
-    }
-
-    public Integer getItemsQuantity() {
-        return itemsQuantity;
-    }
-
-    public void setItemsQuantity(Integer itemsQuantity) {
-        this.itemsQuantity = itemsQuantity;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -126,7 +103,7 @@ public class Storage {
         Storage storage = (Storage) o;
         return Objects.equals(id, storage.id) &&
                Objects.equals(name, storage.name) &&
-               type == storage.type &&
+               Objects.equals(type, storage.type) &&
                Objects.equals(username, storage.username);
     }
 
@@ -139,12 +116,10 @@ public class Storage {
     public String toString() {
         return "Storage{" +
                 "id=" + id +
-                ", type=" + type +
+                ", type='" + type + '\'' +
                 ", name='" + name + '\'' +
                 ", bucket='" + bucket + '\'' +
-                ", updated=" + updated +
-                ", size=" + size +
-                ", itemsQuantity=" + itemsQuantity +
+                ", updated=" + updated + '\'' +
                 ", username='" + username + '\'' +
                 '}';
     }

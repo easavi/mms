@@ -1,17 +1,25 @@
 package com.mms.controller;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.mms.dto.storage.StorageCreateRequest;
 import com.mms.dto.storage.StorageResponse;
 import com.mms.dto.storage.StorageUpdateRequest;
-import com.mms.entity.StorageType;
 import com.mms.service.StorageServiceImpl;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.UUID;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/storage")
@@ -42,7 +50,7 @@ public class StorageController {
     }
     
     @GetMapping("/type/{type}")
-    public ResponseEntity<List<StorageResponse>> getStoragesByType(@PathVariable StorageType type) {
+    public ResponseEntity<List<StorageResponse>> getStoragesByType(@PathVariable String type) {
         List<StorageResponse> storages = storageService.getStoragesByType(type);
         return ResponseEntity.ok(storages);
     }
@@ -69,13 +77,13 @@ public class StorageController {
     
     @GetMapping("/user/{username}/total-size")
     public ResponseEntity<Long> getTotalSizeByUsername(@PathVariable String username) {
-        Long totalSize = storageService.getTotalSizeByUsername(username);
+        Long totalSize = 0L;//storageService.getTotalSizeByUsername(username);
         return ResponseEntity.ok(totalSize != null ? totalSize : 0L);
     }
     
     @GetMapping("/user/{username}/total-items")
     public ResponseEntity<Long> getTotalItemsQuantityByUsername(@PathVariable String username) {
-        Long totalItems = storageService.getTotalItemsQuantityByUsername(username);
+        Long totalItems = 0L;//storageService.getTotalItemsQuantityByUsername(username);
         return ResponseEntity.ok(totalItems != null ? totalItems : 0L);
     }
 }

@@ -16,12 +16,10 @@ CREATE TABLE users (
 -- Storage table
 CREATE TABLE storage (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    type storage_type NOT NULL,
+    type VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     bucket VARCHAR(255) NOT NULL,
     updated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    size BIGINT NOT NULL DEFAULT 0,
-    items_quantity INTEGER NOT NULL DEFAULT 0,
     username VARCHAR(50) NOT NULL REFERENCES users(username)
 );
 
@@ -29,7 +27,7 @@ CREATE TABLE storage (
 CREATE TABLE media (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
-    media_type media_type NOT NULL,
+    media_type VARCHAR(255) NOT NULL,
     file_name VARCHAR(255) NOT NULL,
     file_url VARCHAR(1024) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,

@@ -1,22 +1,22 @@
 package com.mms.repository;
 
-import com.mms.entity.Storage;
-import com.mms.entity.StorageType;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import com.mms.entity.Storage;
 
 public interface StorageRepository extends JpaRepository<Storage, UUID> {
     
     List<Storage> findByUsername(String username);
     
-    List<Storage> findByType(StorageType type);
+    List<Storage> findByType(String type);
     
-    List<Storage> findByUsernameAndType(String username, StorageType type);
+    List<Storage> findByUsernameAndType(String username, String type);
     
     Optional<Storage> findByUsernameAndName(String username, String name);
     
@@ -26,9 +26,4 @@ public interface StorageRepository extends JpaRepository<Storage, UUID> {
     @Query("SELECT COUNT(s) FROM Storage s WHERE s.username = :username")
     long countByUsername(@Param("username") String username);
     
-    @Query("SELECT SUM(s.size) FROM Storage s WHERE s.username = :username")
-    Long getTotalSizeByUsername(@Param("username") String username);
-    
-    @Query("SELECT SUM(s.itemsQuantity) FROM Storage s WHERE s.username = :username")
-    Long getTotalItemsQuantityByUsername(@Param("username") String username);
 }

@@ -1,10 +1,9 @@
 package com.mms.dto.media;
 
-import com.mms.entity.MediaType;
+import java.time.OffsetDateTime;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
-import java.time.OffsetDateTime;
 
 public class MediaCreateRequest {
     
@@ -12,7 +11,7 @@ public class MediaCreateRequest {
     private String name;
     
     @NotNull(message = "Media type is required")
-    private MediaType mediaType;
+    private String mediaType;
     
     @NotBlank(message = "File name is required")
     private String fileName;
@@ -28,7 +27,7 @@ public class MediaCreateRequest {
     public MediaCreateRequest() {
     }
     
-    public MediaCreateRequest(String name, MediaType mediaType, String fileName, 
+    public MediaCreateRequest(String name, String mediaType, String fileName, 
                              String fileUrl, OffsetDateTime createdAt, String[] tagNames) {
         this.name = name;
         this.mediaType = mediaType;
@@ -46,11 +45,11 @@ public class MediaCreateRequest {
         this.name = name;
     }
     
-    public MediaType getMediaType() {
+    public String getMediaType() {
         return mediaType;
     }
     
-    public void setMediaType(MediaType mediaType) {
+    public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }
     

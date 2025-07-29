@@ -15,9 +15,8 @@ public class Media {
     @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "media_type", nullable = false)
-    private MediaType mediaType;
+    private String mediaType;
 
     @Column(name = "file_name", nullable = false)
     private String fileName;
@@ -43,7 +42,7 @@ public class Media {
         this.tags = new HashSet<>();
     }
 
-    public Media(String name, MediaType mediaType, String fileName, String fileUrl, OffsetDateTime createdAt) {
+    public Media(String name, String mediaType, String fileName, String fileUrl, OffsetDateTime createdAt) {
         this.name = name;
         this.mediaType = mediaType;
         this.fileName = fileName;
@@ -68,11 +67,11 @@ public class Media {
         this.name = name;
     }
 
-    public MediaType getMediaType() {
+    public String getMediaType() {
         return mediaType;
     }
 
-    public void setMediaType(MediaType mediaType) {
+    public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }
 
@@ -142,7 +141,7 @@ public class Media {
         Media media = (Media) o;
         return Objects.equals(id, media.id) &&
                Objects.equals(name, media.name) &&
-               mediaType == media.mediaType &&
+               Objects.equals(mediaType, media.mediaType) &&
                Objects.equals(fileName, media.fileName);
     }
 

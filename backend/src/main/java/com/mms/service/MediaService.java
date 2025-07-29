@@ -2,7 +2,7 @@ package com.mms.service;
 
 import com.mms.dto.media.MediaCreateRequest;
 import com.mms.dto.media.MediaFilterRequest;
-import com.mms.dto.media.MediaResponseNew;
+import com.mms.dto.media.MediaResponse;
 import com.mms.dto.media.MediaUpdateRequest;
 import com.mms.dto.media.GroupedMediaResponse;
 import com.mms.entity.Media;
@@ -22,18 +22,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class MediaServiceNew {
+public class MediaService {
     
     private final MediaRepository mediaRepository;
     private final TagRepository tagRepository;
     
-    public MediaServiceNew(MediaRepository mediaRepository, TagRepository tagRepository) {
+    public MediaService(MediaRepository mediaRepository, TagRepository tagRepository) {
         this.mediaRepository = mediaRepository;
         this.tagRepository = tagRepository;
     }
     
     @Transactional
-    public MediaResponseNew createMedia(MediaCreateRequest request) {
+    public MediaResponse createMedia(MediaCreateRequest request) {
         Set<Tag> tags = processTags(request.getTagNames());
         
         Media media = new Media();
@@ -49,7 +49,7 @@ public class MediaServiceNew {
     }
     
     @Transactional(readOnly = true)
-    public List<MediaResponseNew> getAllMedia() {
+    public List<MediaResponse> getAllMedia() {
         return mediaRepository.findAll()
                 .stream()
                 .map(this::convertToResponse)
@@ -57,7 +57,7 @@ public class MediaServiceNew {
     }
     
     @Transactional(readOnly = true)
-    public Page<MediaResponseNew> getMediaWithFilters(
+    public Page<MediaResponse> getMediaWithFilters(
             OffsetDateTime startDate, 
             OffsetDateTime endDate,
             List<String> tagNames,
@@ -105,7 +105,7 @@ public class MediaServiceNew {
     }
     
     @Transactional(readOnly = true)
-    public Page<MediaResponseNew> getMediaWithFilters(
+    public Page<MediaResponse> getMediaWithFilters(
             OffsetDateTime startDate, 
             OffsetDateTime endDate,
             List<String> tagNames,
@@ -119,14 +119,14 @@ public class MediaServiceNew {
     }
     
     @Transactional(readOnly = true)
-    public MediaResponseNew getMediaById(UUID id) {
+    public MediaResponse getMediaById(UUID id) {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found"));
         return convertToResponse(media);
     }
     
     @Transactional
-    public MediaResponseNew updateMedia(UUID id, MediaUpdateRequest request) {
+    public MediaResponse updateMedia(UUID id, MediaUpdateRequest request) {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found"));
         
@@ -202,13 +202,13 @@ public class MediaServiceNew {
     }
     
     @Transactional(readOnly = true)
-    public Page<MediaResponseNew> searchMedia(String searchTerm, Pageable pageable) {
+    public Page<MediaResponse> searchMedia(String searchTerm, Pageable pageable) {
         Page<Media> mediaPage = mediaRepository.searchByNameOrFileName(searchTerm, pageable);
         return mediaPage.map(this::convertToResponse);
     }
     
     @Transactional(readOnly = true)
-    public Page<MediaResponseNew> getMediaWithAdvancedFilter(MediaFilterRequest filter, Pageable pageable) {
+    public Page<MediaResponse> getMediaWithAdvancedFilter(MediaFilterRequest filter, Pageable pageable) {
         return getMediaWithFilters(
             filter.getStartDate(),
             filter.getEndDate(),
@@ -302,8 +302,8 @@ public class MediaServiceNew {
                 .collect(Collectors.toSet());
     }
     
-    private MediaResponseNew convertToResponse(Media media) {
-        MediaResponseNew response = new MediaResponseNew();
+    private MediaResponse convertToResponse(Media media) {
+        MediaResponse response = new MediaResponse();
         response.setId(media.getId().toString());
         response.setName(media.getName());
         response.setMediaType(media.getMediaType());

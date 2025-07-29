@@ -70,16 +70,7 @@ public class ValidationService {
             } catch (Exception e) {
                 repositoryTests.put("tagRepository", "error: " + e.getMessage());
             }
-            
-            try {
-                if (userCount > 0) {
-                    storageRepository.getTotalSizeByUsername("test_user");
-                }
-                repositoryTests.put("storageRepository", "ok");
-            } catch (Exception e) {
-                repositoryTests.put("storageRepository", "error: " + e.getMessage());
-            }
-            
+                        
             health.put("repositoryTests", repositoryTests);
             
         } catch (Exception e) {

@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../providers/media_provider.dart';
 import '../widgets/media_card.dart';
 import '../widgets/media_filters.dart';
+import 'file_upload_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -50,6 +51,17 @@ class _MainScreenState extends State<MainScreen> {
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: _showFilters,
+          ),
+          IconButton(
+            icon: const Icon(Icons.upload_file),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const FileUploadScreen(),
+                ),
+              );
+            },
+            tooltip: 'Upload Files',
           ),
           PopupMenuButton<String>(
             onSelected: (value) {

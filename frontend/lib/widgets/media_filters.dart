@@ -61,6 +61,19 @@ class _MediaFiltersState extends State<MediaFilters> {
 
                 // Group options
                 _buildGroupOptions(mediaProvider),
+                const SizedBox(height: 24),
+
+                // Close button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text('Close'),
+                  ),
+                ),
               ],
             ),
           ),

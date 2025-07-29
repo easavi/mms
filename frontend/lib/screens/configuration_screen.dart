@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/models.dart';
 import '../services/services.dart';
+import '../providers/auth_provider.dart';
 
 class ConfigurationScreen extends StatefulWidget {
   const ConfigurationScreen({super.key});
@@ -242,12 +243,7 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
           try {
             final updateRequest = UpdateStorageRequest(
               name: request.name,
-              storageType: request.storageType,
-              accessKey: request.accessKey,
-              secretKey: request.secretKey,
-              bucketName: request.bucketName,
-              region: request.region,
-              endpoint: request.endpoint,
+              bucket: request.bucket,
             );
             await _storageService.updateStorage(storage.id, updateRequest);
             await _loadStorages();
@@ -463,13 +459,15 @@ class _StorageDialogState extends State<_StorageDialog> {
 
   void _saveStorage() {
     if (_formKey.currentState!.validate()) {
+      // Get current username from AuthProvider
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final username = authProvider.username ?? 'admin'; // fallback to admin
+      
       final request = CreateStorageRequest(
         name: _nameController.text,
-        storageType: _selectedType,
-        accessKey: 'default-access-key', // TODO: Add proper access key field
-        secretKey: 'default-secret-key', // TODO: Add proper secret key field
-        bucketName: _bucketController.text,
-        endpoint: 'http://localhost:9000', // TODO: Add proper endpoint field
+        type: _selectedType,
+        bucket: _bucketController.text,
+        username: username,
       );
       
       widget.onSave(request);

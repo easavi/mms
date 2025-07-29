@@ -51,3 +51,5 @@ Start modifying the database, backend and the last one the frontend.
 Adapt the frontend to work with the APIs on backend.
 After the login screen it must be redirected to the main screen, where all the media will be view.
 The configuration screen must list the storage items.
+
+Add to the frontend the capability to run like app on windows, where could access files on hard drive

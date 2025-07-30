@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "2b4d5e1a-8c9f-4a2e-b8d1-3f7e6c9a8b5c",
 		"name": "MMS API Collection",
-		"description": "Complete API collection for Multimedia Sharing Service (MMS) Backend",
+		"description": "Complete API collection for Multimedia Sharing Service (MMS) Backend. Includes authentication, media management with file upload to MinIO, storage management, and tag operations.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "12345678"
 	},
@@ -441,6 +441,83 @@
 							"raw": "{{baseUrl}}/api/media",
 							"host": ["{{baseUrl}}"],
 							"path": ["api", "media"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Media File",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "title",
+									"value": "My Uploaded Image",
+									"type": "text"
+								},
+								{
+									"key": "mediaType",
+									"value": "image",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Test upload via Postman",
+									"type": "text"
+								},
+								{
+									"key": "tags",
+									"value": "test,upload,postman",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/media/upload",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "upload"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Media File (Minimal)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": [],
+									"description": "Select your media file (image, video, audio, document)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/media/upload",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "upload"]
 						}
 					},
 					"response": []

@@ -63,6 +63,7 @@ This folder contains Postman collection and environment files for testing the Mu
 
 ### Media
 - `POST /api/media` - Create media item
+- `POST /api/media/upload` - Upload media file to MinIO bucket
 - `GET /api/media` - Get media with pagination
 - `GET /api/media/all` - Get all media
 - `GET /api/media/{id}` - Get media by ID
@@ -127,7 +128,19 @@ This folder contains Postman collection and environment files for testing the Mu
    }
    ```
 
-4. **Filter Media**:
+4. **Upload Media File**:
+   ```
+   POST /api/media/upload
+   Content-Type: multipart/form-data
+   
+   Form Data:
+   - file: [binary file data]
+   - title: "My uploaded image"
+   - mediaType: "image"
+   - tags: "nature,landscape" (optional, comma-separated)
+   ```
+
+5. **Filter Media**:
    ```
    GET /api/media/filter?sortBy=createdAt&sortDirection=desc&startDate=2025-01-01&endDate=2025-12-31
    ```

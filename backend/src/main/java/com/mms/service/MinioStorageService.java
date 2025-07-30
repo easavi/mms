@@ -21,6 +21,23 @@ public class MinioStorageService implements StorageService {
 
     public MinioStorageService(MinioClient minioClient) {
         this.minioClient = minioClient;
+        ensureBucketExists();
+    }
+    
+    private void ensureBucketExists() {
+        try {
+            boolean bucketExists = minioClient.bucketExists(BucketExistsArgs.builder()
+                    .bucket(bucket)
+                    .build());
+            
+            if (!bucketExists) {
+                minioClient.makeBucket(MakeBucketArgs.builder()
+                        .bucket(bucket)
+                        .build());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Could not create bucket: " + bucket, e);
+        }
     }
 
     @Override

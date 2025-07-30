@@ -36,6 +36,7 @@ public class ApiInfoController {
         // Media endpoints
         Map<String, String> mediaEndpoints = new HashMap<>();
         mediaEndpoints.put("POST /api/media", "Create new media");
+        mediaEndpoints.put("POST /api/media/upload", "Upload media file to MinIO bucket");
         mediaEndpoints.put("GET /api/media", "Get media with filters (startDate, endDate, tags, sort)");
         mediaEndpoints.put("GET /api/media/all", "Get all media");
         mediaEndpoints.put("GET /api/media/{id}", "Get media by ID");

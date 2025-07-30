@@ -4,6 +4,7 @@ import com.mms.dto.media.MediaCreateRequest;
 import com.mms.dto.media.MediaFilterRequest;
 import com.mms.dto.media.MediaResponse;
 import com.mms.dto.media.MediaUpdateRequest;
+import com.mms.dto.media.MediaUploadRequest;
 import com.mms.dto.media.GroupedMediaResponse;
 import com.mms.service.MediaService;
 import jakarta.validation.Valid;
@@ -34,6 +35,12 @@ public class MediaController {
     @PostMapping
     public ResponseEntity<MediaResponse> createMedia(@Valid @RequestBody MediaCreateRequest request) {
         MediaResponse response = mediaService.createMedia(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    
+    @PostMapping("/upload")
+    public ResponseEntity<MediaResponse> uploadMedia(@Valid @ModelAttribute MediaUploadRequest request) {
+        MediaResponse response = mediaService.uploadMedia(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
     

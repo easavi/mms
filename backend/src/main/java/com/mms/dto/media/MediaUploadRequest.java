@@ -4,16 +4,13 @@ import java.util.Arrays;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class MediaUploadRequest {
-    @NotBlank
     private String title;
     
     private String description;
     
-    @NotNull
     private String mediaType;
     
     @NotNull
@@ -70,6 +67,19 @@ public class MediaUploadRequest {
 
     public void setTags(String[] tags) {
         this.tags = tags != null ? tags.clone() : null;
+    }
+    
+    // Handle tags as comma-separated string (for form submission)
+    public void setTags(String tagsString) {
+        if (tagsString != null && !tagsString.trim().isEmpty()) {
+            this.tags = tagsString.split(",");
+            // Trim whitespace from each tag
+            for (int i = 0; i < this.tags.length; i++) {
+                this.tags[i] = this.tags[i].trim();
+            }
+        } else {
+            this.tags = null;
+        }
     }
 
     @Override

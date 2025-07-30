@@ -4,6 +4,7 @@ import com.mms.dto.media.MediaCreateRequest;
 import com.mms.dto.media.MediaFilterRequest;
 import com.mms.dto.media.MediaResponse;
 import com.mms.dto.media.MediaUpdateRequest;
+import com.mms.dto.media.MediaUploadRequest;
 import com.mms.dto.media.GroupedMediaResponse;
 import com.mms.entity.Media;
 import com.mms.entity.Tag;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,10 +28,12 @@ public class MediaService {
     
     private final MediaRepository mediaRepository;
     private final TagRepository tagRepository;
+    private final StorageService storageService;
     
-    public MediaService(MediaRepository mediaRepository, TagRepository tagRepository) {
+    public MediaService(MediaRepository mediaRepository, TagRepository tagRepository, StorageService storageService) {
         this.mediaRepository = mediaRepository;
         this.tagRepository = tagRepository;
+        this.storageService = storageService;
     }
     
     @Transactional
@@ -46,6 +50,96 @@ public class MediaService {
         
         media = mediaRepository.save(media);
         return convertToResponse(media);
+    }
+    
+    @Transactional
+    public MediaResponse uploadMedia(MediaUploadRequest request) {
+        try {
+            MultipartFile file = request.getFile();
+            
+            // Generate unique file path
+            String fileName = file.getOriginalFilename();
+            String extension = fileName != null && fileName.contains(".") 
+                ? fileName.substring(fileName.lastIndexOf(".")) 
+                : "";
+            String uniqueFileName = UUID.randomUUID().toString() + extension;
+            String filePath = "media/" + uniqueFileName;
+            
+            // Store file in MinIO
+            String storedPath = storageService.store(file, filePath);
+            
+            // Get the public URL for the stored file
+            String fileUrl = storageService.getUrl(storedPath);
+            
+            // Determine title (use provided title or derive from filename)
+            String title = request.getTitle();
+            if (title == null || title.trim().isEmpty()) {
+                title = fileName != null ? fileName : "Uploaded File";
+                // Remove extension from title if present
+                if (title.contains(".")) {
+                    title = title.substring(0, title.lastIndexOf("."));
+                }
+            }
+            
+            // Determine media type (use provided type or derive from file)
+            String mediaType = request.getMediaType();
+            if (mediaType == null || mediaType.trim().isEmpty()) {
+                mediaType = determineMediaTypeFromFile(fileName, file.getContentType());
+            }
+            
+            // Process tags
+            Set<Tag> tags = processTags(request.getTags());
+            
+            // Create media entity
+            Media media = new Media();
+            media.setName(title);
+            media.setMediaType(mediaType);
+            media.setFileName(fileName);
+            media.setFileUrl(fileUrl);
+            media.setCreatedAt(OffsetDateTime.now());
+            media.setUploadedAt(OffsetDateTime.now());
+            media.setTags(tags);
+            
+            // Save to database
+            media = mediaRepository.save(media);
+            return convertToResponse(media);
+            
+        } catch (Exception e) {
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, 
+                "Failed to upload file: " + e.getMessage());
+        }
+    }
+    
+    private String determineMediaTypeFromFile(String fileName, String contentType) {
+        if (fileName != null) {
+            String extension = fileName.toLowerCase();
+            if (extension.matches(".*\\.(jpg|jpeg|png|gif|bmp|webp|svg)$")) {
+                return "image";
+            } else if (extension.matches(".*\\.(mp4|avi|mov|wmv|flv|webm|mkv|3gp)$")) {
+                return "video";
+            } else if (extension.matches(".*\\.(mp3|wav|flac|aac|ogg)$")) {
+                return "audio";
+            } else if (extension.matches(".*\\.(pdf|doc|docx|txt|rtf)$")) {
+                return "document";
+            }
+        }
+        
+        // Fallback to content type if available
+        if (contentType != null) {
+            if (contentType.startsWith("image/")) {
+                return "image";
+            } else if (contentType.startsWith("video/")) {
+                return "video";
+            } else if (contentType.startsWith("audio/")) {
+                return "audio";
+            } else if (contentType.startsWith("application/pdf") || 
+                      contentType.startsWith("application/msword") ||
+                      contentType.startsWith("text/")) {
+                return "document";
+            }
+        }
+        
+        return "file"; // Default fallback
     }
     
     @Transactional(readOnly = true)

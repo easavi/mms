@@ -7,7 +7,7 @@ import 'providers/media_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/main_screen.dart';
-import 'screens/configuration_screen.dart';
+import 'screens/config/configuration_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {

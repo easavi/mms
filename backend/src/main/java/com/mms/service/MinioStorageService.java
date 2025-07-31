@@ -1,30 +1,32 @@
 package com.mms.service;
 
-import io.minio.*;
-import io.minio.http.Method;
-import org.springframework.beans.factory.annotation.Value;
+import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
-import java.util.concurrent.TimeUnit;
+import io.minio.BucketExistsArgs;
+import io.minio.GetObjectArgs;
+import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.MakeBucketArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
+import io.minio.http.Method;
 
 @Service
 @ConditionalOnProperty(name = "storage.type", havingValue = "minio")
 public class MinioStorageService implements StorageService {
 
-    @Value("${storage.minio.bucket}")
-    private String bucket;
-
     private final MinioClient minioClient;
 
     public MinioStorageService(MinioClient minioClient) {
-        this.minioClient = minioClient;
-        ensureBucketExists();
+        this.minioClient = minioClient;        
     }
     
-    private void ensureBucketExists() {
+    private void ensureBucketExists(String bucket) {
         try {
             boolean bucketExists = minioClient.bucketExists(BucketExistsArgs.builder()
                     .bucket(bucket)
@@ -41,8 +43,11 @@ public class MinioStorageService implements StorageService {
     }
 
     @Override
-    public String store(MultipartFile file, String path) {
+    public String store(String bucket, MultipartFile file, String path) {
         try {
+
+            ensureBucketExists(bucket);
+
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucket)
                     .object(path)
@@ -56,8 +61,11 @@ public class MinioStorageService implements StorageService {
     }
 
     @Override
-    public InputStream retrieve(String path) {
+    public InputStream retrieve(String bucket, String path) {
         try {
+
+            ensureBucketExists(bucket);
+
             return minioClient.getObject(GetObjectArgs.builder()
                     .bucket(bucket)
                     .object(path)
@@ -68,8 +76,11 @@ public class MinioStorageService implements StorageService {
     }
 
     @Override
-    public void delete(String path) {
+    public void delete(String bucket, String path) {
         try {
+
+            ensureBucketExists(bucket);
+
             minioClient.removeObject(RemoveObjectArgs.builder()
                     .bucket(bucket)
                     .object(path)
@@ -80,8 +91,11 @@ public class MinioStorageService implements StorageService {
     }
 
     @Override
-    public String getUrl(String path) {
+    public String getUrl(String bucket, String path) {
         try {
+
+            ensureBucketExists(bucket);
+            
             return minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
                     .method(Method.GET)
                     .bucket(bucket)

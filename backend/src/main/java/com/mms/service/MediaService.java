@@ -66,10 +66,10 @@ public class MediaService {
             String filePath = "media/" + uniqueFileName;
             
             // Store file in MinIO
-            String storedPath = storageService.store(file, filePath);
+            String storedPath = storageService.store("mms", file, filePath);
             
             // Get the public URL for the stored file
-            String fileUrl = storageService.getUrl(storedPath);
+            String fileUrl = storageService.getUrl("mms", storedPath);
             
             // Determine title (use provided title or derive from filename)
             String title = request.getTitle();

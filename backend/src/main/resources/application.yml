@@ -14,9 +14,11 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   servlet:
     multipart:
+      enabled: true
       max-file-size: 100MB
       max-request-size: 100MB
-
+      file-size-threshold: 0
+      location: ${java.io.tmpdir}
 security:
   jwt:
     secret: Vc0AdKyBIffZ5ErS4yvib99zRZkdR5eMuxzHVDLUBNk=
@@ -26,14 +28,16 @@ storage:
   type: minio  # or 's3'
   minio:
     endpoint: http://localhost:9000
-    accessKey: admin
-    secretKey: adminmms
-    bucket: mms-media
+    accessKey: minioadmin
+    secretKey: minioadmin    
   s3:
     region: your_aws_region
     accessKey: your_aws_access_key
-    secretKey: your_aws_secret_key
-    bucket: mms-media
+    secretKey: your_aws_secret_key    
 
 server:
   port: 8080
+
+logging:
+  level:
+    com.mms: DEBUG

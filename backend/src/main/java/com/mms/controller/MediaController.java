@@ -39,6 +39,7 @@ public class MediaController {
     }
     
     @PostMapping("/upload")
+    // public ResponseEntity<MediaResponse> uploadMedia(@Valid @ModelAttribute MediaUploadRequest request) {
     public ResponseEntity<MediaResponse> uploadMedia(@Valid @ModelAttribute MediaUploadRequest request) {
         MediaResponse response = mediaService.uploadMedia(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

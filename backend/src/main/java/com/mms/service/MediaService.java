@@ -55,7 +55,17 @@ public class MediaService {
     @Transactional
     public MediaResponse uploadMedia(MediaUploadRequest request) {
         try {
+            // Debug logging
+            System.out.println("=== MediaService Debug ===");
+            System.out.println("Request: " + request);
+            System.out.println("Request file: " + (request.getFile() != null ? request.getFile().getOriginalFilename() : "NULL"));
+            System.out.println("=========================");
+            
             MultipartFile file = request.getFile();
+            
+            if (file == null) {
+                throw new RuntimeException("File is null in MediaService");
+            }
             
             // Generate unique file path
             String fileName = file.getOriginalFilename();

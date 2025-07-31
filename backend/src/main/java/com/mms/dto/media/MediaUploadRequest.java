@@ -4,8 +4,6 @@ import java.util.Arrays;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.validation.constraints.NotNull;
-
 public class MediaUploadRequest {
     private String title;
     
@@ -13,7 +11,6 @@ public class MediaUploadRequest {
     
     private String mediaType;
     
-    @NotNull
     private MultipartFile file;
     
     private String[] tags;

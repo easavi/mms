@@ -16,8 +16,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -39,10 +41,43 @@ public class MediaController {
     }
     
     @PostMapping("/upload")
-    // public ResponseEntity<MediaResponse> uploadMedia(@Valid @ModelAttribute MediaUploadRequest request) {
-    public ResponseEntity<MediaResponse> uploadMedia(@Valid @ModelAttribute MediaUploadRequest request) {
+    public ResponseEntity<MediaResponse> uploadMedia(
+            @RequestParam(value = "file", required = true) MultipartFile file,
+            @RequestParam(value = "title", required = true) String title,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "mediaType", required = true) String mediaType,
+            @RequestParam(value = "tags", required = false) String[] tags) {
+        
+        // Validate file
+        if (file == null || file.isEmpty()) {
+            throw new RuntimeException("File is required and cannot be empty");
+        }
+        
+        // Create MediaUploadRequest object using setters instead of constructor
+        MediaUploadRequest request = new MediaUploadRequest();
+        request.setTitle(title);
+        request.setDescription(description);
+        request.setMediaType(mediaType);
+        request.setFile(file);
+        request.setTags(tags);        
+        
         MediaResponse response = mediaService.uploadMedia(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    
+    @PostMapping("/test-upload")
+    public ResponseEntity<Map<String, String>> testUpload(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "title", required = false) String title) {
+        
+        Map<String, String> response = new java.util.HashMap<>();
+        response.put("fileName", file != null ? file.getOriginalFilename() : "NULL");
+        response.put("fileSize", file != null ? String.valueOf(file.getSize()) : "0");
+        response.put("title", title);
+        response.put("contentType", file != null ? file.getContentType() : "NULL");
+        response.put("status", "File received successfully");
+        
+        return ResponseEntity.ok(response);
     }
     
     @GetMapping

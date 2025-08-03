@@ -213,13 +213,58 @@ public class MediaService {
             OffsetDateTime startDate, 
             OffsetDateTime endDate,
             List<String> tagNames,
-            String sortBy,
+            String mediaType,
             String sortDirection,
             Pageable pageable) {
         
-        // For now, delegate to the existing method since repository methods are hardcoded to createdAt
-        // In the future, this could be enhanced to support dynamic sorting
-        return getMediaWithFilters(startDate, endDate, tagNames, sortDirection, pageable);
+        boolean ascending = "asc".equalsIgnoreCase(sortDirection);
+        Page<Media> mediaPage;
+        
+        // Determine which filters are active
+        boolean hasDateFilter = startDate != null && endDate != null;
+        boolean hasTagsFilter = tagNames != null && !tagNames.isEmpty();
+        boolean hasMediaTypeFilter = mediaType != null && !mediaType.isEmpty();
+        
+        if (hasMediaTypeFilter && hasDateFilter && hasTagsFilter) {
+            // All three filters: media type + date range + tags
+            if (ascending) {
+                mediaPage = mediaRepository.findByMediaTypeAndCreatedAtBetweenAndTagsNameInOrderByCreatedAtAsc(
+                    mediaType, startDate, endDate, tagNames, pageable);
+            } else {
+                mediaPage = mediaRepository.findByMediaTypeAndCreatedAtBetweenAndTagsNameInOrderByCreatedAtDesc(
+                    mediaType, startDate, endDate, tagNames, pageable);
+            }
+        } else if (hasMediaTypeFilter && hasDateFilter) {
+            // Media type + date range
+            if (ascending) {
+                mediaPage = mediaRepository.findByMediaTypeAndCreatedAtBetweenOrderByCreatedAtAsc(
+                    mediaType, startDate, endDate, pageable);
+            } else {
+                mediaPage = mediaRepository.findByMediaTypeAndCreatedAtBetweenOrderByCreatedAtDesc(
+                    mediaType, startDate, endDate, pageable);
+            }
+        } else if (hasMediaTypeFilter && hasTagsFilter) {
+            // Media type + tags
+            if (ascending) {
+                mediaPage = mediaRepository.findByMediaTypeAndTagsNameInOrderByCreatedAtAsc(
+                    mediaType, tagNames, pageable);
+            } else {
+                mediaPage = mediaRepository.findByMediaTypeAndTagsNameInOrderByCreatedAtDesc(
+                    mediaType, tagNames, pageable);
+            }
+        } else if (hasMediaTypeFilter) {
+            // Only media type filter
+            if (ascending) {
+                mediaPage = mediaRepository.findByMediaTypeOrderByCreatedAtAsc(mediaType, pageable);
+            } else {
+                mediaPage = mediaRepository.findByMediaTypeOrderByCreatedAtDesc(mediaType, pageable);
+            }
+        } else {
+            // Fall back to existing method for other combinations
+            return getMediaWithFilters(startDate, endDate, tagNames, sortDirection, pageable);
+        }
+        
+        return mediaPage.map(this::convertToResponse);
     }
     
     @Transactional(readOnly = true)

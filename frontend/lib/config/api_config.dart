@@ -26,15 +26,6 @@ class ApiConfig {
   // Media endpoints
   static const String media = '/api/media';
   static const String mediaById = '/api/media/'; // Append ID when using
-  static const String mediaFilter = '/api/media/filter';
-  static const String mediaFilterPaged = '/api/media/filter/paged';
-  static const String mediaGrouped = '/api/media/grouped';
-  static const String mediaGroupedPaged = '/api/media/grouped/paged';
-  static const String mediaByTags = '/api/media/by-tags';
-  static const String mediaByTagsPaged = '/api/media/by-tags/paged';
-  static const String mediaSearch = '/api/media/search';
-  static const String mediaSearchPaged = '/api/media/search/paged';
-  static const String mediaStats = '/api/media/stats';
   static const String mediaUpload = '/api/media/upload';
 
   // Storage endpoints

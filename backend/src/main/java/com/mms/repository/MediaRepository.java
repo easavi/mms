@@ -24,6 +24,67 @@ public interface MediaRepository extends JpaRepository<Media, UUID> {
     
     Page<Media> findByMediaTypeOrderByCreatedAtAsc(String mediaType, Pageable pageable);
     
+    // Combined filters: media type + date range
+    @Query("SELECT m FROM Media m WHERE m.mediaType = :mediaType AND " +
+           "m.createdAt BETWEEN :startDate AND :endDate ORDER BY m.createdAt DESC")
+    Page<Media> findByMediaTypeAndCreatedAtBetweenOrderByCreatedAtDesc(
+        @Param("mediaType") String mediaType,
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate,
+        Pageable pageable
+    );
+    
+    @Query("SELECT m FROM Media m WHERE m.mediaType = :mediaType AND " +
+           "m.createdAt BETWEEN :startDate AND :endDate ORDER BY m.createdAt ASC")
+    Page<Media> findByMediaTypeAndCreatedAtBetweenOrderByCreatedAtAsc(
+        @Param("mediaType") String mediaType,
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate,
+        Pageable pageable
+    );
+    
+    // Combined filters: media type + tags
+    @Query("SELECT DISTINCT m FROM Media m JOIN m.tags t WHERE " +
+           "m.mediaType = :mediaType AND t.name IN :tagNames ORDER BY m.createdAt DESC")
+    Page<Media> findByMediaTypeAndTagsNameInOrderByCreatedAtDesc(
+        @Param("mediaType") String mediaType,
+        @Param("tagNames") List<String> tagNames,
+        Pageable pageable
+    );
+    
+    @Query("SELECT DISTINCT m FROM Media m JOIN m.tags t WHERE " +
+           "m.mediaType = :mediaType AND t.name IN :tagNames ORDER BY m.createdAt ASC")
+    Page<Media> findByMediaTypeAndTagsNameInOrderByCreatedAtAsc(
+        @Param("mediaType") String mediaType,
+        @Param("tagNames") List<String> tagNames,
+        Pageable pageable
+    );
+    
+    // Combined filters: media type + date range + tags
+    @Query("SELECT DISTINCT m FROM Media m JOIN m.tags t WHERE " +
+           "m.mediaType = :mediaType AND " +
+           "m.createdAt BETWEEN :startDate AND :endDate AND " +
+           "t.name IN :tagNames ORDER BY m.createdAt DESC")
+    Page<Media> findByMediaTypeAndCreatedAtBetweenAndTagsNameInOrderByCreatedAtDesc(
+        @Param("mediaType") String mediaType,
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate,
+        @Param("tagNames") List<String> tagNames,
+        Pageable pageable
+    );
+    
+    @Query("SELECT DISTINCT m FROM Media m JOIN m.tags t WHERE " +
+           "m.mediaType = :mediaType AND " +
+           "m.createdAt BETWEEN :startDate AND :endDate AND " +
+           "t.name IN :tagNames ORDER BY m.createdAt ASC")
+    Page<Media> findByMediaTypeAndCreatedAtBetweenAndTagsNameInOrderByCreatedAtAsc(
+        @Param("mediaType") String mediaType,
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate,
+        @Param("tagNames") List<String> tagNames,
+        Pageable pageable
+    );
+    
     // Filter by date range
     @Query("SELECT m FROM Media m WHERE m.createdAt BETWEEN :startDate AND :endDate ORDER BY m.createdAt DESC")
     Page<Media> findByCreatedAtBetweenOrderByCreatedAtDesc(

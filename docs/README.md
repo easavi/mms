@@ -64,19 +64,20 @@ This folder contains Postman collection and environment files for testing the Mu
 ### Media
 - `POST /api/media` - Create media item
 - `POST /api/media/upload` - Upload media file to MinIO bucket
-- `GET /api/media` - Get media with pagination
-- `GET /api/media/all` - Get all media
+- `GET /api/media` - Get media with filtering and pagination
+  - Query parameters:
+    - `group` - Grouping method: 'month', 'day', or 'tag' (default: 'month')
+    - `sortDirection` - Sort direction: 'asc' or 'desc' (default: 'desc')
+    - `start` - Start date in YYYY-MM-DD format (optional)
+    - `end` - End date in YYYY-MM-DD format (optional)
+    - `type` - Media type: 'image', 'video', or 'file' (optional)
+    - `tags` - List of tag names (optional)
+    - `page` - Page number (default: 0)
+    - `size` - Page size (default: 20)
+- `GET /api/media/all` - Get all media without pagination
 - `GET /api/media/{id}` - Get media by ID
 - `PUT /api/media/{id}` - Update media
 - `DELETE /api/media/{id}` - Delete media
-- `GET /api/media/search` - Search media
-- `GET /api/media/grouped/month` - Get media grouped by month
-- `GET /api/media/grouped/day` - Get media grouped by day
-- `GET /api/media/grouped/tag` - Get media grouped by tag
-- `GET /api/media/filter` - Filter media (GET)
-- `POST /api/media/filter` - Filter media (POST)
-- `GET /api/media/statistics` - Get media statistics
-- `GET /api/media/validate-filter` - Validate filter parameters
 
 ### Tags
 - `POST /api/tags` - Create tag

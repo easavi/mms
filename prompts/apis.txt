@@ -1,0 +1,16 @@
+media api
+
+api/media
+    ?group=<a string where could be 'month', 'day' or 'tag', default value is 'month'>    
+    &sortDirection=<string where could be 'asc' or 'desc', optional, default is 'desc' >
+    &start=<date in format YYYY-MM-DD, optional>
+    &end=<date in format YYYY-MM-DD, optional>
+    &type=<a string where could be 'image', 'video' or 'file', optional, leave blank for all>
+    &tags=<list of strings, where each string represents a tag, optional, leave blank for all>
+    &page=<number of the page>
+    &size=<number of records on page>
+
+
+1. The media will always be sorted only by the field createdAt
+2. if 'start' and 'end' is blank, then should bring all the media
+3. tags could have many tag values

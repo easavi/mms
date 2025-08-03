@@ -12,86 +12,12 @@ class MediaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => _showMediaDetails(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Media preview
-            Expanded(
-              flex: 3,
-              child: Container(
-                width: double.infinity,
-                color: Colors.grey[200],
-                child: _buildMediaPreview(),
-              ),
-            ),
-            
-            // Media info
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title
-                    Text(
-                      media.name,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    
-                    // Date
-                    Text(
-                      media.formattedCreatedAt,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    
-                    const Spacer(),
-                    
-                    // Tags and type
-                    Row(
-                      children: [
-                        // Media type icon
-                        Icon(
-                          _getMediaIcon(),
-                          size: 16,
-                          color: _getMediaColor(),
-                        ),
-                        const SizedBox(width: 4),
-                        
-                        // Tags count
-                        if (media.tags.isNotEmpty) ...[
-                          Icon(
-                            Icons.local_offer,
-                            size: 12,
-                            color: Colors.grey[600],
-                          ),
-                          const SizedBox(width: 2),
-                          Text(
-                            '${media.tags.length}',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+    return InkWell(
+      onTap: () => _showMediaDetails(context),
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: _buildMediaPreview(),
       ),
     );
   }
@@ -171,18 +97,6 @@ class MediaCard extends StatelessWidget {
         ),
       );
     }
-  }
-
-  IconData _getMediaIcon() {
-    if (media.isImage) return Icons.image;
-    if (media.isVideo) return Icons.video_file;
-    return Icons.insert_drive_file;
-  }
-
-  Color _getMediaColor() {
-    if (media.isImage) return Colors.green;
-    if (media.isVideo) return Colors.blue;
-    return Colors.orange;
   }
 
   void _showMediaDetails(BuildContext context) {

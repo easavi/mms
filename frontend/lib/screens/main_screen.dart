@@ -212,13 +212,13 @@ class _MainScreenState extends State<MainScreen> {
 
                 // Media grid
                 SliverPadding(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.zero,
                   sliver: SliverGrid(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.8,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
+                      crossAxisCount: 3,
+                      childAspectRatio: 1.0,
+                      crossAxisSpacing: 2,
+                      mainAxisSpacing: 2,
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {

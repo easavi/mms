@@ -34,7 +34,7 @@ public class MinioStorageService implements StorageService {
             
             if (!bucketExists) {
                 minioClient.makeBucket(MakeBucketArgs.builder()
-                        .bucket(bucket)
+                        .bucket(bucket)                        
                         .build());
             }
         } catch (Exception e) {

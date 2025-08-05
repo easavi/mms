@@ -1,6 +1,7 @@
 package com.mms.service;
 
 import com.mms.dto.media.MediaCreateRequest;
+import com.mms.dto.media.MediaContentResponse;
 import com.mms.dto.media.MediaFilterRequest;
 import com.mms.dto.media.MediaResponse;
 import com.mms.dto.media.MediaUpdateRequest;
@@ -465,5 +466,154 @@ public class MediaService {
                 .map(Tag::getName)
                 .toArray(String[]::new));
         return response;
+    }
+    
+    @Transactional(readOnly = true)
+    public MediaContentResponse getFileContentById(UUID mediaId) {
+        // Find the media record by ID
+        Media media = mediaRepository.findById(mediaId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found"));
+        
+        try {
+            // Extract file path from the stored file URL or derive it
+            String filePath = extractFilePathFromUrl(media.getFileUrl());
+            
+            // Use default bucket (mms) - could be made configurable
+            String bucket = "mms";
+            
+            // Retrieve the file content from storage
+            var inputStream = storageService.retrieve(bucket, filePath);
+            byte[] content = inputStream.readAllBytes();
+            inputStream.close();
+            
+            // Determine content type
+            String contentType = determineContentTypeFromMedia(media.getMediaType(), media.getFileName());
+            
+            return new MediaContentResponse(content, contentType, media.getFileName());
+            
+        } catch (Exception e) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "File content not found: " + e.getMessage());
+        }
+    }
+    
+    private String extractFilePathFromUrl(String fileUrl) {
+        // If the URL contains the full path, extract just the path part
+        // For MinIO URLs like: http://localhost:9000/mms/media/filename.ext
+        // We want to extract: media/filename.ext
+        if (fileUrl.contains("/media/")) {
+            int mediaIndex = fileUrl.indexOf("/media/");
+            return fileUrl.substring(mediaIndex + 1); // Remove the leading slash
+        }
+        
+        // If it's already a path, return as is
+        if (fileUrl.startsWith("media/")) {
+            return fileUrl;
+        }
+        
+        // Fallback: assume it's just the filename and add media/ prefix
+        return "media/" + fileUrl;
+    }
+    
+    @Transactional(readOnly = true)
+    public MediaContentResponse getFileContent(String bucket, String fileId) {
+        try {
+            // Use the file ID as the path in the bucket
+            String filePath = "media/" + fileId;
+            
+            // Retrieve the file content from storage
+            var inputStream = storageService.retrieve(bucket, filePath);
+            byte[] content = inputStream.readAllBytes();
+            inputStream.close();
+            
+            // Find the media record to get content type and filename info
+            // We'll try to determine content type from the file extension
+            String contentType = "application/octet-stream"; // default
+            String fileName = fileId;
+            
+            // Try to find media record by searching for the file path in fileUrl
+            Optional<Media> mediaOpt = mediaRepository.findAll().stream()
+                    .filter(media -> media.getFileUrl() != null && media.getFileUrl().contains(fileId))
+                    .findFirst();
+            
+            if (mediaOpt.isPresent()) {
+                Media media = mediaOpt.get();
+                fileName = media.getFileName() != null ? media.getFileName() : fileId;
+                contentType = determineContentTypeFromMedia(media.getMediaType(), fileName);
+            } else {
+                // Fallback: determine content type from file extension
+                contentType = determineContentTypeFromExtension(fileId);
+            }
+            
+            return new MediaContentResponse(content, contentType, fileName);
+            
+        } catch (Exception e) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "File not found: " + e.getMessage());
+        }
+    }
+    
+    private String determineContentTypeFromMedia(String mediaType, String fileName) {
+        if (fileName != null) {
+            String extension = fileName.toLowerCase();
+            
+            // Image types
+            if (extension.endsWith(".jpg") || extension.endsWith(".jpeg")) return "image/jpeg";
+            if (extension.endsWith(".png")) return "image/png";
+            if (extension.endsWith(".gif")) return "image/gif";
+            if (extension.endsWith(".bmp")) return "image/bmp";
+            if (extension.endsWith(".webp")) return "image/webp";
+            if (extension.endsWith(".svg")) return "image/svg+xml";
+            
+            // Video types
+            if (extension.endsWith(".mp4")) return "video/mp4";
+            if (extension.endsWith(".avi")) return "video/x-msvideo";
+            if (extension.endsWith(".mov")) return "video/quicktime";
+            if (extension.endsWith(".wmv")) return "video/x-ms-wmv";
+            if (extension.endsWith(".webm")) return "video/webm";
+            if (extension.endsWith(".mkv")) return "video/x-matroska";
+            
+            // Audio types
+            if (extension.endsWith(".mp3")) return "audio/mpeg";
+            if (extension.endsWith(".wav")) return "audio/wav";
+            if (extension.endsWith(".flac")) return "audio/flac";
+            if (extension.endsWith(".aac")) return "audio/aac";
+            if (extension.endsWith(".ogg")) return "audio/ogg";
+            
+            // Document types
+            if (extension.endsWith(".pdf")) return "application/pdf";
+            if (extension.endsWith(".doc")) return "application/msword";
+            if (extension.endsWith(".docx")) return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            if (extension.endsWith(".txt")) return "text/plain";
+        }
+        
+        // Fallback based on media type
+        return switch (mediaType) {
+            case "image" -> "image/jpeg";
+            case "video" -> "video/mp4";
+            case "audio" -> "audio/mpeg";
+            case "document" -> "application/pdf";
+            default -> "application/octet-stream";
+        };
+    }
+    
+    private String determineContentTypeFromExtension(String fileName) {
+        if (fileName != null) {
+            String extension = fileName.toLowerCase();
+            
+            if (extension.endsWith(".jpg") || extension.endsWith(".jpeg")) return "image/jpeg";
+            if (extension.endsWith(".png")) return "image/png";
+            if (extension.endsWith(".gif")) return "image/gif";
+            if (extension.endsWith(".bmp")) return "image/bmp";
+            if (extension.endsWith(".webp")) return "image/webp";
+            if (extension.endsWith(".svg")) return "image/svg+xml";
+            if (extension.endsWith(".mp4")) return "video/mp4";
+            if (extension.endsWith(".avi")) return "video/x-msvideo";
+            if (extension.endsWith(".mov")) return "video/quicktime";
+            if (extension.endsWith(".mp3")) return "audio/mpeg";
+            if (extension.endsWith(".wav")) return "audio/wav";
+            if (extension.endsWith(".pdf")) return "application/pdf";
+            if (extension.endsWith(".txt")) return "text/plain";
+        }
+        
+        return "application/octet-stream";
     }
 }

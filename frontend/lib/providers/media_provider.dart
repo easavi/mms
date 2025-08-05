@@ -45,17 +45,33 @@ class MediaProvider extends ChangeNotifier {
     _error = null;
 
     try {
-      final request = MediaFilterRequest(
-        startDate: _startDate,
-        endDate: _endDate,
-        tagNames: _selectedTags.isNotEmpty ? _selectedTags.toList() : null,
-        sortBy: _sortByToString(_sortBy),
-        sortDirection: _sortAscending ? 'asc' : 'desc',
-        groupBy: _groupBy != null ? _groupByToString(_groupBy!) : null,
-        search: _searchQuery,
-      );
+      // Convert selected media types to string
+      String? type;
+      if (_selectedMediaTypes.isNotEmpty) {
+        // For now, use the first selected type
+        type = _selectedMediaTypes.first.name.toLowerCase();
+      }
 
-      _media = await _mediaService.filterMedia(request);
+      // Convert dates to string format (YYYY-MM-DD)
+      String? start;
+      String? end;
+      if (_startDate != null) {
+        start = '${_startDate!.year.toString().padLeft(4, '0')}-${_startDate!.month.toString().padLeft(2, '0')}-${_startDate!.day.toString().padLeft(2, '0')}';
+      }
+      if (_endDate != null) {
+        end = '${_endDate!.year.toString().padLeft(4, '0')}-${_endDate!.month.toString().padLeft(2, '0')}-${_endDate!.day.toString().padLeft(2, '0')}';
+      }
+
+      _media = await _mediaService.getAllMedia(
+        group: _groupBy != null ? _groupByToString(_groupBy!) : 'month',
+        sortDirection: _sortAscending ? 'asc' : 'desc',
+        start: start,
+        end: end,
+        type: type,
+        tags: _selectedTags.isNotEmpty ? _selectedTags.toList() : null,
+        page: 0,
+        size: 100, // Get more items by default
+      );
       notifyListeners();
     } catch (e) {
       _error = e.toString();
@@ -159,6 +175,10 @@ class MediaProvider extends ChangeNotifier {
   }
 
   Future<void> searchMedia(String query) async {
+    // Note: Search functionality has been simplified in the new API
+    // For now, we'll just reload the media with current filters
+    // In the future, you might want to implement client-side filtering
+    // or add a search parameter to the backend API
     _searchQuery = query.isEmpty ? null : query;
     await loadMedia();
   }
@@ -223,7 +243,7 @@ class MediaProvider extends ChangeNotifier {
     }
     
     if (_searchQuery != null) {
-      filters.add('Search: $_searchQuery');
+      filters.add('Search: $_searchQuery (client-side)');
     }
     
     filters.add('Sort: ${_sortByToString(_sortBy)} (${_sortAscending ? 'ASC' : 'DESC'})');

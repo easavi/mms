@@ -76,6 +76,11 @@ This folder contains Postman collection and environment files for testing the Mu
     - `size` - Page size (default: 20)
 - `GET /api/media/all` - Get all media without pagination
 - `GET /api/media/{id}` - Get media by ID
+- `GET /api/media/content/{id}` - Get file content by media ID (returns file bytes for display/download)
+- `GET /api/media/content` - Get file content by bucket and file ID
+  - Query parameters:
+    - `bucket` - The MinIO bucket name (required)
+    - `fileId` - The file ID/path in the bucket (required)
 - `PUT /api/media/{id}` - Update media
 - `DELETE /api/media/{id}` - Delete media
 
@@ -141,7 +146,24 @@ This folder contains Postman collection and environment files for testing the Mu
    - tags: "nature,landscape" (optional, comma-separated)
    ```
 
-5. **Filter Media**:
+6. **Get File Content by Media ID**:
+   ```
+   GET /api/media/content/{mediaId}
+   
+   Returns the raw file content with appropriate Content-Type headers.
+   Perfect for displaying images in the browser or downloading files.
+   Example: GET /api/media/content/123e4567-e89b-12d3-a456-426614174000
+   ```
+
+7. **Get File Content by Bucket and File ID**:
+   ```
+   GET /api/media/content?bucket=mms&fileId=media/filename.jpg
+   
+   Direct access to files in MinIO bucket using bucket name and file path.
+   Useful when you know the exact storage location.
+   ```
+
+8. **Filter Media**:
    ```
    GET /api/media/filter?sortBy=createdAt&sortDirection=desc&startDate=2025-01-01&endDate=2025-12-31
    ```
@@ -151,6 +173,11 @@ This folder contains Postman collection and environment files for testing the Mu
 - **Media Filtering**: Use various filters like date ranges, media types, and tags
 - **Grouping**: Group media by month, day, or tag for organized viewing
 - **Search**: Full-text search across media names and metadata
+- **File Content Access**: Direct access to file content for displaying images, videos, or downloading files
+  - Access by media ID for authenticated content viewing
+  - Direct bucket access for advanced use cases
+  - Proper Content-Type headers for browser compatibility
+  - Cache headers for improved performance
 - **Statistics**: Get comprehensive statistics about your media collection
 
 ## Environment Variables

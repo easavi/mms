@@ -1,6 +1,7 @@
 package com.mms.controller;
 
 import com.mms.dto.media.MediaCreateRequest;
+import com.mms.dto.media.MediaContentResponse;
 import com.mms.dto.media.MediaResponse;
 import com.mms.dto.media.MediaUpdateRequest;
 import com.mms.dto.media.MediaUploadRequest;
@@ -128,5 +129,37 @@ public class MediaController {
     public ResponseEntity<Void> deleteMedia(@PathVariable UUID id) {
         mediaService.deleteMedia(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/content/{id}")
+    public ResponseEntity<byte[]> getFileContent(@PathVariable UUID id) {
+        
+        try {
+            MediaContentResponse mediaContent = mediaService.getFileContentById(id);
+            return ResponseEntity.ok()
+                    .header("Content-Type", mediaContent.getContentType())
+                    .header("Content-Disposition", "inline; filename=\"" + mediaContent.getFileName() + "\"")
+                    .header("Cache-Control", "max-age=3600") // Cache for 1 hour
+                    .body(mediaContent.getContent());
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
+    @GetMapping("/content")
+    public ResponseEntity<byte[]> getFileContentByBucketAndId(
+            @RequestParam String bucket,
+            @RequestParam String fileId) {
+        
+        try {
+            MediaContentResponse mediaContent = mediaService.getFileContent(bucket, fileId);
+            return ResponseEntity.ok()
+                    .header("Content-Type", mediaContent.getContentType())
+                    .header("Content-Disposition", "inline; filename=\"" + mediaContent.getFileName() + "\"")
+                    .header("Cache-Control", "max-age=3600") // Cache for 1 hour  
+                    .body(mediaContent.getContent());
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

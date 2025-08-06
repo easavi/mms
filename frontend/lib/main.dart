@@ -7,7 +7,7 @@ import 'providers/media_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/main_screen.dart';
-import 'screens/config/configuration_screen.dart';
+import 'screens/config/storage_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
         '/main': (context) => const MainScreen(),
-        '/config': (context) => const ConfigurationScreen(),
+        '/storages': (context) => const StorageScreen(),
       },
       debugShowCheckedModeBanner: false,
     );

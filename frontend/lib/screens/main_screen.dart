@@ -54,32 +54,32 @@ class _MainScreenState extends State<MainScreen> {
           PopupMenuButton<String>(
             onSelected: (value) {
               switch (value) {
-                case 'config':
-                  Navigator.of(context).pushNamed('/config');
+                case 'storages':
+                  Navigator.of(context).pushNamed('/storages');
                   break;
-                case 'logout':
+                case 'logoff':
                   _handleLogout();
                   break;
               }
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
-                value: 'config',
+                value: 'storages',
                 child: Row(
                   children: [
-                    Icon(Icons.settings),
+                    Icon(Icons.storage),
                     SizedBox(width: 8),
-                    Text('Configuration'),
+                    Text('Storages'),
                   ],
                 ),
               ),
               const PopupMenuItem(
-                value: 'logout',
+                value: 'logoff',
                 child: Row(
                   children: [
                     Icon(Icons.logout),
                     SizedBox(width: 8),
-                    Text('Logout'),
+                    Text('Logoff'),
                   ],
                 ),
               ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
-import '../config/configuration_screen.dart';
+import '../config/storage_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -148,7 +148,7 @@ class _MainScreenState extends State<MainScreen> {
   void _navigateToConfig() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ConfigurationScreen()),
+      MaterialPageRoute(builder: (context) => const StorageScreen()),
     );
   }
 

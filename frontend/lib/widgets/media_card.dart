@@ -111,8 +111,7 @@ class MediaCard extends StatelessWidget {
             Text('Type: ${media.mediaType.displayName}'),
             Text('File: ${media.fileName}'),
             Text('Created: ${media.dayMonthYear}'),
-            if (media.uploadedAt != null)
-              Text('Uploaded: ${media.uploadedAt!.toLocal().toString().split('.')[0]}'),
+            Text('Uploaded: ${media.uploadedAt.toLocal().toString().split('.')[0]}'),
             if (media.tags.isNotEmpty) ...[
               const SizedBox(height: 8),
               const Text('Tags:'),

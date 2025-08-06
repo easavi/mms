@@ -202,8 +202,8 @@ class _MainScreenState extends State<MainScreen> {
                 SliverPadding(
                   padding: EdgeInsets.zero,
                   sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
+                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 128.0,
                       childAspectRatio: 1.0,
                       crossAxisSpacing: 2,
                       mainAxisSpacing: 2,

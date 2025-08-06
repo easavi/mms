@@ -1,0 +1,30 @@
+Storage API
+
+Change the storage api controller and database scripts, to:
+- fields of a Storage
+   - bucket: string, auto generated, first 8 digits of uuid, not visible
+   - path: path to the local folder on device (must open a popup to choose on device), string
+   - type: server (only option, default value), string (not visible)
+   - user: string (not visible), always set with username receive on authorization token
+- create crud apis
+   - the list of storages must always be filter by the username receive on authentication token
+- create a endpoint to return the number of items on this storage: /storage/{bucket}/quantity
+- create a endpoint to return the total size this storage: /storage/{bucket}/size
+
+Storage screen
+
+- the screen is a list of storage that can be added by user on frontend
+- each record of storage have the fields   
+   - bucket: string, auto generated on server, not visible on screen
+   - path: path to the local folder on device (must open a popup to choose on device), string
+   - type: server (only option, default value), string (not visible)
+   - user: string (not visible), value will be set on server
+- the add button must float at bottom right of screen
+- each item of the list must show the fields
+   - bucket
+   - path   
+   - number of items on this storage, should asynchonous get this number from the api: /storage/{bucket}/quantity
+   - total size of the files on this storage, should asynchonous get this number from the api: /storage/{bucket}/size
+   - an icon to disable the storage
+   - an icon to delete the storage (when pressed a confirmation popup must be shown saying that this will erase the files on the server too)
+- when a storage is added will imediately start to upload the files on that local folder path to the api upload on server, listening for any new files there

@@ -26,17 +26,17 @@ public class StorageServiceImpl {
     }
     
     @Transactional
-    public StorageResponse createStorage(StorageCreateRequest request) {
-        // Check if storage with same name exists for user
-        if (storageRepository.findByUsernameAndName(request.getUsername(), request.getName()).isPresent()) {
-            throw new ApiException(HttpStatus.CONFLICT, "Storage with this name already exists for user");
+    public StorageResponse createStorage(StorageCreateRequest request, String username) {
+        // Check if storage with same path exists for user
+        if (storageRepository.findByUsernameAndPath(username, request.getPath()).isPresent()) {
+            throw new ApiException(HttpStatus.CONFLICT, "Storage with this path already exists for user");
         }
         
         Storage storage = new Storage();
-        storage.setType(request.getType());
-        storage.setName(request.getName());
-        storage.setBucket(request.getBucket());
-        storage.setUsername(request.getUsername());
+        storage.setPath(request.getPath());
+        storage.setUsername(username);
+        storage.setType("server"); // Always server
+        // Bucket will be auto-generated in @PrePersist
         
         storage = storageRepository.save(storage);
         return convertToResponse(storage);
@@ -78,11 +78,8 @@ public class StorageServiceImpl {
         Storage storage = storageRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Storage not found"));
         
-        if (request.getName() != null) {
-            storage.setName(request.getName());
-        }
-        if (request.getBucket() != null) {
-            storage.setBucket(request.getBucket());
+        if (request.getPath() != null) {
+            storage.setPath(request.getPath());
         }
         
         storage = storageRepository.save(storage);
@@ -95,18 +92,35 @@ public class StorageServiceImpl {
             throw new ApiException(HttpStatus.NOT_FOUND, "Storage not found");
         }
         storageRepository.deleteById(id);
+    }
+    
+    @Transactional(readOnly = true)
+    public Integer getStorageQuantity(String bucket) {
+        // TODO: Implement actual media count for this storage bucket
+        // This would typically query the media table for files in this bucket
+        return 0;
+    }
+    
+    @Transactional(readOnly = true)
+    public Long getStorageSize(String bucket) {
+        // TODO: Implement actual size calculation for this storage bucket
+        // This would typically sum up file sizes from media table for this bucket
+        return 0L;
     }    
     
     private StorageResponse convertToResponse(Storage storage) {
         StorageResponse response = new StorageResponse();
         response.setId(storage.getId().toString());
-        response.setType(storage.getType());
-        response.setName(storage.getName());
         response.setBucket(storage.getBucket());
+        response.setPath(storage.getPath());
+        response.setType(storage.getType());
         response.setUpdated(storage.getUpdated().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         response.setUsername(storage.getUsername());
+        
+        // TODO: Calculate actual size and items quantity from media files
         response.setSize(0L);
         response.setItemsQuantity(0);
+        
         return response;
     }
 }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
 import '../../theme/app_theme.dart';
 import '../auth/login_screen.dart';
+import 'storage_screen.dart';
 
 class ConfigurationScreen extends StatefulWidget {
   const ConfigurationScreen({super.key});
@@ -12,7 +13,6 @@ class ConfigurationScreen extends StatefulWidget {
 }
 
 class _ConfigurationScreenState extends State<ConfigurationScreen> {
-  final List<StorageItem> _storageItems = [];
 
   void _logout() async {
     try {
@@ -62,6 +62,13 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
     Navigator.pop(context);
   }
 
+  void _openStorageConfiguration() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const StorageScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,232 +79,69 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Stack(
-        children: [
-          // Storage items list
-          ListView.separated(
-            padding: const EdgeInsets.all(16).copyWith(bottom: 120), // Space for floating buttons
-            itemCount: _storageItems.length,
-            separatorBuilder: (context, index) => Container(
-              height: 1,
-              color: Colors.grey[600],
-              margin: const EdgeInsets.symmetric(vertical: 8),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Storage Configuration Card
+            Card(
+              color: AppTheme.cardColor,
+              child: ListTile(
+                leading: Icon(Icons.storage, color: AppTheme.accentColor),
+                title: const Text(
+                  'Storage Configuration',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                subtitle: const Text(
+                  'Manage local folder synchronization',
+                  style: TextStyle(color: Colors.white70),
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white70),
+                onTap: _openStorageConfiguration,
+              ),
             ),
-            itemBuilder: (context, index) {
-              final item = _storageItems[index];
-              return _StorageItemWidget(item: item);
-            },
-          ),
-          
-          // Floating action buttons at bottom right
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            const SizedBox(height: 16),
+            
+            // Other configuration options can go here
+            const Spacer(),
+            
+            // Action buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Back button
-                FloatingActionButton(
-                  heroTag: "back",
+                ElevatedButton.icon(
                   onPressed: _goBack,
-                  backgroundColor: AppTheme.accentColor,
-                  child: const Icon(Icons.arrow_back, color: Colors.black),
+                  icon: const Icon(Icons.arrow_back),
+                  label: const Text('Back'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.accentColor,
+                    foregroundColor: Colors.black,
+                  ),
                 ),
-                const SizedBox(height: 12),
-                
-                // Synchronize button
-                FloatingActionButton(
-                  heroTag: "sync",
+                ElevatedButton.icon(
                   onPressed: _synchronize,
-                  backgroundColor: AppTheme.confirmColor,
-                  child: const Icon(Icons.sync, color: Colors.black),
+                  icon: const Icon(Icons.sync),
+                  label: const Text('Sync'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.confirmColor,
+                    foregroundColor: Colors.black,
+                  ),
                 ),
-                const SizedBox(height: 12),
-                
-                // Logout button
-                FloatingActionButton(
-                  heroTag: "logout",
+                ElevatedButton.icon(
                   onPressed: _logout,
-                  backgroundColor: AppTheme.dangerColor,
-                  child: const Icon(Icons.logout, color: Colors.white),
+                  icon: const Icon(Icons.logout),
+                  label: const Text('Logout'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.dangerColor,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class StorageItem {
-  final String type;
-  final String name;
-  final String updated;
-  final String size;
-  final int items;
-
-  StorageItem({
-    required this.type,
-    required this.name,
-    required this.updated,
-    required this.size,
-    required this.items,
-  });
-}
-
-class _StorageItemWidget extends StatelessWidget {
-  final StorageItem item;
-
-  const _StorageItemWidget({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.cardColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Colors.grey[700]!,
-          width: 0.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Type badge and name row
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _getTypeColor(item.type),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  item.type,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  item.name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              // Status indicator
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: AppTheme.confirmColor,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          
-          // Storage details
-          Row(
-            children: [
-              Expanded(
-                child: _InfoColumn(
-                  label: 'Updated',
-                  value: item.updated,
-                  icon: Icons.schedule,
-                ),
-              ),
-              Expanded(
-                child: _InfoColumn(
-                  label: 'Size',
-                  value: item.size,
-                  icon: Icons.storage,
-                ),
-              ),
-              Expanded(
-                child: _InfoColumn(
-                  label: 'Items',
-                  value: item.items.toString(),
-                  icon: Icons.folder,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Color _getTypeColor(String type) {
-    switch (type.toLowerCase()) {
-      case 'aws':
-        return Colors.orange;
-      case 'server':
-        return AppTheme.confirmColor;
-      case 'minio':
-        return AppTheme.accentColor;
-      default:
-        return Colors.grey;
-    }
-  }
-}
-
-class _InfoColumn extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-
-  const _InfoColumn({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(
-              icon,
-              size: 14,
-              color: AppTheme.accentColor,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
           ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

@@ -59,6 +59,26 @@ class StorageService {
     }
   }
 
+  // Get storage quantity by bucket
+  Future<int> getStorageQuantity(String bucket) async {
+    try {
+      final response = await _apiService.get('${ApiConfig.storage}/$bucket/quantity');
+      return response.data as int;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get storage size by bucket
+  Future<int> getStorageSize(String bucket) async {
+    try {
+      final response = await _apiService.get('${ApiConfig.storage}/$bucket/size');
+      return response.data as int;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Test storage connection
   Future<Map<String, dynamic>> testStorageConnection(String id) async {
     try {

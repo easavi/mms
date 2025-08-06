@@ -1,47 +1,29 @@
 import '../storage.dart';
 
 class CreateStorageRequest {
-  final String name;
-  final StorageType type;
-  final String bucket;
-  final String username;
+  final String path; // Path to local folder on device
 
   CreateStorageRequest({
-    required this.name,
-    required this.type,
-    required this.bucket,
-    required this.username,
+    required this.path,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'name': name,
-      'type': type.apiValue,
-      'bucket': bucket,
-      'username': username,
+      'path': path,
     };
   }
 }
 
 class UpdateStorageRequest {
-  final String? name;
-  final String? bucket;
-  final int? size;
-  final int? itemsQuantity;
+  final String? path;
 
   UpdateStorageRequest({
-    this.name,
-    this.bucket,
-    this.size,
-    this.itemsQuantity,
+    this.path,
   });
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> json = {};
-    if (name != null) json['name'] = name;
-    if (bucket != null) json['bucket'] = bucket;
-    if (size != null) json['size'] = size;
-    if (itemsQuantity != null) json['itemsQuantity'] = itemsQuantity;
+    if (path != null) json['path'] = path;
     return json;
   }
 }

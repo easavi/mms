@@ -16,11 +16,12 @@ CREATE TABLE users (
 -- Storage table
 CREATE TABLE storage (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    type VARCHAR(255) NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    bucket VARCHAR(255) NOT NULL,
+    bucket VARCHAR(8) NOT NULL UNIQUE, -- First 8 digits of UUID, auto-generated
+    path VARCHAR(1024) NOT NULL,       -- Path to local folder on device
+    type VARCHAR(255) NOT NULL DEFAULT 'server', -- Always 'server'
     updated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    username VARCHAR(50) NOT NULL REFERENCES users(username)
+    username VARCHAR(50) NOT NULL REFERENCES users(username),
+    UNIQUE(username, path) -- Prevent duplicate paths per user
 );
 
 -- Media table

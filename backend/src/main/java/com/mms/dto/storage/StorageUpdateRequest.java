@@ -2,30 +2,20 @@ package com.mms.dto.storage;
 
 public class StorageUpdateRequest {
     
-    private String name;
-    private String bucket;
+    private String path; // Only path can be updated
     
     public StorageUpdateRequest() {
     }
     
-    public StorageUpdateRequest(String name, String bucket) {
-        this.name = name;
-        this.bucket = bucket;
+    public StorageUpdateRequest(String path) {
+        this.path = path;
     }
     
-    public String getName() {
-        return name;
+    public String getPath() {
+        return path;
     }
     
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public String getBucket() {
-        return bucket;
-    }
-    
-    public void setBucket(String bucket) {
-        this.bucket = bucket;
+    public void setPath(String path) {
+        this.path = path;
     }
 }

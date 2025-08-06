@@ -18,7 +18,9 @@ public interface StorageRepository extends JpaRepository<Storage, UUID> {
     
     List<Storage> findByUsernameAndType(String username, String type);
     
-    Optional<Storage> findByUsernameAndName(String username, String name);
+    Optional<Storage> findByUsernameAndPath(String username, String path);
+    
+    Optional<Storage> findByBucket(String bucket);
     
     @Query("SELECT s FROM Storage s WHERE s.username = :username ORDER BY s.updated DESC")
     List<Storage> findByUsernameOrderByUpdatedDesc(@Param("username") String username);

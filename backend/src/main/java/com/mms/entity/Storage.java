@@ -13,14 +13,14 @@ public class Storage {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
-    private String type;
+    @Column(nullable = false, length = 8)
+    private String bucket; // First 8 digits of UUID, auto-generated
 
-    @Column(nullable = false)
-    private String name;
+    @Column(nullable = false, length = 1024)
+    private String path; // Path to local folder on device
 
-    @Column(nullable = false)
-    private String bucket;
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'server'")
+    private String type = "server"; // Only "server" option, default value
 
     @Column(nullable = false)
     private OffsetDateTime updated;
@@ -31,11 +31,11 @@ public class Storage {
     public Storage() {
     }
 
-    public Storage(String type, String name, String bucket, String username) {
-        this.type = type;
-        this.name = name;
-        this.bucket = bucket;
+    public Storage(String path, String username) {
+        this.path = path;
         this.username = username;
+        this.type = "server"; // Default value
+        // Bucket will be auto-generated in @PrePersist
     }
 
     public UUID getId() {
@@ -46,28 +46,28 @@ public class Storage {
         this.id = id;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getBucket() {
         return bucket;
     }
 
     public void setBucket(String bucket) {
         this.bucket = bucket;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public OffsetDateTime getUpdated() {
@@ -89,6 +89,10 @@ public class Storage {
     @PrePersist
     protected void onCreate() {
         updated = OffsetDateTime.now();
+        // Auto-generate bucket as first 8 digits of UUID if not set
+        if (bucket == null || bucket.isEmpty()) {
+            bucket = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        }
     }
 
     @PreUpdate
@@ -102,23 +106,24 @@ public class Storage {
         if (o == null || getClass() != o.getClass()) return false;
         Storage storage = (Storage) o;
         return Objects.equals(id, storage.id) &&
-               Objects.equals(name, storage.name) &&
+               Objects.equals(bucket, storage.bucket) &&
+               Objects.equals(path, storage.path) &&
                Objects.equals(type, storage.type) &&
                Objects.equals(username, storage.username);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, username);
+        return Objects.hash(id, bucket, path, type, username);
     }
 
     @Override
     public String toString() {
         return "Storage{" +
                 "id=" + id +
-                ", type='" + type + '\'' +
-                ", name='" + name + '\'' +
                 ", bucket='" + bucket + '\'' +
+                ", path='" + path + '\'' +
+                ", type='" + type + '\'' +
                 ", updated=" + updated + '\'' +
                 ", username='" + username + '\'' +
                 '}';

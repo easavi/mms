@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,14 +33,17 @@ public class StorageController {
     }
     
     @PostMapping
-    public ResponseEntity<StorageResponse> createStorage(@Valid @RequestBody StorageCreateRequest request) {
-        StorageResponse response = storageService.createStorage(request);
+    public ResponseEntity<StorageResponse> createStorage(@Valid @RequestBody StorageCreateRequest request, 
+                                                       Authentication authentication) {
+        String username = authentication.getName(); // Extract username from JWT token
+        StorageResponse response = storageService.createStorage(request, username);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
     
     @GetMapping
-    public ResponseEntity<List<StorageResponse>> getAllStorages() {
-        List<StorageResponse> storages = storageService.getAllStorages();
+    public ResponseEntity<List<StorageResponse>> getAllStorages(Authentication authentication) {
+        String username = authentication.getName(); // Filter by authenticated user
+        List<StorageResponse> storages = storageService.getStoragesByUsername(username);
         return ResponseEntity.ok(storages);
     }
     
@@ -85,5 +89,17 @@ public class StorageController {
     public ResponseEntity<Long> getTotalItemsQuantityByUsername(@PathVariable String username) {
         Long totalItems = 0L;//storageService.getTotalItemsQuantityByUsername(username);
         return ResponseEntity.ok(totalItems != null ? totalItems : 0L);
+    }
+    
+    @GetMapping("/{bucket}/quantity")
+    public ResponseEntity<Integer> getStorageQuantity(@PathVariable String bucket) {
+        Integer quantity = storageService.getStorageQuantity(bucket);
+        return ResponseEntity.ok(quantity);
+    }
+    
+    @GetMapping("/{bucket}/size")
+    public ResponseEntity<Long> getStorageSize(@PathVariable String bucket) {
+        Long size = storageService.getStorageSize(bucket);
+        return ResponseEntity.ok(size);
     }
 }

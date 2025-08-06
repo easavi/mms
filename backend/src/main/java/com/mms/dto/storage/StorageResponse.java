@@ -3,25 +3,27 @@ package com.mms.dto.storage;
 public class StorageResponse {
     
     private String id;
-    private String type;
-    private String name;
-    private String bucket;
-    private String updated;
-    private Long size;
-    private Integer itemsQuantity;
-    private String username;
+    private String bucket;    // Auto-generated, first 8 digits of UUID
+    private String path;      // Path to local folder on device
+    private String type;      // Always "server", but included for completeness
+    private String updated;   // Timestamp
+    private String username;  // User owning this storage
+    private Long size;        // Total size in bytes (calculated dynamically)
+    private Integer itemsQuantity; // Number of items (calculated dynamically)
     
     public StorageResponse() {
     }
     
-    public StorageResponse(String id, String type, String name, String bucket, 
-                          String updated, Long size, Integer itemsQuantity, String username) {
+    public StorageResponse(String id, String bucket, String path, String type, 
+                          String updated, String username, Long size, Integer itemsQuantity) {
         this.id = id;
-        this.type = type;
-        this.name = name;
         this.bucket = bucket;
+        this.path = path;
+        this.type = type;
         this.updated = updated;
         this.username = username;
+        this.size = size;
+        this.itemsQuantity = itemsQuantity;
     }
     
     public String getId() {
@@ -32,28 +34,28 @@ public class StorageResponse {
         this.id = id;
     }
     
-    public String getType() {
-        return type;
-    }
-    
-    public void setType(String type) {
-        this.type = type;
-    }
-    
-    public String getName() {
-        return name;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
-    
     public String getBucket() {
         return bucket;
     }
     
     public void setBucket(String bucket) {
         this.bucket = bucket;
+    }
+
+    public String getPath() {
+        return path;
+    }
+    
+    public void setPath(String path) {
+        this.path = path;
+    }
+    
+    public String getType() {
+        return type;
+    }
+    
+    public void setType(String type) {
+        this.type = type;
     }
     
     public String getUpdated() {

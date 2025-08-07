@@ -7,27 +7,33 @@ class MediaProvider extends ChangeNotifier {
   
   List<Media> _media = [];
   bool _isLoading = false;
+  bool _isLoadingMore = false;
   String? _error;
+  bool _hasMoreData = true;
+  int _currentPage = 0;
+  final int _pageSize = 20; // API page size
   
   // Filters
   DateTime? _startDate;
   DateTime? _endDate;
   Set<String> _selectedTags = {};
-  Set<MediaType> _selectedMediaTypes = {};
+  String? _selectedMediaType; // Changed to single string to match API
   MediaSortBy _sortBy = MediaSortBy.createdAt;
   bool _sortAscending = false;
-  MediaGroupBy? _groupBy;
+  MediaGroupBy? _groupBy = MediaGroupBy.month; // Default to 'month' as per API
   String? _searchQuery;
   String? _activeDateFilter;
 
   // Getters
   List<Media> get media => _media;
   bool get isLoading => _isLoading;
+  bool get isLoadingMore => _isLoadingMore;
+  bool get hasMoreData => _hasMoreData;
   String? get error => _error;
   DateTime? get startDate => _startDate;
   DateTime? get endDate => _endDate;
   Set<String> get selectedTags => _selectedTags;
-  Set<MediaType> get selectedMediaTypes => _selectedMediaTypes;
+  String? get selectedMediaType => _selectedMediaType;
   MediaSortBy get sortBy => _sortBy;
   bool get sortAscending => _sortAscending;
   MediaGroupBy? get groupBy => _groupBy;
@@ -37,21 +43,16 @@ class MediaProvider extends ChangeNotifier {
       _startDate != null ||
       _endDate != null ||
       _selectedTags.isNotEmpty ||
-      _selectedMediaTypes.isNotEmpty ||
+      _selectedMediaType != null ||
       _searchQuery != null;
 
   Future<void> loadMedia() async {
     _setLoading(true);
     _error = null;
+    _currentPage = 0;
+    _hasMoreData = true;
 
     try {
-      // Convert selected media types to string
-      String? type;
-      if (_selectedMediaTypes.isNotEmpty) {
-        // For now, use the first selected type
-        type = _selectedMediaTypes.first.name.toLowerCase();
-      }
-
       // Convert dates to string format (YYYY-MM-DD)
       String? start;
       String? end;
@@ -62,22 +63,69 @@ class MediaProvider extends ChangeNotifier {
         end = '${_endDate!.year.toString().padLeft(4, '0')}-${_endDate!.month.toString().padLeft(2, '0')}-${_endDate!.day.toString().padLeft(2, '0')}';
       }
 
-      _media = await _mediaService.getAllMedia(
-        group: _groupBy != null ? _groupByToString(_groupBy!) : 'month',
+      final result = await _mediaService.getAllMedia(
+        group: _groupByToString(_groupBy ?? MediaGroupBy.month),
         sortDirection: _sortAscending ? 'asc' : 'desc',
         start: start,
         end: end,
-        type: type,
+        type: _selectedMediaType,
         tags: _selectedTags.isNotEmpty ? _selectedTags.toList() : null,
-        page: 0,
-        size: 100, // Get more items by default
+        page: _currentPage,
+        size: _pageSize,
       );
+      
+      _media = result;
+      _hasMoreData = result.length == _pageSize;
       notifyListeners();
     } catch (e) {
       _error = e.toString();
       debugPrint('Error loading media: $e');
     } finally {
       _setLoading(false);
+    }
+  }
+
+  Future<void> loadMoreMedia() async {
+    if (!_hasMoreData || _isLoadingMore) return;
+
+    _isLoadingMore = true;
+    notifyListeners();
+
+    try {
+      _currentPage++;
+      
+      // Convert dates to string format (YYYY-MM-DD)
+      String? start;
+      String? end;
+      if (_startDate != null) {
+        start = '${_startDate!.year.toString().padLeft(4, '0')}-${_startDate!.month.toString().padLeft(2, '0')}-${_startDate!.day.toString().padLeft(2, '0')}';
+      }
+      if (_endDate != null) {
+        end = '${_endDate!.year.toString().padLeft(4, '0')}-${_endDate!.month.toString().padLeft(2, '0')}-${_endDate!.day.toString().padLeft(2, '0')}';
+      }
+
+      final result = await _mediaService.getAllMedia(
+        group: _groupByToString(_groupBy ?? MediaGroupBy.month),
+        sortDirection: _sortAscending ? 'asc' : 'desc',
+        start: start,
+        end: end,
+        type: _selectedMediaType,
+        tags: _selectedTags.isNotEmpty ? _selectedTags.toList() : null,
+        page: _currentPage,
+        size: _pageSize,
+      );
+      
+      _media.addAll(result);
+      _hasMoreData = result.length == _pageSize;
+      notifyListeners();
+    } catch (e) {
+      _currentPage--; // Revert page increment on error
+      _error = e.toString();
+      debugPrint('Error loading more media: $e');
+      notifyListeners();
+    } finally {
+      _isLoadingMore = false;
+      notifyListeners();
     }
   }
 
@@ -131,11 +179,18 @@ class MediaProvider extends ChangeNotifier {
   }
 
   // Media type filter methods
+  void setMediaTypeFilter(String? type) {
+    _selectedMediaType = type;
+    notifyListeners();
+    loadMedia();
+  }
+
   void toggleMediaTypeFilter(MediaType type) {
-    if (_selectedMediaTypes.contains(type)) {
-      _selectedMediaTypes.remove(type);
+    String typeString = type.name.toLowerCase();
+    if (_selectedMediaType == typeString) {
+      _selectedMediaType = null;
     } else {
-      _selectedMediaTypes.add(type);
+      _selectedMediaType = typeString;
     }
     notifyListeners();
     loadMedia();
@@ -168,7 +223,7 @@ class MediaProvider extends ChangeNotifier {
   }
 
   // Group methods
-  void setGroupBy(MediaGroupBy? groupBy) {
+  void setGroupBy(MediaGroupBy groupBy) {
     _groupBy = groupBy;
     notifyListeners();
     loadMedia();
@@ -210,11 +265,11 @@ class MediaProvider extends ChangeNotifier {
     _startDate = null;
     _endDate = null;
     _selectedTags.clear();
-    _selectedMediaTypes.clear();
+    _selectedMediaType = null;
     _searchQuery = null;
     _sortBy = MediaSortBy.createdAt;
     _sortAscending = false;
-    _groupBy = null;
+    _groupBy = MediaGroupBy.month;
     _activeDateFilter = null;
     loadMedia();
   }
@@ -238,8 +293,8 @@ class MediaProvider extends ChangeNotifier {
       filters.add('Tags: ${_selectedTags.join(', ')}');
     }
 
-    if (_selectedMediaTypes.isNotEmpty) {
-      filters.add('Types: ${_selectedMediaTypes.map((t) => t.displayName).join(', ')}');
+    if (_selectedMediaType != null) {
+      filters.add('Type: $_selectedMediaType');
     }
     
     if (_searchQuery != null) {

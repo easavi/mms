@@ -155,15 +155,31 @@ class _MediaFiltersState extends State<MediaFilters> {
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
-          children: MediaType.values.map((type) {
-            return FilterChip(
-              label: Text(type.displayName),
-              selected: provider.selectedMediaTypes.contains(type),
+          children: [
+            FilterChip(
+              label: const Text('All'),
+              selected: provider.selectedMediaType == null,
               onSelected: (selected) {
-                provider.toggleMediaTypeFilter(type);
+                if (selected) {
+                  provider.setMediaTypeFilter(null);
+                }
               },
-            );
-          }).toList(),
+            ),
+            ...MediaType.values.map((type) {
+              String typeString = type.name.toLowerCase();
+              return FilterChip(
+                label: Text(type.displayName),
+                selected: provider.selectedMediaType == typeString,
+                onSelected: (selected) {
+                  if (selected) {
+                    provider.setMediaTypeFilter(typeString);
+                  } else {
+                    provider.setMediaTypeFilter(null);
+                  }
+                },
+              );
+            }).toList(),
+          ],
         ),
       ],
     );
@@ -253,30 +269,20 @@ class _MediaFiltersState extends State<MediaFilters> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Sort By',
+          'Sort Order',
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
         Row(
           children: [
             Expanded(
-              child: DropdownButtonFormField<MediaSortBy>(
-                value: provider.sortBy,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                items: MediaSortBy.values.map((sortBy) {
-                  return DropdownMenuItem(
-                    value: sortBy,
-                    child: Text(_getSortByDisplayName(sortBy)),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    provider.setSortBy(value);
-                  }
-                },
+                child: const Text('Created Date (as per API)'),
               ),
             ),
             const SizedBox(width: 8),
@@ -302,41 +308,26 @@ class _MediaFiltersState extends State<MediaFilters> {
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
-        DropdownButtonFormField<MediaGroupBy?>(
-          value: provider.groupBy,
+        DropdownButtonFormField<MediaGroupBy>(
+          value: provider.groupBy ?? MediaGroupBy.month,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           ),
-          items: [
-            const DropdownMenuItem<MediaGroupBy?>(
-              value: null,
-              child: Text('No grouping'),
-            ),
-            ...MediaGroupBy.values.map((groupBy) {
-              return DropdownMenuItem(
-                value: groupBy,
-                child: Text(_getGroupByDisplayName(groupBy)),
-              );
-            }),
-          ],
+          items: MediaGroupBy.values.map((groupBy) {
+            return DropdownMenuItem(
+              value: groupBy,
+              child: Text(_getGroupByDisplayName(groupBy)),
+            );
+          }).toList(),
           onChanged: (value) {
-            provider.setGroupBy(value);
+            if (value != null) {
+              provider.setGroupBy(value);
+            }
           },
         ),
       ],
     );
-  }
-
-  String _getSortByDisplayName(MediaSortBy sortBy) {
-    switch (sortBy) {
-      case MediaSortBy.createdAt:
-        return 'Created Date';
-      case MediaSortBy.name:
-        return 'Name';
-      case MediaSortBy.uploadedAt:
-        return 'Upload Date';
-    }
   }
 
   String _getGroupByDisplayName(MediaGroupBy groupBy) {

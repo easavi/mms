@@ -9,6 +9,30 @@
 			"isBackground": true,
 			"args": [],
 			"problemMatcher": []
+		},
+		{
+			"label": "Run Flutter App - Windows",
+			"type": "shell",
+			"command": "flutter",
+			"args": ["run", "-d", "windows"],
+			"group": "build",
+			"isBackground": true,
+			"options": {
+				"cwd": "${workspaceFolder}/frontend"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build Flutter App - Windows Release",
+			"type": "shell",
+			"command": "flutter",
+			"args": ["build", "windows", "--release"],
+			"group": "build",
+			"isBackground": false,
+			"options": {
+				"cwd": "${workspaceFolder}/frontend"
+			},
+			"problemMatcher": []
 		}
 	]
 }

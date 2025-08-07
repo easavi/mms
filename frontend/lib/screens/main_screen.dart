@@ -18,6 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MediaProvider>().loadMedia();
     });
@@ -25,8 +26,20 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= 
+        _scrollController.position.maxScrollExtent - 200) {
+      // Load more when we're 200 pixels from the bottom
+      final mediaProvider = context.read<MediaProvider>();
+      if (mediaProvider.hasMoreData && !mediaProvider.isLoadingMore) {
+        mediaProvider.loadMoreMedia();
+      }
+    }
   }
 
   void _showFilters() {
@@ -219,7 +232,7 @@ class _MainScreenState extends State<MainScreen> {
                 ),
 
                 // Loading indicator for pagination
-                if (mediaProvider.isLoading && mediaProvider.media.isNotEmpty)
+                if (mediaProvider.isLoadingMore)
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.all(16),

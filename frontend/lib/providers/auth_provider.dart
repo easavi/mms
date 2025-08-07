@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+// import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Temporarily commented out
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/services.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -7,7 +8,7 @@ class AuthProvider extends ChangeNotifier {
   static const String _usernameKey = 'username';
   
   final ApiService _apiService = ApiService();
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  // final FlutterSecureStorage _storage = const FlutterSecureStorage(); // Temporarily commented out
   
   String? _token;
   String? _username;
@@ -24,8 +25,9 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> _loadStoredAuth() async {
     try {
-      _token = await _storage.read(key: _tokenKey);
-      _username = await _storage.read(key: _usernameKey);
+      final prefs = await SharedPreferences.getInstance();
+      _token = prefs.getString(_tokenKey);
+      _username = prefs.getString(_usernameKey);
       notifyListeners();
     } catch (e) {
       debugPrint('Error loading stored auth: $e');
@@ -45,15 +47,17 @@ class AuthProvider extends ChangeNotifier {
       _username = response.data['username'] ?? username;
 
       // Store credentials securely
-      await _storage.write(key: _tokenKey, value: _token);
-      await _storage.write(key: _usernameKey, value: _username);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_tokenKey, _token!);
+      await prefs.setString(_usernameKey, _username!);
 
       notifyListeners();
     } catch (e) {
       _token = null;
       _username = null;
-      await _storage.delete(key: _tokenKey);
-      await _storage.delete(key: _usernameKey);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_tokenKey);
+      await prefs.remove(_usernameKey);
       notifyListeners();
       rethrow;
     } finally {
@@ -75,15 +79,17 @@ class AuthProvider extends ChangeNotifier {
       _username = response.data['username'] ?? username;
 
       // Store credentials securely
-      await _storage.write(key: _tokenKey, value: _token);
-      await _storage.write(key: _usernameKey, value: _username);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_tokenKey, _token!);
+      await prefs.setString(_usernameKey, _username!);
 
       notifyListeners();
     } catch (e) {
       _token = null;
       _username = null;
-      await _storage.delete(key: _tokenKey);
-      await _storage.delete(key: _usernameKey);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_tokenKey);
+      await prefs.remove(_usernameKey);
       notifyListeners();
       rethrow;
     } finally {
@@ -95,8 +101,9 @@ class AuthProvider extends ChangeNotifier {
     _token = null;
     _username = null;
     
-    await _storage.delete(key: _tokenKey);
-    await _storage.delete(key: _usernameKey);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
+    await prefs.remove(_usernameKey);
     
     notifyListeners();
   }

@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+// import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Temporarily commented out
+import 'package:shared_preferences/shared_preferences.dart';
 import '../config/api_config.dart';
 import 'api_service.dart';
 
 class AuthService extends ChangeNotifier {
-  final _storage = const FlutterSecureStorage();
+  // final _storage = const FlutterSecureStorage(); // Temporarily commented out
   final _apiService = ApiService();
   String? _token;
   bool _isAuthenticated = false;
@@ -23,7 +24,8 @@ class AuthService extends ChangeNotifier {
       );
 
       _token = response.data['token'];
-      await _storage.write(key: 'token', value: _token);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', _token!);
       _isAuthenticated = true;
       notifyListeners();
     } catch (e) {
@@ -48,14 +50,16 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await _storage.delete(key: 'token');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
     _token = null;
     _isAuthenticated = false;
     notifyListeners();
   }
 
   Future<void> checkAuthStatus() async {
-    _token = await _storage.read(key: 'token');
+    final prefs = await SharedPreferences.getInstance();
+    _token = prefs.getString('token');
     _isAuthenticated = _token != null;
     notifyListeners();
   }

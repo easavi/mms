@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+// import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Temporarily commented out
+import 'package:shared_preferences/shared_preferences.dart';
 import '../config/api_config.dart';
 
 class ApiService {
   late final Dio _dio;
-  final _storage = const FlutterSecureStorage();
+  // final _storage = const FlutterSecureStorage(); // Temporarily commented out
 
   ApiService() {
     _dio = Dio(BaseOptions(
@@ -16,7 +17,8 @@ class ApiService {
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         // Add JWT token to requests if available
-        final token = await _storage.read(key: 'auth_token');
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('auth_token');
         if (token != null && token.isNotEmpty) {
           options.headers['Authorization'] = 'Bearer $token';
         }
@@ -25,8 +27,9 @@ class ApiService {
       onError: (DioException error, handler) async {
         if (error.response?.statusCode == 401) {
           // Handle unauthorized access - clear stored token
-          await _storage.delete(key: 'auth_token');
-          await _storage.delete(key: 'username');
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.remove('auth_token');
+          await prefs.remove('username');
         }
         return handler.next(error);
       },

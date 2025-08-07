@@ -53,3 +53,12 @@ After the login screen it must be redirected to the main screen, where all the m
 The configuration screen must list the storage items.
 
 Add to the frontend the capability to run like app on windows, where could access files on hard drive
+
+--------------------------------
+
+Upload files service
+
+When the login is successful, it should start a service that have the following objective:
+    - list all storage of the user
+    - based on path of each storage, should read the new files from folder
+    - make the upload to the backend of these files

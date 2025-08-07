@@ -4,10 +4,12 @@ import 'config/api_config.dart';
 import 'config/environment.dart';
 import 'providers/auth_provider.dart';
 import 'providers/media_provider.dart';
+import 'providers/file_upload_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/main_screen.dart';
 import 'screens/config/storage_screen.dart';
+import 'screens/upload_status_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -18,6 +20,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => MediaProvider()),
+        ChangeNotifierProvider(create: (_) => FileUploadProvider()),
       ],
       child: const MyApp(),
     ),
@@ -47,6 +50,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignupScreen(),
         '/main': (context) => const MainScreen(),
         '/storages': (context) => const StorageScreen(),
+        '/upload-status': (context) => const UploadStatusScreen(),
       },
       debugShowCheckedModeBanner: false,
     );

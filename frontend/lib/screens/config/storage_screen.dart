@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 import '../../models/models.dart';
 import '../../services/storage_service.dart';
+import '../../providers/file_upload_provider.dart';
 import '../../theme/app_theme.dart';
 
 class StorageScreen extends StatefulWidget {
@@ -94,7 +96,7 @@ class _StorageScreenState extends State<StorageScreen> {
           );
           
           // TODO: Start file monitoring and upload for this path
-          _startFileUploadMonitoring(result['path']);
+          _startFileUploadMonitoring(result['path'], newStorage);
         }
       } catch (e) {
         if (mounted) {
@@ -146,6 +148,12 @@ class _StorageScreenState extends State<StorageScreen> {
           _storageSizes.remove(storage.bucket);
         });
         
+        // Remove from upload service
+        final uploadProvider = context.read<FileUploadProvider>();
+        uploadProvider.uploadService?.removeStorage(storage.id).catchError((error) {
+          debugPrint('Failed to remove storage from upload service: $error');
+        });
+        
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -183,18 +191,26 @@ class _StorageScreenState extends State<StorageScreen> {
           username: storage.username,
           isEnabled: !storage.isEnabled,
         );
+        
+        // Update upload service
+        if (mounted) {
+          final uploadProvider = context.read<FileUploadProvider>();
+          uploadProvider.uploadService?.updateStorage(_storages[index]).catchError((error) {
+            debugPrint('Failed to update storage in upload service: $error');
+          });
+        }
       }
     });
   }
 
-  void _startFileUploadMonitoring(String path) {
-    // TODO: Implement file monitoring and auto-upload
-    // This would typically:
-    // 1. Watch the directory for file changes
-    // 2. Upload new files to the server
-    // 3. Handle file deletion/modification
-    // 4. Update storage stats in real-time
-    print('Starting file upload monitoring for: $path');
+  void _startFileUploadMonitoring(String path, Storage storage) {
+    // Add storage to the upload service
+    final uploadProvider = context.read<FileUploadProvider>();
+    uploadProvider.uploadService?.addStorage(storage).catchError((error) {
+      debugPrint('Failed to add storage to upload service: $error');
+    });
+    
+    debugPrint('Starting file upload monitoring for: $path');
   }
 
   String _formatSize(int bytes) {

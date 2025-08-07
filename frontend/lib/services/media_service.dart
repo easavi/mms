@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import '../config/api_config.dart';
 import '../models/models.dart';
 import 'api_service.dart';
@@ -78,6 +79,33 @@ class MediaService {
   Future<void> deleteMedia(String id) async {
     try {
       await _apiService.delete('${ApiConfig.mediaById}$id');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Media> uploadMedia({
+    required String filePath,
+    required String title,
+    required String mediaType,
+    String? description,
+    List<String>? tags,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(filePath),
+        'title': title,
+        'mediaType': mediaType,
+        'description': description ?? '',
+        'tags': tags?.join(',') ?? '',
+      });
+
+      final response = await _apiService.uploadFile(
+        ApiConfig.mediaUpload,
+        formData,
+      );
+      
+      return Media.fromJson(response.data);
     } catch (e) {
       rethrow;
     }

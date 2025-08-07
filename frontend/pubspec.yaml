@@ -41,6 +41,8 @@ dependencies:
   # flutter_secure_storage: ^9.0.0  # Temporarily commented out due to Windows build issues
   dio: ^5.4.0
   path: ^1.8.3
+  watcher: ^1.1.0
+  mime: ^1.0.5
 
 dev_dependencies:
   flutter_test:

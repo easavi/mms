@@ -413,6 +413,42 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Storage Quantity by Bucket",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/{{bucketName}}/quantity",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "storage", "{{bucketName}}", "quantity"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Storage Size by Bucket",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/{{bucketName}}/size",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "storage", "{{bucketName}}", "size"]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -461,27 +497,38 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": []
+									"src": [],
+									"description": "Required - Select your media file"
 								},
 								{
 									"key": "title",
 									"value": "My Uploaded Image",
-									"type": "text"
+									"type": "text",
+									"description": "Required - Title for the media"
 								},
 								{
 									"key": "mediaType",
 									"value": "image",
-									"type": "text"
+									"type": "text",
+									"description": "Required - Type of media (image, video, audio, document)"
 								},
 								{
 									"key": "description",
 									"value": "Test upload via Postman",
-									"type": "text"
+									"type": "text",
+									"description": "Optional - Description of the media"
 								},
 								{
 									"key": "tags",
-									"value": "test,upload,postman",
-									"type": "text"
+									"value": "test",
+									"type": "text",
+									"description": "Optional - Single tag value"
+								},
+								{
+									"key": "tags",
+									"value": "upload",
+									"type": "text",
+									"description": "Optional - Additional tag (can have multiple tags parameters)"
 								}
 							]
 						},
@@ -494,15 +541,10 @@
 					"response": []
 				},
 				{
-					"name": "Upload Media File (Minimal)",
+					"name": "Test Upload (Debug)",
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -510,20 +552,27 @@
 									"key": "file",
 									"type": "file",
 									"src": [],
-									"description": "Select your media file (image, video, audio, document)"
+									"description": "Select a test file"
+								},
+								{
+									"key": "title",
+									"value": "Test Title",
+									"type": "text",
+									"description": "Optional test title"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/media/upload",
+							"raw": "{{baseUrl}}/api/media/test-upload",
 							"host": ["{{baseUrl}}"],
-							"path": ["api", "media", "upload"]
+							"path": ["api", "media", "test-upload"]
 						}
 					},
 					"response": []
 				},
+
 				{
-					"name": "Get Media with Pagination",
+					"name": "Get Media with Filters",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -533,25 +582,54 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/media?page=0&size=10&sortBy=createdAt&sortDirection=desc",
+							"raw": "{{baseUrl}}/api/media?group=month&sortDirection=desc&start=2025-01-01&end=2025-12-31&type=image&tags=test&tags=upload&page=0&size=20",
 							"host": ["{{baseUrl}}"],
 							"path": ["api", "media"],
 							"query": [
 								{
-									"key": "page",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "10"
-								},
-								{
-									"key": "sortBy",
-									"value": "createdAt"
+									"key": "group",
+									"value": "month",
+									"description": "Grouping type (month, day, tag) - default: month"
 								},
 								{
 									"key": "sortDirection",
-									"value": "desc"
+									"value": "desc",
+									"description": "Sort direction (asc, desc) - default: desc"
+								},
+								{
+									"key": "start",
+									"value": "2025-01-01",
+									"description": "Start date (YYYY-MM-DD)"
+								},
+								{
+									"key": "end",
+									"value": "2025-12-31",
+									"description": "End date (YYYY-MM-DD)"
+								},
+								{
+									"key": "type",
+									"value": "image",
+									"description": "Media type filter"
+								},
+								{
+									"key": "tags",
+									"value": "test",
+									"description": "Tag filter (can have multiple)"
+								},
+								{
+									"key": "tags",
+									"value": "upload",
+									"description": "Additional tag filter"
+								},
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Page number - default: 0"
+								},
+								{
+									"key": "size",
+									"value": "20",
+									"description": "Page size - default: 20"
 								}
 							]
 						}
@@ -639,255 +717,38 @@
 					"response": []
 				},
 				{
-					"name": "Search Media",
+					"name": "Get Media Content by ID",
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
+						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/media/search?q={{searchTerm}}&page=0&size=10",
+							"raw": "{{baseUrl}}/api/media/content/{{mediaId}}",
 							"host": ["{{baseUrl}}"],
-							"path": ["api", "media", "search"],
+							"path": ["api", "media", "content", "{{mediaId}}"],
+							"description": "Returns the actual media file content with proper headers"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Media Content by Bucket and File ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/media/content?bucket={{bucketName}}&fileId={{fileId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "media", "content"],
 							"query": [
 								{
-									"key": "q",
-									"value": "{{searchTerm}}"
+									"key": "bucket",
+									"value": "{{bucketName}}",
+									"description": "Storage bucket name"
 								},
 								{
-									"key": "page",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "10"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Media Grouped by Month",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/media/grouped/month",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "media", "grouped", "month"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Media Grouped by Day",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/media/grouped/day",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "media", "grouped", "day"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Media Grouped by Tag",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/media/grouped/tag",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "media", "grouped", "tag"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Filter Media (GET)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/media/filter?sortBy=createdAt&sortDirection=desc&startDate=2025-01-01&endDate=2025-12-31&mediaTypes=image,video&tags=vacation,family",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "media", "filter"],
-							"query": [
-								{
-									"key": "sortBy",
-									"value": "createdAt"
-								},
-								{
-									"key": "sortDirection",
-									"value": "desc"
-								},
-								{
-									"key": "startDate",
-									"value": "2025-01-01"
-								},
-								{
-									"key": "endDate",
-									"value": "2025-12-31"
-								},
-								{
-									"key": "mediaTypes",
-									"value": "image,video"
-								},
-								{
-									"key": "tags",
-									"value": "vacation,family"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Enhanced Grouped Media by Month",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/media/grouped/enhanced/month",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "media", "grouped", "enhanced", "month"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Enhanced Grouped Media by Day",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/media/grouped/enhanced/day",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "media", "grouped", "enhanced", "day"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Enhanced Grouped Media by Tag",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/media/grouped/enhanced/tag",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "media", "grouped", "enhanced", "tag"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Filter Media (POST)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"sortBy\": \"createdAt\",\n    \"sortDirection\": \"desc\",\n    \"startDate\": \"2025-01-01\",\n    \"endDate\": \"2025-12-31\",\n    \"mediaTypes\": [\"image\", \"video\"],\n    \"tags\": [\"vacation\", \"family\"],\n    \"page\": 0,\n    \"size\": 10\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/media/filter",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "media", "filter"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Media Statistics",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/media/statistics",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "media", "statistics"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Validate Filter",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/media/validate-filter?sortBy=createdAt&sortDirection=desc",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "media", "validate-filter"],
-							"query": [
-								{
-									"key": "sortBy",
-									"value": "createdAt"
-								},
-								{
-									"key": "sortDirection",
-									"value": "desc"
+									"key": "fileId",
+									"value": "{{fileId}}",
+									"description": "File ID in the storage"
 								}
 							]
 						}
@@ -990,12 +851,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/tags/search?q={{searchTerm}}",
+							"raw": "{{baseUrl}}/api/tags/search?name={{searchTerm}}",
 							"host": ["{{baseUrl}}"],
 							"path": ["api", "tags", "search"],
 							"query": [
 								{
-									"key": "q",
+									"key": "name",
 									"value": "{{searchTerm}}"
 								}
 							]
@@ -1050,46 +911,10 @@
 			]
 		},
 		{
-			"name": "Demo",
+			"name": "Validation",
 			"item": [
 				{
-					"name": "Create Demo Data",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/demo/create",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "demo", "create"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Clear Demo Data",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/demo/clear",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "demo", "clear"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Demo Info",
+					"name": "System Health Check",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -1099,9 +924,45 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/demo/info",
+							"raw": "{{baseUrl}}/api/validation/health",
 							"host": ["{{baseUrl}}"],
-							"path": ["api", "demo", "info"]
+							"path": ["api", "validation", "health"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Advanced Features Validation",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/validation/features",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "validation", "features"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Validation Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/validation/info",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "validation", "info"]
 						}
 					},
 					"response": []
@@ -1173,6 +1034,16 @@
 		{
 			"key": "searchTerm",
 			"value": "test",
+			"type": "string"
+		},
+		{
+			"key": "bucketName",
+			"value": "mms",
+			"type": "string"
+		},
+		{
+			"key": "fileId",
+			"value": "",
 			"type": "string"
 		}
 	]

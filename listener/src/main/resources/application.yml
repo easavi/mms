@@ -1,6 +1,9 @@
 spring:
   application:
     name: mms-listener
+  main:
+    web-application-type: none  # Disable web server
+    banner-mode: console       # Show banner in console only
 
 # MMS Backend Configuration
 mms:
@@ -12,7 +15,6 @@ mms:
   # Folders to monitor (only used in listener mode)
   folders:
     - "D:/dev/mms/images"
-    - "D:/dev/mms/test-folder"
   
   # File patterns to include/exclude
   file-patterns:
@@ -21,11 +23,8 @@ mms:
   
   # Backup configuration (only used in backup mode)
   backup:
-    download-folder: "./backups"
-    max-concurrent-downloads: 5
-
-server:
-  port: 8081
+    download-folder: "D:/dev/mms/temp/backup"
+    max-concurrent-downloads: 1
 
 logging:
   level:

@@ -1,0 +1,28 @@
+# Build artifacts
+target/
+*.jar
+*.war
+*.ear
+*.class
+
+# IDE files
+.idea/
+.project
+.classpath
+.settings/
+*.iml
+*.iws
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Backup files
+backups/
+
+# Temporary files
+*.tmp
+*.temp

@@ -8,62 +8,117 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "mms")
 public class MmsConfig {
-    
+
     private Backend backend = new Backend();
     private List<String> folders;
     private FilePatterns filePatterns = new FilePatterns();
     private Backup backup = new Backup();
-    
+
     public static class Backend {
         private String url;
         private String username;
         private String password;
-        
+
         // Getters and setters
-        public String getUrl() { return url; }
-        public void setUrl(String url) { this.url = url; }
-        
-        public String getUsername() { return username; }
-        public void setUsername(String username) { this.username = username; }
-        
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
-    
+
     public static class FilePatterns {
         private String include;
         private String exclude;
-        
+
         // Getters and setters
-        public String getInclude() { return include; }
-        public void setInclude(String include) { this.include = include; }
-        
-        public String getExclude() { return exclude; }
-        public void setExclude(String exclude) { this.exclude = exclude; }
+        public String getInclude() {
+            return include;
+        }
+
+        public void setInclude(String include) {
+            this.include = include;
+        }
+
+        public String getExclude() {
+            return exclude;
+        }
+
+        public void setExclude(String exclude) {
+            this.exclude = exclude;
+        }
     }
-    
+
     public static class Backup {
         private String downloadFolder;
         private int maxConcurrentDownloads = 5;
-        
+
         // Getters and setters
-        public String getDownloadFolder() { return downloadFolder; }
-        public void setDownloadFolder(String downloadFolder) { this.downloadFolder = downloadFolder; }
-        
-        public int getMaxConcurrentDownloads() { return maxConcurrentDownloads; }
-        public void setMaxConcurrentDownloads(int maxConcurrentDownloads) { this.maxConcurrentDownloads = maxConcurrentDownloads; }
+        public String getDownloadFolder() {
+            return downloadFolder;
+        }
+
+        public void setDownloadFolder(String downloadFolder) {
+            this.downloadFolder = downloadFolder;
+        }
+
+        public int getMaxConcurrentDownloads() {
+            return maxConcurrentDownloads;
+        }
+
+        public void setMaxConcurrentDownloads(int maxConcurrentDownloads) {
+            this.maxConcurrentDownloads = maxConcurrentDownloads;
+        }
     }
-    
+
     // Main getters and setters
-    public Backend getBackend() { return backend; }
-    public void setBackend(Backend backend) { this.backend = backend; }
-    
-    public List<String> getFolders() { return folders; }
-    public void setFolders(List<String> folders) { this.folders = folders; }
-    
-    public FilePatterns getFilePatterns() { return filePatterns; }
-    public void setFilePatterns(FilePatterns filePatterns) { this.filePatterns = filePatterns; }
-    
-    public Backup getBackup() { return backup; }
-    public void setBackup(Backup backup) { this.backup = backup; }
+    public Backend getBackend() {
+        return backend;
+    }
+
+    public void setBackend(Backend backend) {
+        this.backend = backend;
+    }
+
+    public List<String> getFolders() {
+        return folders;
+    }
+
+    public void setFolders(List<String> folders) {
+        this.folders = folders;
+    }
+
+    public FilePatterns getFilePatterns() {
+        return filePatterns;
+    }
+
+    public void setFilePatterns(FilePatterns filePatterns) {
+        this.filePatterns = filePatterns;
+    }
+
+    public Backup getBackup() {
+        return backup;
+    }
+
+    public void setBackup(Backup backup) {
+        this.backup = backup;
+    }
 }

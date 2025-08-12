@@ -18,7 +18,15 @@ public class MmsApplicationRunner implements CommandLineRunner {
     
     @Override
     public void run(String... args) throws Exception {
-        String mode = System.getProperty("mms.operation.mode", "listener");
+        // Parse command line arguments for mode
+        String mode = "listener"; // default mode
+        
+        for (String arg : args) {
+            if (arg.startsWith("--mode=")) {
+                mode = arg.substring(7);
+                break;
+            }
+        }
         
         System.out.println("=====================================");
         System.out.println("🚀 MMS Listener Application");

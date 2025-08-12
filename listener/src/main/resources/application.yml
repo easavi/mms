@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: mms-listener
+
+# MMS Backend Configuration
+mms:
+  backend:
+    url: http://localhost:8080
+    username: admin
+    password: admin123
+  
+  # Folders to monitor (only used in listener mode)
+  folders:
+    - "D:/dev/mms/images"
+    - "D:/dev/mms/test-folder"
+  
+  # File patterns to include/exclude
+  file-patterns:
+    include: "\\.(jpg|jpeg|png|gif|bmp|mp4|avi|mov|wmv|pdf|doc|docx|txt)$"
+    exclude: "\\.(tmp|temp|log)$"
+  
+  # Backup configuration (only used in backup mode)
+  backup:
+    download-folder: "./backups"
+    max-concurrent-downloads: 5
+
+server:
+  port: 8081
+
+logging:
+  level:
+    com.mms.listener: DEBUG
+    org.springframework.web.reactive: DEBUG

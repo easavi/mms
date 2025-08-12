@@ -1,0 +1,15 @@
+Create a application usign java 24, maven and springboot, like the backend.
+The application should be on folder "listener" on root of the project.
+
+The main objective of this application is to keep listening a folder and make the upload of the existing and new files to the backend.
+
+- the backend apis cannot be changed
+- only access by apis
+- a list of folders to be listening will be provided on application.yml file 
+- the username and password for the api will be provided on application.yml file
+- each file uploaded show be printed on console
+- when starting the application a parameter could be provided to define a mode of operation, the operations mode are:
+    - listener: will start the listener on the folders defined on application.yml
+    - backup: will receive and save the files from backend using the apis of content, will save the files on a folder in the same place of the application is running, called "backups" 
+
+

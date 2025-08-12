@@ -1,0 +1,29 @@
+# MMS Listener Configuration (Properties format)
+# Alternative to application.yml - rename to application.properties to use
+
+# Application name
+spring.application.name=mms-listener
+
+# MMS Backend Configuration
+mms.backend.url=http://localhost:8080
+mms.backend.username=admin
+mms.backend.password=admin123
+
+# Folders to monitor (comma-separated)
+mms.folders[0]=D:/dev/mms/images
+mms.folders[1]=D:/dev/mms/test-folder
+
+# File patterns
+mms.file-patterns.include=\\.(jpg|jpeg|png|gif|bmp|mp4|avi|mov|wmv|pdf|doc|docx|txt)$
+mms.file-patterns.exclude=\\.(tmp|temp|log)$
+
+# Backup configuration
+mms.backup.download-folder=./backups
+mms.backup.max-concurrent-downloads=5
+
+# Server configuration
+server.port=8081
+
+# Logging
+logging.level.com.mms.listener=DEBUG
+logging.level.org.springframework.web.reactive=DEBUG

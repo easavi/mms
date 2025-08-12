@@ -1,7 +1,25 @@
 # Postman Collection Updates
 
 ## Overview
-The MMS API Collection has been updated to accurately reflect the actual REST controllers implemented in the backend codebase.
+The MMS API Collection has been updated to accurately reflect the actual REST controllers implemented in the backend codebase, and includes automatic authentication handling.
+
+## 🆕 **Auto-Authentication Feature**
+
+### Pre-Request Script (Collection Level)
+- **Automatic Login**: Before each request (except auth endpoints), the collection automatically performs login if no token exists
+- **Token Management**: Stores and reuses JWT tokens across requests
+- **Smart Skipping**: Skips auto-login for `/auth/` endpoints to avoid infinite loops
+- **Configurable Credentials**: Uses collection variables for username/password
+
+### Post-Request Script (Collection Level)
+- **Token Expiration Handling**: Automatically clears tokens on 401/403 responses
+- **Re-authentication**: Forces new login on next request after auth failures
+- **Token Updates**: Automatically stores tokens from successful login responses
+
+### Collection Variables Added
+- `password`: Default login password (admin123)
+- `bucketName`: Default bucket name (mms)
+- `fileId`: For content retrieval endpoints
 
 ## Changes Made
 
@@ -58,6 +76,31 @@ The MMS API Collection has been updated to accurately reflect the actual REST co
 
 6. **ValidationController** (`/api/validation`) ✅ (New)
    - Complete new section added
+
+## Testing Recommendations
+
+### 🚀 **Quick Start with Auto-Authentication**
+1. **Import the Collection**: Import the updated JSON file into Postman
+2. **Set Base URL**: Update the `baseUrl` variable if needed (default: http://localhost:8080)
+3. **Configure Credentials**: Update `username` and `password` variables if different from defaults
+4. **Start Testing**: Run any endpoint - authentication will happen automatically!
+
+### 📝 **Manual Testing Steps**
+1. **File Upload Testing**: Use the updated upload endpoint with proper tag parameters
+2. **Content Retrieval**: Test both content endpoints for media file access
+3. **Validation Testing**: Use validation endpoints to verify system health
+4. **Storage Testing**: Test new bucket-specific endpoints
+
+### 🔧 **Authentication Configuration**
+- **Default Credentials**: admin/admin123
+- **Custom Credentials**: Update collection variables `username` and `password`
+- **Token Management**: Automatic - no manual intervention needed
+- **Debug Logging**: Check Postman console for auto-login status messages
+
+### 🛠 **Troubleshooting**
+- **Login Issues**: Check console for error messages
+- **Token Problems**: Manually clear the `token` variable to force re-login
+- **Auth Loops**: Ensure auth endpoints don't have the auto-login logic triggered
 
 ## Testing Recommendations
 

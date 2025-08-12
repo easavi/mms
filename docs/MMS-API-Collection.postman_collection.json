@@ -976,7 +976,65 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					""
+					"// Auto-login script - runs before every request",
+					"",
+					"// Skip login for auth endpoints to avoid infinite loops",
+					"const isAuthEndpoint = pm.request.url.getPath().includes('/auth/');",
+					"",
+					"if (!isAuthEndpoint) {",
+					"    // Check if we already have a valid token",
+					"    const currentToken = pm.collectionVariables.get('token');",
+					"    ",
+					"    // If no token exists, perform login",
+					"    if (!currentToken || currentToken === '') {",
+					"        console.log('No token found, performing auto-login...');",
+					"        ",
+					"        // Get login credentials from collection variables",
+					"        const username = pm.collectionVariables.get('username') || 'admin';",
+					"        const password = pm.collectionVariables.get('password') || 'admin123';",
+					"        const baseUrl = pm.collectionVariables.get('baseUrl');",
+					"        ",
+					"        // Prepare login request",
+					"        const loginRequest = {",
+					"            url: baseUrl + '/auth/login',",
+					"            method: 'POST',",
+					"            header: {",
+					"                'Content-Type': 'application/json'",
+					"            },",
+					"            body: {",
+					"                mode: 'raw',",
+					"                raw: JSON.stringify({",
+					"                    username: username,",
+					"                    password: password",
+					"                })",
+					"            }",
+					"        };",
+					"        ",
+					"        // Send login request synchronously",
+					"        pm.sendRequest(loginRequest, function (err, response) {",
+					"            if (err) {",
+					"                console.error('Login failed:', err);",
+					"                return;",
+					"            }",
+					"            ",
+					"            if (response.code === 200) {",
+					"                const responseJson = response.json();",
+					"                if (responseJson && responseJson.token) {",
+					"                    // Store the token for future requests",
+					"                    pm.collectionVariables.set('token', responseJson.token);",
+					"                    console.log('Auto-login successful, token stored');",
+					"                } else {",
+					"                    console.error('Login response missing token');",
+					"                }",
+					"            } else {",
+					"                console.error('Login failed with status:', response.code);",
+					"                console.error('Response:', response.text());",
+					"            }",
+					"        });",
+					"    } else {",
+					"        console.log('Token already exists, skipping auto-login');",
+					"    }",
+					"}"
 				]
 			}
 		},
@@ -985,7 +1043,27 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					""
+					"// Post-request script - runs after every request",
+					"",
+					"// Check if the request failed due to authentication issues",
+					"if (pm.response.code === 401 || pm.response.code === 403) {",
+					"    console.log('Authentication failed (401/403), clearing token for next request');",
+					"    // Clear the token so the pre-request script will login again",
+					"    pm.collectionVariables.set('token', '');",
+					"}",
+					"",
+					"// For successful auth responses, ensure we store the token",
+					"if (pm.request.url.getPath().includes('/auth/login') && pm.response.code === 200) {",
+					"    try {",
+					"        const responseJson = pm.response.json();",
+					"        if (responseJson && responseJson.token) {",
+					"            pm.collectionVariables.set('token', responseJson.token);",
+					"            console.log('Login successful, token updated');",
+					"        }",
+					"    } catch (e) {",
+					"        console.error('Error parsing login response:', e);",
+					"    }",
+					"}"
 				]
 			}
 		}
@@ -1004,6 +1082,11 @@
 		{
 			"key": "username",
 			"value": "admin",
+			"type": "string"
+		},
+		{
+			"key": "password",
+			"value": "admin123",
 			"type": "string"
 		},
 		{

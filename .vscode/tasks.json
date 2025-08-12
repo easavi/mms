@@ -8,6 +8,9 @@
 			"group": "build",
 			"isBackground": true,
 			"args": [],
+			"options": {
+				"cwd": "${workspaceFolder}/frontend"
+			},
 			"problemMatcher": []
 		},
 		{

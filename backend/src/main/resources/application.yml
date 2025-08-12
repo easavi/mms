@@ -25,15 +25,18 @@ security:
     expiration: 86400000 # 24 hours in milliseconds
 
 storage:
-  type: minio  # or 's3'
-  minio:
-    endpoint: http://localhost:9000
-    accessKey: minioadmin
-    secretKey: minioadmin    
-  s3:
-    region: your_aws_region
-    accessKey: your_aws_access_key
-    secretKey: your_aws_secret_key    
+  type: local  # Changed from 'minio' to 'local'
+  local:
+    base-path: ./buckets  # Local storage directory
+  # Keeping old configs commented for reference
+  # minio:
+  #   endpoint: http://localhost:9000
+  #   accessKey: minioadmin
+  #   secretKey: minioadmin    
+  # s3:
+  #   region: your_aws_region
+  #   accessKey: your_aws_access_key
+  #   secretKey: your_aws_secret_key    
 
 server:
   port: 8080

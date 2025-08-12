@@ -1,0 +1,25 @@
+# Local File Storage Directory
+
+This directory stores uploaded media files organized by:
+- username/images/ - Image files (jpg, png, gif, etc.)
+- username/videos/ - Video files (mp4, avi, mov, etc.)  
+- username/files/ - Other files (documents, audio, etc.)
+
+Directory structure example:
+```
+buckets/
+├── admin/
+│   ├── images/
+│   │   ├── uuid1.jpg
+│   │   └── uuid2.png
+│   ├── videos/
+│   │   └── uuid3.mp4
+│   └── files/
+│       └── uuid4.pdf
+└── user2/
+    ├── images/
+    ├── videos/
+    └── files/
+```
+
+Note: This directory is created automatically when users upload files.

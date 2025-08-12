@@ -68,21 +68,15 @@ public class MediaService {
                 throw new RuntimeException("File is null in MediaService");
             }
             
-            // Generate unique file path
-            String fileName = file.getOriginalFilename();
-            String extension = fileName != null && fileName.contains(".") 
-                ? fileName.substring(fileName.lastIndexOf(".")) 
-                : "";
-            String uniqueFileName = UUID.randomUUID().toString() + extension;
-            String filePath = "media/" + uniqueFileName;
+            // Store file using local storage service
+            // The local storage service will handle creating user-specific directories
+            String storedPath = storageService.store("local", file, "");
             
-            // Store file in MinIO
-            String storedPath = storageService.store("mms", file, filePath);
-            
-            // Get the public URL for the stored file
-            String fileUrl = storageService.getUrl("mms", storedPath);
+            // For local storage, the URL is the path that will be handled by the content API
+            String fileUrl = "/api/media/content?bucket=local&fileId=" + storedPath;
             
             // Determine title (use provided title or derive from filename)
+            String fileName = file.getOriginalFilename();
             String title = request.getTitle();
             if (title == null || title.trim().isEmpty()) {
                 title = fileName != null ? fileName : "Uploaded File";
@@ -475,14 +469,11 @@ public class MediaService {
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found"));
         
         try {
-            // Extract file path from the stored file URL or derive it
+            // Extract file path from the stored file URL
             String filePath = extractFilePathFromUrl(media.getFileUrl());
             
-            // Use default bucket (mms) - could be made configurable
-            String bucket = "mms";
-            
-            // Retrieve the file content from storage
-            var inputStream = storageService.retrieve(bucket, filePath);
+            // Retrieve the file content from local storage
+            var inputStream = storageService.retrieve("local", filePath);
             byte[] content = inputStream.readAllBytes();
             inputStream.close();
             
@@ -497,38 +488,38 @@ public class MediaService {
     }
     
     private String extractFilePathFromUrl(String fileUrl) {
-        // If the URL contains the full path, extract just the path part
-        // For MinIO URLs like: http://localhost:9000/mms/media/filename.ext
-        // We want to extract: media/filename.ext
-        if (fileUrl.contains("/media/")) {
-            int mediaIndex = fileUrl.indexOf("/media/");
-            return fileUrl.substring(mediaIndex + 1); // Remove the leading slash
+        // For local storage URLs like: /api/media/content?bucket=local&fileId=username/images/filename.ext
+        // We want to extract: username/images/filename.ext
+        if (fileUrl.contains("fileId=")) {
+            int fileIdIndex = fileUrl.indexOf("fileId=") + 7;
+            String fileId = fileUrl.substring(fileIdIndex);
+            // Remove any additional query parameters
+            if (fileId.contains("&")) {
+                fileId = fileId.substring(0, fileId.indexOf("&"));
+            }
+            return fileId;
         }
         
-        // If it's already a path, return as is
-        if (fileUrl.startsWith("media/")) {
-            return fileUrl;
-        }
-        
-        // Fallback: assume it's just the filename and add media/ prefix
-        return "media/" + fileUrl;
+        // Fallback: if it's already a path, return as is
+        return fileUrl;
     }
-    
+
     @Transactional(readOnly = true)
     public MediaContentResponse getFileContent(String bucket, String fileId) {
         try {
-            // Use the file ID as the path in the bucket
-            String filePath = "media/" + fileId;
-            
-            // Retrieve the file content from storage
-            var inputStream = storageService.retrieve(bucket, filePath);
+            // Use the file ID as the path directly (it contains the full path: username/mediatype/filename)
+            var inputStream = storageService.retrieve(bucket, fileId);
             byte[] content = inputStream.readAllBytes();
             inputStream.close();
             
             // Find the media record to get content type and filename info
-            // We'll try to determine content type from the file extension
             String contentType = "application/octet-stream"; // default
             String fileName = fileId;
+            
+            // Extract just the filename from the path
+            if (fileId.contains("/")) {
+                fileName = fileId.substring(fileId.lastIndexOf("/") + 1);
+            }
             
             // Try to find media record by searching for the file path in fileUrl
             Optional<Media> mediaOpt = mediaRepository.findAll().stream()
@@ -537,11 +528,11 @@ public class MediaService {
             
             if (mediaOpt.isPresent()) {
                 Media media = mediaOpt.get();
-                fileName = media.getFileName() != null ? media.getFileName() : fileId;
+                fileName = media.getFileName() != null ? media.getFileName() : fileName;
                 contentType = determineContentTypeFromMedia(media.getMediaType(), fileName);
             } else {
                 // Fallback: determine content type from file extension
-                contentType = determineContentTypeFromExtension(fileId);
+                contentType = determineContentTypeFromExtension(fileName);
             }
             
             return new MediaContentResponse(content, contentType, fileName);

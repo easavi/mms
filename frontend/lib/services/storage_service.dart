@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import '../config/api_config.dart';
 import '../models/models.dart';
 import 'api_service.dart';
@@ -9,10 +10,23 @@ class StorageService {
   Future<List<Storage>> getAllStorage() async {
     try {
       final response = await _apiService.get(ApiConfig.storage);
+      debugPrint('Storage API Response type: ${response.data.runtimeType}');
+      debugPrint('Storage API Response: ${response.data}');
+      
       final List<dynamic> data = response.data is List 
           ? response.data 
           : response.data['content'] ?? [];
-      return data.map((json) => Storage.fromJson(json)).toList();
+      
+      debugPrint('Processing ${data.length} storage items');
+      return data.map((json) {
+        try {
+          return Storage.fromJson(json);
+        } catch (e) {
+          debugPrint('Error parsing storage item: $e');
+          debugPrint('JSON data: $json');
+          rethrow;
+        }
+      }).toList();
     } catch (e) {
       rethrow;
     }

@@ -74,7 +74,8 @@ class MediaProvider extends ChangeNotifier {
         size: _pageSize,
       );
       
-      _media = result;
+      debugPrint('Loaded ${result.length} media items');
+      _media = List<Media>.from(result); // Ensure proper list type
       _hasMoreData = result.length == _pageSize;
       notifyListeners();
     } catch (e) {

@@ -15,11 +15,14 @@ extension StorageTypeExtension on StorageType {
   }
 
   static StorageType fromString(String value) {
+    if (value.isEmpty) return StorageType.Server;
+    
     switch (value.toLowerCase()) {
       case 'server':
         return StorageType.Server;
       default:
-        throw ArgumentError('Unknown StorageType: $value');
+        // Return Server as default instead of throwing an error
+        return StorageType.Server;
     }
   }
 }
@@ -48,15 +51,33 @@ class Storage {
   });
 
   factory Storage.fromJson(Map<String, dynamic> json) {
+    // Safely parse size
+    int parsedSize = 0;
+    final sizeData = json['size'];
+    if (sizeData is int) {
+      parsedSize = sizeData;
+    } else if (sizeData is String) {
+      parsedSize = int.tryParse(sizeData) ?? 0;
+    }
+
+    // Safely parse itemsQuantity
+    int parsedItemsQuantity = 0;
+    final itemsQuantityData = json['itemsQuantity'];
+    if (itemsQuantityData is int) {
+      parsedItemsQuantity = itemsQuantityData;
+    } else if (itemsQuantityData is String) {
+      parsedItemsQuantity = int.tryParse(itemsQuantityData) ?? 0;
+    }
+
     return Storage(
-      id: json['id'],
-      bucket: json['bucket'],
-      path: json['path'],
-      type: StorageTypeExtension.fromString(json['type']),
-      updated: DateTime.parse(json['updated']),
-      size: json['size'] ?? 0,
-      itemsQuantity: json['itemsQuantity'] ?? 0,
-      username: json['username'],
+      id: json['id']?.toString() ?? '',
+      bucket: json['bucket']?.toString() ?? '',
+      path: json['path']?.toString() ?? '',
+      type: StorageTypeExtension.fromString(json['type']?.toString() ?? 'server'),
+      updated: DateTime.parse(json['updated']?.toString() ?? DateTime.now().toIso8601String()),
+      size: parsedSize,
+      itemsQuantity: parsedItemsQuantity,
+      username: json['username']?.toString() ?? '',
       isEnabled: json['isEnabled'] ?? true,
     );
   }

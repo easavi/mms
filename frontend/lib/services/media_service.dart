@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../config/api_config.dart';
 import '../models/models.dart';
 import 'api_service.dart';
@@ -33,11 +34,23 @@ class MediaService {
         queryParameters: queryParams,
       );
       
+      debugPrint('API Response type: ${response.data.runtimeType}');
+      debugPrint('API Response: ${response.data}');
+      
       final List<dynamic> data = response.data is List 
           ? response.data 
           : response.data['content'] ?? [];
       
-      return data.map((json) => Media.fromJson(json)).toList();
+      debugPrint('Processing ${data.length} media items');
+      return data.map((json) {
+        try {
+          return Media.fromJson(json);
+        } catch (e) {
+          debugPrint('Error parsing media item: $e');
+          debugPrint('JSON data: $json');
+          rethrow;
+        }
+      }).toList();
     } catch (e) {
       rethrow;
     }

@@ -10,8 +10,8 @@ class Media {
   final DateTime uploadedAt;
   final List<String> tags;
   final String? thumbnailUrl;
-  final int fileSize;
-  final String mimeType;
+  final int fileSize; // Default to 0 if not provided by backend
+  final String mimeType; // Default to empty string if not provided by backend
 
   Media({
     required this.id,
@@ -28,18 +28,59 @@ class Media {
   });
 
   factory Media.fromJson(Map<String, dynamic> json) {
+    // Safely parse tags - backend returns String[] array
+    List<String> parsedTags = [];
+    final tagsData = json['tags'];
+    if (tagsData is List) {
+      parsedTags = List<String>.from(tagsData.map((tag) => tag.toString()));
+    } else if (tagsData is String && tagsData.isNotEmpty) {
+      // Handle case where tags might be a comma-separated string
+      parsedTags = tagsData.split(',').map((tag) => tag.trim()).toList();
+    }
+
+    // fileSize and mimeType are not provided by backend MediaResponse
+    // We'll default them to safe values
+    int parsedFileSize = 0;
+    String parsedMimeType = '';
+
+    // Try to determine mime type from file extension if possible
+    final fileName = json['fileName']?.toString() ?? '';
+    if (fileName.isNotEmpty) {
+      final extension = fileName.toLowerCase().split('.').last;
+      switch (extension) {
+        case 'jpg':
+        case 'jpeg':
+          parsedMimeType = 'image/jpeg';
+          break;
+        case 'png':
+          parsedMimeType = 'image/png';
+          break;
+        case 'gif':
+          parsedMimeType = 'image/gif';
+          break;
+        case 'mp4':
+          parsedMimeType = 'video/mp4';
+          break;
+        case 'pdf':
+          parsedMimeType = 'application/pdf';
+          break;
+        default:
+          parsedMimeType = 'application/octet-stream';
+      }
+    }
+
     return Media(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      fileName: json['fileName'] ?? '',
-      fileUrl: json['fileUrl'] ?? '',
-      mediaType: MediaTypeExtension.fromString(json['mediaType'] ?? 'file'),
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
-      uploadedAt: DateTime.parse(json['uploadedAt'] ?? DateTime.now().toIso8601String()),
-      tags: List<String>.from(json['tags'] ?? []),
-      thumbnailUrl: json['thumbnailUrl'],
-      fileSize: json['fileSize'] ?? 0,
-      mimeType: json['mimeType'] ?? '',
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      fileName: fileName,
+      fileUrl: json['fileUrl']?.toString() ?? '',
+      mediaType: MediaTypeExtension.fromString(json['mediaType']?.toString() ?? 'file'),
+      createdAt: DateTime.parse(json['createdAt']?.toString() ?? DateTime.now().toIso8601String()),
+      uploadedAt: DateTime.parse(json['uploadedAt']?.toString() ?? DateTime.now().toIso8601String()),
+      tags: parsedTags,
+      thumbnailUrl: json['thumbnailUrl']?.toString(),
+      fileSize: parsedFileSize, // Default to 0 since backend doesn't provide this
+      mimeType: parsedMimeType, // Derived from file extension
     );
   }
 

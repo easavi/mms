@@ -25,6 +25,8 @@ extension MediaTypeExtension on MediaType {
   bool get isFile => this == MediaType.file;
 
   static MediaType fromString(String value) {
+    if (value.isEmpty) return MediaType.file;
+    
     switch (value.toLowerCase()) {
       case 'image':
         return MediaType.image;
@@ -33,7 +35,8 @@ extension MediaTypeExtension on MediaType {
       case 'file':
         return MediaType.file;
       default:
-        throw ArgumentError('Unknown MediaType: $value');
+        // Return file as default instead of throwing an error
+        return MediaType.file;
     }
   }
 }

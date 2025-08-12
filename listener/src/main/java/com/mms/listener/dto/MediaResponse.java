@@ -1,7 +1,5 @@
 package com.mms.listener.dto;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 public class MediaResponse {
@@ -14,10 +12,10 @@ public class MediaResponse {
     private Long fileSize;
     private String bucket;
     private String fileId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String createdAt;  // Changed from LocalDateTime to String
+    private String updatedAt;  // Changed from LocalDateTime to String
     private String username;
-    private List<TagResponse> tags;
+    private String[] tags;      // Changed from List<TagResponse> to String[] to match backend
     
     // Default constructor
     public MediaResponse() {}
@@ -50,15 +48,15 @@ public class MediaResponse {
     public String getFileId() { return fileId; }
     public void setFileId(String fileId) { this.fileId = fileId; }
     
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
     
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public String getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
     
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
     
-    public List<TagResponse> getTags() { return tags; }
-    public void setTags(List<TagResponse> tags) { this.tags = tags; }
+    public String[] getTags() { return tags; }
+    public void setTags(String[] tags) { this.tags = tags; }
 }

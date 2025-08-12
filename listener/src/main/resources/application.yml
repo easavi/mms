@@ -14,7 +14,7 @@ mms:
   
   # Folders to monitor (only used in listener mode)
   folders:
-    - "D:/dev/mms/images"
+    - "D:/dev/mms/temp/images"
   
   # File patterns to include/exclude
   file-patterns:

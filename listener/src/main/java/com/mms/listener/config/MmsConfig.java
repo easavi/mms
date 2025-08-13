@@ -12,7 +12,6 @@ public class MmsConfig {
     private Backend backend = new Backend();
     private List<String> folders;
     private FilePatterns filePatterns = new FilePatterns();
-    private Backup backup = new Backup();
 
     public static class Backend {
         private String url;
@@ -67,28 +66,6 @@ public class MmsConfig {
         }
     }
 
-    public static class Backup {
-        private String downloadFolder;
-        private int maxConcurrentDownloads = 5;
-
-        // Getters and setters
-        public String getDownloadFolder() {
-            return downloadFolder;
-        }
-
-        public void setDownloadFolder(String downloadFolder) {
-            this.downloadFolder = downloadFolder;
-        }
-
-        public int getMaxConcurrentDownloads() {
-            return maxConcurrentDownloads;
-        }
-
-        public void setMaxConcurrentDownloads(int maxConcurrentDownloads) {
-            this.maxConcurrentDownloads = maxConcurrentDownloads;
-        }
-    }
-
     // Main getters and setters
     public Backend getBackend() {
         return backend;
@@ -112,13 +89,5 @@ public class MmsConfig {
 
     public void setFilePatterns(FilePatterns filePatterns) {
         this.filePatterns = filePatterns;
-    }
-
-    public Backup getBackup() {
-        return backup;
-    }
-
-    public void setBackup(Backup backup) {
-        this.backup = backup;
     }
 }

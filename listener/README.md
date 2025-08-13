@@ -1,6 +1,6 @@
 # MMS Listener Application
 
-A Java 24 Spring Boot application that provides file monitoring and backup capabilities for the MMS (Media Management System).
+A Java 24 Spring Boot application that provides file monitoring capabilities for the MMS (Media Management System).
 
 ## Features
 
@@ -10,13 +10,6 @@ A Java 24 Spring Boot application that provides file monitoring and backup capab
 - Configurable file filtering with include/exclude patterns
 - Real-time console logging of all upload activities
 - Supports multiple folder monitoring simultaneously
-
-### 💾 Backup Mode
-- Downloads all media files from the MMS backend
-- Organizes files by media type (image, video, file, etc.)
-- Concurrent downloads with configurable limits
-- Progress tracking and error handling
-- Saves files to a local backup directory
 
 ## Requirements
 
@@ -54,14 +47,6 @@ mms:
     exclude: "\\.(tmp|temp|log)$"
 ```
 
-### Backup Settings
-```yaml
-mms:
-  backup:
-    download-folder: "./backups"     # Where to save downloaded files
-    max-concurrent-downloads: 5      # Concurrent download limit
-```
-
 ## Building
 
 ```bash
@@ -71,7 +56,7 @@ mvn clean package
 
 ## Running
 
-### Listener Mode (Default)
+### Listener Mode
 Monitor folders and upload files to backend:
 
 ```bash
@@ -82,18 +67,7 @@ mvn spring-boot:run
 mvn spring-boot:run -Dspring-boot.run.arguments="--mode=listener"
 
 # Using JAR
-java -jar target/mms-listener-1.0.0-SNAPSHOT.jar --mode=listener
-```
-
-### Backup Mode
-Download all files from backend:
-
-```bash
-# Using Maven
-mvn spring-boot:run -Dspring-boot.run.arguments="--mode=backup"
-
-# Using JAR
-java -jar target/mms-listener-1.0.0-SNAPSHOT.jar --mode=backup
+java -jar target/mms-listener-1.0.0-SNAPSHOT.jar
 ```
 
 ## Operation Modes
@@ -106,14 +80,6 @@ java -jar target/mms-listener-1.0.0-SNAPSHOT.jar --mode=backup
 - ✅ Automatic authentication with the backend
 - ✅ Retry logic for failed uploads
 - ✅ File type detection (image, video, audio, file)
-
-### Backup Mode
-- ✅ Downloads all media files from the backend
-- ✅ Organizes files by type in subdirectories
-- ✅ Avoids duplicate downloads (checks existing files)
-- ✅ Concurrent downloads for better performance
-- ✅ Progress reporting with file sizes
-- ✅ Automatic authentication with the backend
 
 ## Console Output Examples
 
@@ -130,47 +96,16 @@ java -jar target/mms-listener-1.0.0-SNAPSHOT.jar --mode=backup
 📤 File uploaded successfully: photo.jpg (ID: 123e4567-e89b-12d3-a456-426614174000)
 ```
 
-### Backup Mode
-```
-🚀 MMS Listener Application
-📋 Operation Mode: BACKUP
-💾 Starting in BACKUP mode...
-✅ Authentication successful for user: admin
-📊 Found 150 files to backup
-📁 Backup directory: D:\dev\mms\listener\backups
-💾 Downloaded: 123e4567_photo.jpg (2.5 MB)
-💾 Downloaded: 456f7890_video.mp4 (15.3 MB)
-✅ Backup process completed!
-```
-
-## File Structure
-
-After running backup mode, files are organized as:
-```
-backups/
-├── image/
-│   ├── 123e4567_photo1.jpg
-│   └── 456f7890_photo2.png
-├── video/
-│   ├── 789a1234_movie1.mp4
-│   └── bcde5678_movie2.avi
-└── file/
-    ├── 901f2345_document.pdf
-    └── 6789abcd_spreadsheet.xlsx
-```
-
 ## API Integration
 
 The application uses the following MMS backend APIs:
 - `POST /auth/login` - Authentication
 - `POST /api/media/upload` - File upload
-- `GET /api/media/all` - Get all media files
-- `GET /api/media/content` - Download file content
 
 ## Error Handling
 
 - ✅ Automatic re-authentication on token expiry
-- ✅ Retry logic for failed uploads/downloads
+- ✅ Retry logic for failed uploads
 - ✅ Graceful handling of network issues
 - ✅ Detailed error logging
 - ✅ Skip invalid/inaccessible files
@@ -178,7 +113,6 @@ The application uses the following MMS backend APIs:
 ## Stopping the Application
 
 - **Listener Mode**: Press `Ctrl+C` to stop monitoring
-- **Backup Mode**: Application exits automatically after completion
 
 ## Troubleshooting
 

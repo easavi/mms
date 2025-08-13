@@ -24,14 +24,9 @@ mms:
 mvn clean package -DskipTests
 ```
 
-### 3. Run in Listener Mode
+### 3. Run the Listener
 ```bash
-java -jar target/mms-listener-1.0.0-SNAPSHOT.jar --mode=listener
-```
-
-### 4. Run in Backup Mode
-```bash
-java -jar target/mms-listener-1.0.0-SNAPSHOT.jar --mode=backup
+java -jar target/mms-listener-1.0.0-SNAPSHOT.jar
 ```
 
 ## Testing the Listener Mode
@@ -40,13 +35,6 @@ java -jar target/mms-listener-1.0.0-SNAPSHOT.jar --mode=backup
 2. Copy a file to one of the monitored folders
 3. Check the console output - you should see upload confirmation
 4. Verify in the MMS backend that the file was uploaded
-
-## Testing the Backup Mode
-
-1. Make sure you have some files in the MMS backend
-2. Run the backup mode
-3. Check the `./backups` folder for downloaded files
-4. Files will be organized by type (image/, video/, file/)
 
 ## Common Issues
 

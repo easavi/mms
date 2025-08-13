@@ -20,23 +20,6 @@
         },
         {
             "type": "java",
-            "name": "MMS Listener - Backup Mode",
-            "request": "launch",
-            "mainClass": "com.mms.listener.MmsListenerApplication",
-            "projectName": "mms-listener",
-            "args": ["--mode=backup"],
-            "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
-            "env": {},
-            "vmArgs": [],
-            "presentation": {
-                "hidden": false,
-                "group": "MMS Listener",
-                "order": 2
-            }
-        },
-        {
-            "type": "java",
             "name": "MMS Listener - Debug Mode (Listener)",
             "request": "launch",
             "mainClass": "com.mms.listener.MmsListenerApplication",
@@ -55,28 +38,6 @@
                 "hidden": false,
                 "group": "MMS Listener Debug",
                 "order": 3
-            }
-        },
-        {
-            "type": "java",
-            "name": "MMS Listener - Debug Mode (Backup)",
-            "request": "launch",
-            "mainClass": "com.mms.listener.MmsListenerApplication",
-            "projectName": "mms-listener",
-            "args": ["--mode=backup"],
-            "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
-            "env": {
-                "SPRING_PROFILES_ACTIVE": "debug"
-            },
-            "vmArgs": [
-                "-Dlogging.level.com.mms.listener=DEBUG",
-                "-Dlogging.level.org.springframework.web.reactive=DEBUG"
-            ],
-            "presentation": {
-                "hidden": false,
-                "group": "MMS Listener Debug",
-                "order": 4
             }
         }
     ]

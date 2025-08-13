@@ -32,6 +32,7 @@ public class MmsApiService {
         this.webClient = WebClient.builder()
                 .baseUrl(config.getBackend().getUrl())
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(50 * 1024 * 1024)) // 50MB buffer
                 .build();
     }
     

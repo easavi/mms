@@ -24,7 +24,7 @@ mms:
   # Backup configuration (only used in backup mode)
   backup:
     download-folder: "D:/dev/mms/temp/backup"
-    max-concurrent-downloads: 1
+    max-concurrent-downloads: 5
 
 logging:
   level:

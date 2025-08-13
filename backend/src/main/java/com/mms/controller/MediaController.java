@@ -162,4 +162,35 @@ public class MediaController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/thumbnail/{id}")
+    public ResponseEntity<byte[]> getThumbnail(@PathVariable UUID id) {
+        try {
+            MediaContentResponse thumbnailContent = mediaService.getThumbnailById(id);
+            return ResponseEntity.ok()
+                    .header("Content-Type", thumbnailContent.getContentType())
+                    .header("Content-Disposition", "inline; filename=\"thumb_" + thumbnailContent.getFileName() + "\"")
+                    .header("Cache-Control", "max-age=7200") // Cache thumbnails for 2 hours
+                    .body(thumbnailContent.getContent());
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/thumbnail")
+    public ResponseEntity<byte[]> getThumbnailByBucketAndId(
+            @RequestParam String bucket,
+            @RequestParam String fileId) {
+        
+        try {
+            MediaContentResponse thumbnailContent = mediaService.getThumbnail(bucket, fileId);
+            return ResponseEntity.ok()
+                    .header("Content-Type", thumbnailContent.getContentType())
+                    .header("Content-Disposition", "inline; filename=\"thumb_" + thumbnailContent.getFileName() + "\"")
+                    .header("Cache-Control", "max-age=7200") // Cache thumbnails for 2 hours
+                    .body(thumbnailContent.getContent());
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

@@ -541,6 +541,81 @@ public class MediaService {
             throw new ApiException(HttpStatus.NOT_FOUND, "File not found: " + e.getMessage());
         }
     }
+
+    @Transactional(readOnly = true)
+    public MediaContentResponse getThumbnailById(UUID mediaId) {
+        // Find the media record by ID
+        Media media = mediaRepository.findById(mediaId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found"));
+        
+        // Check if it's an image
+        if (!"image".equals(media.getMediaType())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Thumbnails are only available for images");
+        }
+        
+        try {
+            // Extract file path from the stored file URL
+            String filePath = extractFilePathFromUrl(media.getFileUrl());
+            
+            // Get thumbnail path using LocalStorageService
+            LocalStorageService localStorageService = (LocalStorageService) storageService;
+            String thumbnailPath = localStorageService.getThumbnailPath(filePath);
+            
+            if (thumbnailPath == null) {
+                throw new ApiException(HttpStatus.NOT_FOUND, "Thumbnail not found for this image");
+            }
+            
+            // Retrieve the thumbnail content
+            var inputStream = storageService.retrieve("local", thumbnailPath);
+            byte[] content = inputStream.readAllBytes();
+            inputStream.close();
+            
+            // Determine content type (thumbnails are typically in the same format as original)
+            String contentType = determineContentTypeFromMedia(media.getMediaType(), media.getFileName());
+            
+            return new MediaContentResponse(content, contentType, media.getFileName());
+            
+        } catch (Exception e) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "Thumbnail not found: " + e.getMessage());
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public MediaContentResponse getThumbnail(String bucket, String fileId) {
+        try {
+            // Check if the original file is an image
+            LocalStorageService localStorageService = (LocalStorageService) storageService;
+            if (!localStorageService.isImageFile(fileId)) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Thumbnails are only available for images");
+            }
+            
+            // Get thumbnail path
+            String thumbnailPath = localStorageService.getThumbnailPath(fileId);
+            
+            if (thumbnailPath == null) {
+                throw new ApiException(HttpStatus.NOT_FOUND, "Thumbnail not found for this image");
+            }
+            
+            // Retrieve the thumbnail content
+            var inputStream = storageService.retrieve(bucket, thumbnailPath);
+            byte[] content = inputStream.readAllBytes();
+            inputStream.close();
+            
+            // Extract filename for content type determination
+            String fileName = fileId;
+            if (fileId.contains("/")) {
+                fileName = fileId.substring(fileId.lastIndexOf("/") + 1);
+            }
+            
+            // Determine content type
+            String contentType = determineContentTypeFromExtension(fileName);
+            
+            return new MediaContentResponse(content, contentType, fileName);
+            
+        } catch (Exception e) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "Thumbnail not found: " + e.getMessage());
+        }
+    }
     
     private String determineContentTypeFromMedia(String mediaType, String fileName) {
         if (fileName != null) {

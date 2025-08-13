@@ -1,5 +1,6 @@
 package com.mms.service;
 
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.core.Authentication;
@@ -50,6 +51,11 @@ public class LocalStorageService implements StorageService {
             // Copy file to destination
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+            }
+            
+            // Generate thumbnail if it's an image
+            if ("images".equals(mediaType)) {
+                generateThumbnail(filePath, uniqueFilename);
             }
             
             // Return relative path from buckets root
@@ -147,5 +153,72 @@ public class LocalStorageService implements StorageService {
             return Files.size(filePath);
         }
         return 0;
+    }
+
+    /**
+     * Generate a thumbnail for an image file
+     * Thumbnail will be saved in the same directory with "_thumb_" prefix
+     */
+    private void generateThumbnail(Path originalImagePath, String originalFilename) {
+        try {
+            // Create thumbnail filename with _thumb_ prefix
+            String thumbnailFilename = "_thumb_" + originalFilename;
+            Path thumbnailPath = originalImagePath.getParent().resolve(thumbnailFilename);
+            
+            // Generate 256x256 thumbnail
+            Thumbnails.of(originalImagePath.toFile())
+                    .size(256, 256)
+                    .keepAspectRatio(true)
+                    .toFile(thumbnailPath.toFile());
+            
+            System.out.println("✅ Thumbnail generated: " + thumbnailPath);
+            
+        } catch (IOException e) {
+            // Log error but don't fail the main upload process
+            System.err.println("❌ Failed to generate thumbnail for " + originalFilename + ": " + e.getMessage());
+        } catch (Exception e) {
+            // Catch any other exceptions (e.g., unsupported image format)
+            System.err.println("❌ Thumbnail generation failed for " + originalFilename + ": " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get the thumbnail path for a given image file
+     * @param originalRelativePath The relative path of the original image (e.g., "username/images/uuid.jpg")
+     * @return The relative path of the thumbnail or null if thumbnail doesn't exist
+     */
+    public String getThumbnailPath(String originalRelativePath) {
+        try {
+            // Extract the directory and filename
+            Path originalPath = Paths.get(originalRelativePath);
+            Path directory = originalPath.getParent();
+            String originalFilename = originalPath.getFileName().toString();
+            
+            // Create thumbnail filename
+            String thumbnailFilename = "_thumb_" + originalFilename;
+            
+            // Build full thumbnail path
+            String thumbnailRelativePath = directory.resolve(thumbnailFilename).toString().replace("\\", "/");
+            
+            // Check if thumbnail exists
+            if (fileExists(thumbnailRelativePath)) {
+                return thumbnailRelativePath;
+            }
+            
+            return null;
+        } catch (Exception e) {
+            System.err.println("❌ Error getting thumbnail path for " + originalRelativePath + ": " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Check if a file is an image based on its path
+     */
+    public boolean isImageFile(String relativePath) {
+        if (relativePath == null) return false;
+        
+        String filename = Paths.get(relativePath).getFileName().toString().toLowerCase();
+        return filename.matches(".*\\.(jpg|jpeg|png|gif|bmp|webp|svg|ico)$");
     }
 }

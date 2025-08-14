@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../models/models.dart';
 import '../../services/storage_service.dart';
+import '../../providers/file_upload_provider.dart';
 import '../../theme/app_theme.dart';
 
 class StorageScreen extends StatefulWidget {

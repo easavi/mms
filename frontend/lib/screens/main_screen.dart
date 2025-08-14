@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/media_provider.dart';
+import '../providers/file_upload_provider.dart';
 import '../widgets/media_card.dart';
 import '../widgets/media_filters.dart';
 
@@ -60,6 +61,52 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: const Text('Media Gallery'),
         actions: [
+          // Upload status indicator
+          Consumer<FileUploadProvider>(
+            builder: (context, fileUploadProvider, child) {
+              final pendingUploads = fileUploadProvider.pendingUploads;
+              final failedUploads = fileUploadProvider.failedUploads.length;
+              
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.cloud_upload,
+                      color: fileUploadProvider.isRunning 
+                          ? (failedUploads > 0 ? Colors.red : Colors.green)
+                          : Colors.grey,
+                    ),
+                    onPressed: () => Navigator.of(context).pushNamed('/upload-status'),
+                    tooltip: 'Upload Status',
+                  ),
+                  if (pendingUploads > 0 || failedUploads > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: failedUploads > 0 ? Colors.red : Colors.blue,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '${pendingUploads + failedUploads}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: _showFilters,
@@ -67,6 +114,9 @@ class _MainScreenState extends State<MainScreen> {
           PopupMenuButton<String>(
             onSelected: (value) {
               switch (value) {
+                case 'upload-status':
+                  Navigator.of(context).pushNamed('/upload-status');
+                  break;
                 case 'storages':
                   Navigator.of(context).pushNamed('/storages');
                   break;
@@ -76,6 +126,16 @@ class _MainScreenState extends State<MainScreen> {
               }
             },
             itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'upload-status',
+                child: Row(
+                  children: [
+                    Icon(Icons.cloud_upload),
+                    SizedBox(width: 8),
+                    Text('Upload Status'),
+                  ],
+                ),
+              ),
               const PopupMenuItem(
                 value: 'storages',
                 child: Row(

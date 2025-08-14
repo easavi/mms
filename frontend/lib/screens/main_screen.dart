@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/media_provider.dart';
-import '../providers/file_upload_provider.dart';
 import '../widgets/media_card.dart';
 import '../widgets/media_filters.dart';
 
@@ -22,11 +21,6 @@ class _MainScreenState extends State<MainScreen> {
     _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MediaProvider>().loadMedia();
-      
-      // Initialize file upload service
-      context.read<FileUploadProvider>().initializeUploadService().catchError((error) {
-        debugPrint('Failed to initialize upload service: $error');
-      });
     });
   }
 
@@ -66,52 +60,6 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: const Text('Media Gallery'),
         actions: [
-          // Upload status indicator
-          Consumer<FileUploadProvider>(
-            builder: (context, uploadProvider, child) {
-              final pendingCount = uploadProvider.pendingUploadsCount;
-              if (pendingCount > 0) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Stack(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.cloud_upload),
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('/upload-status');
-                        },
-                      ),
-                      if (pendingCount > 0)
-                        Positioned(
-                          right: 8,
-                          top: 8,
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 16,
-                              minHeight: 16,
-                            ),
-                            child: Text(
-                              pendingCount.toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: _showFilters,
@@ -121,9 +69,6 @@ class _MainScreenState extends State<MainScreen> {
               switch (value) {
                 case 'storages':
                   Navigator.of(context).pushNamed('/storages');
-                  break;
-                case 'uploads':
-                  Navigator.of(context).pushNamed('/upload-status');
                   break;
                 case 'logoff':
                   _handleLogout();
@@ -138,16 +83,6 @@ class _MainScreenState extends State<MainScreen> {
                     Icon(Icons.storage),
                     SizedBox(width: 8),
                     Text('Storages'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'uploads',
-                child: Row(
-                  children: [
-                    Icon(Icons.cloud_upload),
-                    SizedBox(width: 8),
-                    Text('Upload Status'),
                   ],
                 ),
               ),
@@ -218,17 +153,7 @@ class _MainScreenState extends State<MainScreen> {
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
-                  const Text('Upload some media to get started'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      // TODO: Implement media upload
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Upload feature coming soon')),
-                      );
-                    },
-                    child: const Text('Upload Media'),
-                  ),
+                  const Text('No media available at the moment'),
                 ],
               ),
             );

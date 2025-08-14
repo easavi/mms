@@ -34,14 +34,11 @@ dependencies:
   http: ^1.1.0
   provider: ^6.1.1
   shared_preferences: ^2.2.2
-  file_picker: ^8.0.0
   cached_network_image: ^3.3.0
   video_player: ^2.8.1
   chewie: ^1.7.1
-  # flutter_secure_storage: ^9.0.0  # Temporarily commented out due to Windows build issues
   dio: ^5.4.0
   path: ^1.8.3
-  watcher: ^1.1.0
   mime: ^1.0.5
 
 dev_dependencies:

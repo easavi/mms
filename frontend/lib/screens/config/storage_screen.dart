@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
-import 'package:provider/provider.dart';
 import '../../models/models.dart';
 import '../../services/storage_service.dart';
-import '../../providers/file_upload_provider.dart';
 import '../../theme/app_theme.dart';
 
 class StorageScreen extends StatefulWidget {
@@ -94,9 +90,6 @@ class _StorageScreenState extends State<StorageScreen> {
               backgroundColor: AppTheme.confirmColor,
             ),
           );
-          
-          // TODO: Start file monitoring and upload for this path
-          _startFileUploadMonitoring(result['path'], newStorage);
         }
       } catch (e) {
         if (mounted) {
@@ -148,12 +141,6 @@ class _StorageScreenState extends State<StorageScreen> {
           _storageSizes.remove(storage.bucket);
         });
         
-        // Remove from upload service
-        final uploadProvider = context.read<FileUploadProvider>();
-        uploadProvider.uploadService?.removeStorage(storage.id).catchError((error) {
-          debugPrint('Failed to remove storage from upload service: $error');
-        });
-        
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -191,26 +178,8 @@ class _StorageScreenState extends State<StorageScreen> {
           username: storage.username,
           isEnabled: !storage.isEnabled,
         );
-        
-        // Update upload service
-        if (mounted) {
-          final uploadProvider = context.read<FileUploadProvider>();
-          uploadProvider.uploadService?.updateStorage(_storages[index]).catchError((error) {
-            debugPrint('Failed to update storage in upload service: $error');
-          });
-        }
       }
     });
-  }
-
-  void _startFileUploadMonitoring(String path, Storage storage) {
-    // Add storage to the upload service
-    final uploadProvider = context.read<FileUploadProvider>();
-    uploadProvider.uploadService?.addStorage(storage).catchError((error) {
-      debugPrint('Failed to add storage to upload service: $error');
-    });
-    
-    debugPrint('Starting file upload monitoring for: $path');
   }
 
   String _formatSize(int bytes) {
@@ -575,25 +544,15 @@ class _AddStorageDialogState extends State<_AddStorageDialog> {
   }
 
   Future<void> _selectFolder() async {
-    if (kIsWeb) {
-      // On web, show a dialog to enter path manually
-      final result = await showDialog<String>(
-        context: context,
-        builder: (context) => _PathInputDialog(),
-      );
-      if (result != null && result.isNotEmpty) {
-        setState(() {
-          _pathController.text = result;
-        });
-      }
-    } else {
-      // On desktop/mobile, use native folder picker
-      String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-      if (selectedDirectory != null) {
-        setState(() {
-          _pathController.text = selectedDirectory;
-        });
-      }
+    // On web, show a dialog to enter path manually
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => _PathInputDialog(),
+    );
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        _pathController.text = result;
+      });
     }
   }
 
@@ -634,16 +593,16 @@ class _AddStorageDialogState extends State<_AddStorageDialog> {
                 decoration: InputDecoration(
                   labelText: 'Folder Path',
                   labelStyle: const TextStyle(color: Colors.white70),
-                  hintText: kIsWeb ? 'Enter folder path...' : 'Select a folder...',
+                  hintText: 'Enter folder path...',
                   hintStyle: const TextStyle(color: Colors.white38),
                   prefixIcon: const Icon(Icons.folder, color: Colors.white70),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      kIsWeb ? Icons.edit : Icons.folder_open, 
+                      Icons.edit, 
                       color: AppTheme.accentColor
                     ),
                     onPressed: _selectFolder,
-                    tooltip: kIsWeb ? 'Enter path' : 'Browse for folder',
+                    tooltip: 'Enter path',
                   ),
                   border: const OutlineInputBorder(),
                   enabledBorder: const OutlineInputBorder(
@@ -655,12 +614,11 @@ class _AddStorageDialogState extends State<_AddStorageDialog> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Please ${kIsWeb ? "enter" : "select"} a folder path';
+                    return 'Please enter a folder path';
                   }
                   return null;
                 },
-                readOnly: !kIsWeb,
-                onTap: kIsWeb ? null : _selectFolder,
+                onTap: _selectFolder,
               ),
               const SizedBox(height: 12),
               
@@ -678,9 +636,7 @@ class _AddStorageDialogState extends State<_AddStorageDialog> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        kIsWeb 
-                          ? 'Files in this folder will be synced to the server. Enter the full path to your local folder.'
-                          : 'Files in this folder will be automatically synced to the server.',
+                        'Files in this folder will be synced to the server. Enter the full path to your local folder.',
                         style: TextStyle(
                           color: AppTheme.accentColor,
                           fontSize: 13,

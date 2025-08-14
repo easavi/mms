@@ -10,49 +10,36 @@
             "name": "MmsApplication",
             "request": "launch",
             "mainClass": "com.mms.MmsApplication",
-            "projectName": "mms-backend"
-        },
-        {
-            "name": "frontend",
-            "cwd": "frontend",
-            "request": "launch",
-            "type": "dart"
+            "projectName": "mms-backend",
+            "presentation": {
+                "hidden": false,
+                "group": "MMS Backend",
+                "order": 1
+            }
         },
         {
             "name": "frontend (Chrome)",
             "cwd": "frontend",
             "request": "launch",
             "type": "dart",
-            "deviceId": "chrome"
+            "deviceId": "chrome",
+            "presentation": {
+                "hidden": false,
+                "group": "MMS Frontend",
+                "order": 1
+            }
         },
         {
             "name": "frontend (Windows)",
             "cwd": "frontend",
             "request": "launch",
             "type": "dart",
-            "deviceId": "windows"
-        },
-        {
-            "name": "frontend (Chrome Profile)",
-            "cwd": "frontend",
-            "request": "launch",
-            "type": "dart",
-            "deviceId": "chrome",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "frontend (profile mode)",
-            "cwd": "frontend",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "frontend (release mode)",
-            "cwd": "frontend",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
+            "deviceId": "windows",
+            "presentation": {
+                "hidden": false,
+                "group": "MMS Frontend",
+                "order": 2
+            }
         },
         {
             "type": "java",
@@ -89,8 +76,8 @@
             ],
             "presentation": {
                 "hidden": false,
-                "group": "MMS Listener Debug",
-                "order": 3
+                "group": "MMS Listener",
+                "order": 2
             }
         }
     ]

@@ -11,6 +11,7 @@ public class MmsConfig {
 
     private Backend backend = new Backend();
     private List<String> folders;
+    private List<FolderCopyMapping> folderCopyMappings;
     private FilePatterns filePatterns = new FilePatterns();
 
     public static class Backend {
@@ -41,6 +42,41 @@ public class MmsConfig {
 
         public void setPassword(String password) {
             this.password = password;
+        }
+    }
+
+    public static class FolderCopyMapping {
+        private String source;
+        private String destination;
+
+        // Constructors
+        public FolderCopyMapping() {}
+
+        public FolderCopyMapping(String source, String destination) {
+            this.source = source;
+            this.destination = destination;
+        }
+
+        // Getters and setters
+        public String getSource() {
+            return source;
+        }
+
+        public void setSource(String source) {
+            this.source = source;
+        }
+
+        public String getDestination() {
+            return destination;
+        }
+
+        public void setDestination(String destination) {
+            this.destination = destination;
+        }
+
+        @Override
+        public String toString() {
+            return source + " -> " + destination;
         }
     }
 
@@ -81,6 +117,14 @@ public class MmsConfig {
 
     public void setFolders(List<String> folders) {
         this.folders = folders;
+    }
+
+    public List<FolderCopyMapping> getFolderCopyMappings() {
+        return folderCopyMappings;
+    }
+
+    public void setFolderCopyMappings(List<FolderCopyMapping> folderCopyMappings) {
+        this.folderCopyMappings = folderCopyMappings;
     }
 
     public FilePatterns getFilePatterns() {

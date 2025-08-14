@@ -249,18 +249,44 @@ class FileUploadService extends ChangeNotifier {
     }
   }
 
-  /// Scan existing files in a directory
+  /// Scan existing files in a directory and upload them
   Future<void> _scanExistingFiles(Storage storage) async {
     try {
       final directory = Directory(storage.path);
+      int existingFilesCount = 0;
+      int queuedForUploadCount = 0;
+      
+      // Get all media items once before checking files
+      debugPrint('🔍 Fetching existing media items to check against...');
+      final mediaItems = await _mediaService.getAllMedia();
+      final existingFileNames = mediaItems.map((item) => item.fileName).toSet();
+      debugPrint('📊 Found ${existingFileNames.length} existing files in backend');
       
       await for (final entity in directory.list(recursive: true)) {
         if (entity is File && _shouldProcessFile(entity.path)) {
+          existingFilesCount++;
+          
+          // Check if file already exists in backend
+          final fileName = path.basename(entity.path);
+          final fileExists = existingFileNames.contains(fileName);
+          
+          if (!fileExists) {
+            // File doesn't exist in backend, add to upload queue
+            debugPrint('📤 Queuing existing file for upload: $fileName');
+            _addToUploadQueue(entity.path, storage);
+            queuedForUploadCount++;
+          } else {
+            debugPrint('✅ File already exists in backend: $fileName');
+          }
+          
           _processedFiles.add(entity.path);
         }
       }
       
-      debugPrint('📁 Scanned ${_processedFiles.length} existing files in ${storage.path}');
+      debugPrint('📁 Scanned $existingFilesCount existing files in ${storage.path}');
+      if (queuedForUploadCount > 0) {
+        debugPrint('📤 Queued $queuedForUploadCount existing files for upload');
+      }
     } catch (e) {
       debugPrint('❌ Error scanning directory ${storage.path}: $e');
     }

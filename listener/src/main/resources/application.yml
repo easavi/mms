@@ -16,6 +16,13 @@ mms:
   folders:
     - "D:/dev/mms/temp/files"
   
+  # Folder copy mappings (from -> to)
+  folder-copy-mappings:
+    - source: "D:/dev/mms/temp/source1"
+      destination: "D:/dev/mms/temp/destination1"
+    - source: "D:/dev/mms/temp/source2"
+      destination: "D:/dev/mms/temp/destination2"
+  
   # File patterns to include/exclude
   file-patterns:
     include: "\\.(jpg|jpeg|png|gif|bmp|mp4|avi|mov|wmv|pdf|doc|docx|txt)$"

@@ -41,7 +41,7 @@ The File Upload Service automatically monitors configured storage paths and uplo
 When the user logs in successfully, the service:
 1. Loads all user storage configurations
 2. Creates file watchers for each enabled storage path
-3. Scans existing files to mark them as already processed
+3. Scans existing files and uploads any that don't exist in the backend
 4. Starts monitoring for new file additions
 
 ### 2. File Detection
@@ -87,12 +87,13 @@ The service automatically starts after successful login. No manual intervention 
 1. Go to Storage Configuration
 2. Add new storage path
 3. Service automatically starts monitoring if enabled
-4. Existing files are scanned and marked as processed
+4. Existing files are scanned and uploaded if not present in backend
 
 ### Enabling/Disabling
 1. Toggle storage on/off in Storage Configuration
 2. Service starts/stops monitoring immediately
 3. Pending uploads are preserved when re-enabling
+4. When re-enabling, existing files are checked and uploaded if needed
 
 ### Removing Storage
 1. Delete storage in Storage Configuration
@@ -145,7 +146,8 @@ The service automatically starts after successful login. No manual intervention 
 ## Performance Considerations
 
 ### File Scanning
-- Initial scan of existing files may take time for large directories
+- Initial scan checks existing files against backend and uploads missing ones
+- Scanning of existing files may take time for large directories
 - Files are processed in batches to avoid memory issues
 - Recursive scanning depth is unlimited but monitored
 
@@ -153,6 +155,7 @@ The service automatically starts after successful login. No manual intervention 
 - Concurrent upload limit prevents server overload
 - Large files show progress indicators
 - Failed uploads don't block queue processing
+- Existing file upload during initialization processes in background
 
 ### Memory Usage
 - Processed file list grows with directory size
@@ -205,6 +208,26 @@ Standard MediaResponse object with:
 - Generated unique ID
 - Upload timestamp
 - File metadata
+
+## Behavioral Notes
+
+### Existing File Upload
+- When the service starts, it scans all existing files in monitored directories
+- Files that don't exist in the backend are automatically queued for upload
+- Files that already exist in the backend (matched by filename) are skipped
+- This ensures full synchronization between local directories and backend storage
+
+### File Deletion After Upload
+- After successful upload, files are automatically deleted from the local directory
+- This matches the behavior of the Java listener service
+- Failed uploads leave files in place for retry
+- Deletion only occurs after confirmed successful upload response
+
+### Duplicate Prevention
+- The service checks backend media items by filename before uploading
+- Files with identical names are considered duplicates and skipped
+- This prevents unnecessary uploads and storage waste
+- Filename comparison is case-sensitive
 
 ## Future Enhancements
 

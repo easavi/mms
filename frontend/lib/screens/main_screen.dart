@@ -61,6 +61,12 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: const Text('Media Gallery'),
         actions: [
+          // Refresh button
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _refresh,
+            tooltip: 'Refresh Gallery',
+          ),
           // Upload status indicator
           Consumer<FileUploadProvider>(
             builder: (context, fileUploadProvider, child) {

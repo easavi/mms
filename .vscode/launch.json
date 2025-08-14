@@ -26,6 +26,13 @@
             "deviceId": "chrome"
         },
         {
+            "name": "frontend (Windows)",
+            "cwd": "frontend",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "windows"
+        },
+        {
             "name": "frontend (Chrome Profile)",
             "cwd": "frontend",
             "request": "launch",

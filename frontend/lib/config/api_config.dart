@@ -27,6 +27,8 @@ class ApiConfig {
   static const String media = '/api/media';
   static const String mediaById = '/api/media/'; // Append ID when using
   static const String mediaUpload = '/api/media/upload';
+  static const String mediaThumbnail = '/api/media/thumbnail/'; // Append ID when using
+  static const String mediaThumbnailByBucket = '/api/media/thumbnail'; // Use with bucket and fileId params
 
   // Storage endpoints
   static const String storage = '/api/storage';

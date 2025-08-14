@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../models/models.dart';
+import '../config/api_config.dart';
+import 'authenticated_image.dart';
 
 class MediaCard extends StatelessWidget {
   final Media media;
@@ -14,7 +15,7 @@ class MediaCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => _showMediaDetails(context),
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: _buildMediaPreview(),
@@ -24,16 +25,21 @@ class MediaCard extends StatelessWidget {
 
   Widget _buildMediaPreview() {
     if (media.isImage) {
-      return CachedNetworkImage(
-        imageUrl: media.fileUrl,
+      // Use thumbnail URL if available, fallback to original image URL
+      final imageUrl = media.thumbnailUrlFromFileUrl != null 
+          ? ApiConfig.getFullUrl(media.thumbnailUrlFromFileUrl!)
+          : ApiConfig.getFullUrl(media.fileUrl);
+      
+      return AuthenticatedImage(
+        imageUrl: imageUrl,
         fit: BoxFit.cover,
-        placeholder: (context, url) => Container(
+        placeholder: Container(
           color: Colors.grey[300],
           child: const Center(
             child: CircularProgressIndicator(),
           ),
         ),
-        errorWidget: (context, url, error) => Container(
+        errorWidget: Container(
           color: Colors.grey[300],
           child: const Icon(
             Icons.broken_image,

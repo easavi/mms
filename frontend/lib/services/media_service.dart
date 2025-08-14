@@ -123,4 +123,28 @@ class MediaService {
       rethrow;
     }
   }
+
+  /// Get the full URL for a media thumbnail by ID
+  String getThumbnailUrlById(String mediaId) {
+    return ApiConfig.getFullUrl('${ApiConfig.mediaThumbnail}$mediaId');
+  }
+
+  /// Get the full URL for a media thumbnail by bucket and file ID
+  String getThumbnailUrlByBucketAndFileId(String bucket, String fileId) {
+    return '${ApiConfig.getFullUrl(ApiConfig.mediaThumbnailByBucket)}?bucket=$bucket&fileId=$fileId';
+  }
+
+  /// Get the full thumbnail URL for a media item (convenience method)
+  String? getFullThumbnailUrl(Media media) {
+    final thumbnailPath = media.thumbnailUrlFromFileUrl;
+    if (thumbnailPath != null) {
+      return ApiConfig.getFullUrl(thumbnailPath);
+    }
+    return null;
+  }
+
+  /// Check if a media item has a thumbnail (only images have thumbnails)
+  bool hasThumbnail(Media media) {
+    return media.isImage;
+  }
 }

@@ -113,4 +113,25 @@ class Media {
   String get dayMonthYear {
     return '${createdAt.day.toString().padLeft(2, '0')}/${createdAt.month.toString().padLeft(2, '0')}/${createdAt.year}';
   }
+
+  /// Get the thumbnail URL for this media item (only available for images)
+  String? get thumbnailUrlFromFileUrl {
+    if (!isImage) return null;
+    
+    // Extract bucket and fileId from fileUrl
+    // Example fileUrl: "/api/media/content?bucket=local&fileId=username/images/filename.ext"
+    final uri = Uri.parse(fileUrl);
+    final bucket = uri.queryParameters['bucket'];
+    final fileId = uri.queryParameters['fileId'];
+    
+    if (bucket != null && fileId != null) {
+      // Construct thumbnail URL
+      final thumbnailUrl = '/api/media/thumbnail?bucket=$bucket&fileId=$fileId';
+      print('🎯 Generated thumbnail URL for ${fileName}: $thumbnailUrl');
+      return thumbnailUrl;
+    }
+    
+    print('⚠️ Could not generate thumbnail URL for ${fileName}, fileUrl: $fileUrl');
+    return null;
+  }
 }

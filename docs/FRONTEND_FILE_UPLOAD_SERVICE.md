@@ -9,6 +9,7 @@ The File Upload Service has been successfully created for the Flutter frontend p
 ### ✅ Core Functionality
 - **File System Monitoring**: Uses the `watcher` package for cross-platform file monitoring
 - **Automatic Upload**: Detects new files and uploads them to the backend automatically  
+- **File Cleanup**: Automatically deletes files from monitored folders after successful upload
 - **Queue Management**: Manages upload queue with configurable concurrent uploads (max 3)
 - **Progress Tracking**: Real-time upload progress and status tracking
 - **Error Handling**: Robust error handling with retry functionality
@@ -60,6 +61,7 @@ The File Upload Service has been successfully created for the Flutter frontend p
 - Generates metadata (title, media type, tags)
 - Creates multipart form data and uploads to backend
 - Updates status and handles errors with retry capability
+- **Automatically deletes files from source folder after successful upload**
 
 ### 4. User Management
 - Real-time status updates in UI
@@ -124,7 +126,8 @@ The File Upload Service has been successfully created for the Flutter frontend p
 2. Configure a storage path in Storage Configuration
 3. Add a supported file to the monitored directory
 4. Verify file appears in upload queue and uploads successfully
-5. Check that uploaded file appears in media gallery
+5. **Verify that the file is automatically deleted from the source folder after upload**
+6. Check that uploaded file appears in media gallery
 
 ### Advanced Testing
 - Test with multiple concurrent uploads

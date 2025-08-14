@@ -289,7 +289,11 @@ class _MainScreenState extends State<MainScreen> {
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         final media = mediaProvider.media[index];
-                        return MediaCard(media: media);
+                        return MediaCard(
+                          media: media,
+                          allMedia: mediaProvider.media,
+                          index: index,
+                        );
                       },
                       childCount: mediaProvider.media.length,
                     ),

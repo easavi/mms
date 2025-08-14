@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../config/api_config.dart';
+import '../screens/media_viewer_screen.dart';
 import 'authenticated_image.dart';
 
 class MediaCard extends StatelessWidget {
   final Media media;
+  final List<Media> allMedia;
+  final int index;
 
   const MediaCard({
     super.key,
     required this.media,
+    required this.allMedia,
+    required this.index,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => _showMediaDetails(context),
+      onTap: () => _openMediaViewer(context),
       child: SizedBox(
         width: double.infinity,
         height: double.infinity,
@@ -105,45 +110,13 @@ class MediaCard extends StatelessWidget {
     }
   }
 
-  void _showMediaDetails(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(media.name),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Type: ${media.mediaType.displayName}'),
-            Text('File: ${media.fileName}'),
-            Text('Created: ${media.dayMonthYear}'),
-            Text('Uploaded: ${media.uploadedAt.toLocal().toString().split('.')[0]}'),
-            if (media.tags.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              const Text('Tags:'),
-              Wrap(
-                spacing: 4,
-                children: media.tags.map((tag) => Chip(
-                  label: Text(tag),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                )).toList(),
-              ),
-            ],
-          ],
+  void _openMediaViewer(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => MediaViewerScreen(
+          mediaList: allMedia,
+          initialIndex: index,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // TODO: Open media viewer
-            },
-            child: const Text('View'),
-          ),
-        ],
       ),
     );
   }

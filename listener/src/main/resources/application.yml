@@ -12,21 +12,20 @@ mms:
     username: admin
     password: admin123
   
-  # Folders to monitor (only used in listener mode)
+  # Folders to monitor for LISTENER mode (uploads to backend and deletes files)
   folders:
     - "D:/dev/mms/temp/files"
   
-  # Folder copy mappings (from -> to)
+  # Folder copy mappings for COPY mode (copies files and preserves originals)
+  # In ALL mode, both configurations above are used simultaneously
   folder-copy-mappings:
-    - source: "D:/dev/mms/temp/source1"
-      destination: "D:/dev/mms/temp/destination1"
-    - source: "D:/dev/mms/temp/source2"
-      destination: "D:/dev/mms/temp/destination2"
+    - source: "D:/dev/mms/temp/original"
+      destination: "D:/dev/mms/temp/files"
   
-  # File patterns to include/exclude
+  # File patterns to include/exclude (applies to both modes)
   file-patterns:
-    include: "\\.(jpg|jpeg|png|gif|bmp|mp4|avi|mov|wmv|pdf|doc|docx|txt)$"
-    exclude: "\\.(tmp|temp|log)$"
+    include: "\\.(jpg|jpeg|png|gif|bmp|tiff|webp|mp4|avi|mov|wmv|mkv|mp3|wav|flac|pdf|doc|docx|txt|rtf|odt)$"
+    exclude: "\\.(tmp|temp|partial|download|crdownload|part|~|log|lock|swp|DS_Store)$"
 
 logging:
   level:

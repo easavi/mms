@@ -47,7 +47,7 @@
             "request": "launch",
             "mainClass": "com.mms.listener.MmsListenerApplication",
             "projectName": "mms-listener",
-            "args": ["--mode=listener"],
+            "args": ["--mode=all"],
             "cwd": "${workspaceFolder}/listener",
             "console": "integratedTerminal",
             "env": {},

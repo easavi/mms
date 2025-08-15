@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class FileListenerService {
@@ -20,6 +22,20 @@ public class FileListenerService {
     private DirectoryWatcher watcher;
     private Pattern includePattern;
     private Pattern excludePattern;
+    
+    // File monitoring for stability check
+    private final Map<Path, FileMonitorInfo> fileMonitorMap = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
+    
+    // Inner class to track file monitoring information
+    private static class FileMonitorInfo {
+        final AtomicLong lastSize = new AtomicLong(0);
+        volatile boolean isStabilityChecking = false;
+        
+        FileMonitorInfo(long initialSize) {
+            lastSize.set(initialSize);
+        }
+    }
     
     public FileListenerService(MmsConfig config, MmsApiService apiService) {
         this.config = config;
@@ -97,6 +113,15 @@ public class FileListenerService {
                 if (watcher != null) {
                     watcher.close();
                 }
+                scheduler.shutdown();
+                try {
+                    if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                        scheduler.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    scheduler.shutdownNow();
+                    Thread.currentThread().interrupt();
+                }
             } catch (Exception e) {
                 System.err.println("Error closing watcher: " + e.getMessage());
             }
@@ -112,8 +137,23 @@ public class FileListenerService {
     public void stopListening() throws Exception {
         if (watcher != null) {
             watcher.close();
-            System.out.println("🛑 File listener stopped");
         }
+        
+        // Shutdown the scheduler
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+        
+        // Clear the monitoring map
+        fileMonitorMap.clear();
+        
+        System.out.println("🛑 File listener stopped");
     }
     
     /**
@@ -141,7 +181,7 @@ public class FileListenerService {
                  .filter(this::shouldProcessFile)
                  .forEach(path -> {
                      System.out.println("📁 Found existing file: " + path.getFileName());
-                     uploadFile(path);
+                     scheduleFileSizeCheck(path);
                  });
         } catch (IOException e) {
             System.err.println("❌ Error scanning directory " + directory + ": " + e.getMessage());
@@ -151,19 +191,21 @@ public class FileListenerService {
     private void handleFileCreated(Path path) {
         if (shouldProcessFile(path)) {
             System.out.println("📝 New file detected: " + path.getFileName());
-            uploadFile(path);
+            scheduleFileSizeCheck(path);
         }
     }
     
     private void handleFileModified(Path path) {
         if (shouldProcessFile(path)) {
             System.out.println("✏️ File modified: " + path.getFileName());
-            uploadFile(path);
+            scheduleFileSizeCheck(path);
         }
     }
     
     private void handleFileDeleted(Path path) {
         System.out.println("🗑️ File deleted: " + path.getFileName());
+        // Remove from monitoring map
+        fileMonitorMap.remove(path);
         // Note: We don't delete from backend as per requirements
     }
     
@@ -187,6 +229,90 @@ public class FileListenerService {
         }
         
         return true;
+    }
+    
+    /**
+     * Schedule a file size check to ensure the file is stable before uploading
+     */
+    private void scheduleFileSizeCheck(Path path) {
+        try {
+            if (!Files.exists(path) || !Files.isRegularFile(path)) {
+                return;
+            }
+            
+            long currentSize = Files.size(path);
+            FileMonitorInfo monitorInfo = fileMonitorMap.computeIfAbsent(path, _ -> new FileMonitorInfo(currentSize));
+            
+            // Update the current size
+            monitorInfo.lastSize.set(currentSize);
+            
+            if (monitorInfo.isStabilityChecking) {
+                // Already checking this file, just update the size
+                System.out.println("🔄 File size updated during check: " + path.getFileName() + " (size: " + currentSize + " bytes)");
+                return;
+            }
+            
+            // Start the stability check process
+            monitorInfo.isStabilityChecking = true;
+            System.out.println("⏱️ Starting stability check for: " + path.getFileName() + " (size: " + currentSize + " bytes)");
+            
+            // Schedule first check after 5 seconds
+            scheduler.schedule(() -> performSizeCheck(path, false), 5, TimeUnit.SECONDS);
+            
+        } catch (IOException e) {
+            System.err.println("❌ Error getting file size for " + path.getFileName() + ": " + e.getMessage());
+            fileMonitorMap.remove(path);
+        }
+    }
+    
+    /**
+     * Perform the actual size check and decide whether to upload or wait more
+     */
+    private void performSizeCheck(Path path, boolean isSecondCheck) {
+        try {
+            if (!Files.exists(path) || !Files.isRegularFile(path)) {
+                System.out.println("⚠️ File no longer exists during stability check: " + path.getFileName());
+                fileMonitorMap.remove(path);
+                return;
+            }
+            
+            FileMonitorInfo monitorInfo = fileMonitorMap.get(path);
+            if (monitorInfo == null) {
+                return; // File was removed from monitoring
+            }
+            
+            long currentSize = Files.size(path);
+            long previousSize = monitorInfo.lastSize.get();
+            
+            if (currentSize != previousSize) {
+                // Size changed, update and restart the check
+                monitorInfo.lastSize.set(currentSize);
+                System.out.println("📏 File size changed during check: " + path.getFileName() + 
+                                 " (" + previousSize + " -> " + currentSize + " bytes). Restarting stability check...");
+                
+                // Reschedule for another 5 seconds
+                scheduler.schedule(() -> performSizeCheck(path, false), 5, TimeUnit.SECONDS);
+            } else {
+                // Size is the same
+                if (!isSecondCheck) {
+                    // First check passed, wait additional 10 seconds for final verification
+                    System.out.println("✅ First stability check passed for: " + path.getFileName() + 
+                                     " (size stable: " + currentSize + " bytes). Waiting 10 more seconds...");
+                    scheduler.schedule(() -> performSizeCheck(path, true), 10, TimeUnit.SECONDS);
+                } else {
+                    // Second check passed, file is stable - proceed with upload
+                    System.out.println("🎯 File is stable after verification: " + path.getFileName() + 
+                                     " (size: " + currentSize + " bytes). Proceeding with upload...");
+                    monitorInfo.isStabilityChecking = false;
+                    fileMonitorMap.remove(path);
+                    uploadFile(path);
+                }
+            }
+            
+        } catch (IOException e) {
+            System.err.println("❌ Error during size check for " + path.getFileName() + ": " + e.getMessage());
+            fileMonitorMap.remove(path);
+        }
     }
     
     private void uploadFile(Path path) {

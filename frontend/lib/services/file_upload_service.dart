@@ -9,6 +9,18 @@ import '../models/models.dart';
 import '../services/storage_service.dart';
 import '../services/media_service.dart';
 
+/// File monitoring information for stability checking
+class FileMonitorInfo {
+  int lastSize;
+  bool isStabilityChecking;
+  DateTime lastCheckTime;
+  
+  FileMonitorInfo({
+    required this.lastSize,
+    this.isStabilityChecking = false,
+  }) : lastCheckTime = DateTime.now();
+}
+
 /// Represents a file upload item in the queue
 class UploadItem {
   final String id;
@@ -56,6 +68,10 @@ class FileUploadService extends ChangeNotifier {
   
   // File watchers for each storage path
   final Map<String, StreamSubscription<WatchEvent>> _watchers = {};
+  
+  // File monitoring for stability check (Windows only)
+  final Map<String, FileMonitorInfo> _fileMonitorMap = <String, FileMonitorInfo>{};
+  final Map<String, Timer> _stabilityTimers = <String, Timer>{};
   
   // Queue management
   final Queue<UploadItem> _uploadQueue = Queue<UploadItem>();
@@ -133,6 +149,13 @@ class FileUploadService extends ChangeNotifier {
     }
     _watchers.clear();
     
+    // Cancel all stability check timers
+    for (final timer in _stabilityTimers.values) {
+      timer.cancel();
+    }
+    _stabilityTimers.clear();
+    _fileMonitorMap.clear();
+    
     // Cancel pending uploads
     final pendingItems = _uploadItems.values
         .where((item) => item.status == UploadStatus.pending || item.status == UploadStatus.uploading)
@@ -173,6 +196,18 @@ class FileUploadService extends ChangeNotifier {
       for (final item in itemsToCancel) {
         item.status = UploadStatus.cancelled;
         _uploadQueue.remove(item);
+      }
+      
+      // Cancel stability timers for files in this storage by checking storage ID in upload items
+      final storageFilePaths = _uploadItems.values
+          .where((item) => item.storageId == storageId)
+          .map((item) => item.filePath)
+          .toSet();
+      
+      for (final filePath in storageFilePaths) {
+        _stabilityTimers[filePath]?.cancel();
+        _stabilityTimers.remove(filePath);
+        _fileMonitorMap.remove(filePath);
       }
       
       debugPrint('🗑️ Stopped monitoring storage: $storageId');
@@ -273,7 +308,13 @@ class FileUploadService extends ChangeNotifier {
           if (!fileExists) {
             // File doesn't exist in backend, add to upload queue
             debugPrint('📤 Queuing existing file for upload: $fileName');
-            _addToUploadQueue(entity.path, storage);
+            
+            // Use stability check for Windows platform, direct upload for others
+            if (!kIsWeb && Platform.isWindows) {
+              _scheduleFileSizeCheck(entity.path, storage);
+            } else {
+              _addToUploadQueue(entity.path, storage);
+            }
             queuedForUploadCount++;
           } else {
             debugPrint('✅ File already exists in backend: $fileName');
@@ -299,7 +340,14 @@ class FileUploadService extends ChangeNotifier {
       
       if (_shouldProcessFile(filePath) && !_processedFiles.contains(filePath)) {
         debugPrint('📝 New file detected: ${path.basename(filePath)}');
-        _addToUploadQueue(filePath, storage);
+        
+        // Use stability check for Windows platform, direct upload for others
+        if (!kIsWeb && Platform.isWindows) {
+          _scheduleFileSizeCheck(filePath, storage);
+        } else {
+          _addToUploadQueue(filePath, storage);
+        }
+        
         _processedFiles.add(filePath);
       }
     }
@@ -347,6 +395,113 @@ class FileUploadService extends ChangeNotifier {
     if (mimeType.startsWith('video/')) return 'video';
     if (mimeType.startsWith('audio/')) return 'audio';
     return 'file';
+  }
+
+  /// Schedule a file size check to ensure the file is stable before uploading (Windows only)
+  void _scheduleFileSizeCheck(String filePath, Storage storage) {
+    try {
+      final file = File(filePath);
+      if (!file.existsSync()) {
+        return;
+      }
+      
+      final currentSize = file.lengthSync();
+      final fileName = path.basename(filePath);
+      
+      // Cancel any existing timer for this file
+      _stabilityTimers[filePath]?.cancel();
+      
+      // Update or create monitoring info
+      final monitorInfo = _fileMonitorMap[filePath] ?? FileMonitorInfo(lastSize: currentSize);
+      monitorInfo.lastSize = currentSize;
+      monitorInfo.lastCheckTime = DateTime.now();
+      
+      if (monitorInfo.isStabilityChecking) {
+        // Already checking this file, just update the size
+        debugPrint('🔄 File size updated during check: $fileName (size: $currentSize bytes)');
+        _fileMonitorMap[filePath] = monitorInfo;
+        return;
+      }
+      
+      // Start the stability check process
+      monitorInfo.isStabilityChecking = true;
+      _fileMonitorMap[filePath] = monitorInfo;
+      
+      debugPrint('⏱️ Starting stability check for: $fileName (size: $currentSize bytes)');
+      
+      // Schedule first check after 5 seconds
+      _stabilityTimers[filePath] = Timer(const Duration(seconds: 5), () {
+        _performSizeCheck(filePath, storage, false);
+      });
+      
+    } catch (e) {
+      debugPrint('❌ Error getting file size for ${path.basename(filePath)}: $e');
+      _fileMonitorMap.remove(filePath);
+      _stabilityTimers.remove(filePath);
+    }
+  }
+
+  /// Perform the actual size check and decide whether to upload or wait more
+  void _performSizeCheck(String filePath, Storage storage, bool isSecondCheck) {
+    try {
+      final file = File(filePath);
+      if (!file.existsSync()) {
+        debugPrint('⚠️ File no longer exists during stability check: ${path.basename(filePath)}');
+        _fileMonitorMap.remove(filePath);
+        _stabilityTimers.remove(filePath);
+        return;
+      }
+      
+      final monitorInfo = _fileMonitorMap[filePath];
+      if (monitorInfo == null) {
+        return; // File was removed from monitoring
+      }
+      
+      final currentSize = file.lengthSync();
+      final previousSize = monitorInfo.lastSize;
+      final fileName = path.basename(filePath);
+      
+      if (currentSize != previousSize) {
+        // Size changed, update and restart the check
+        monitorInfo.lastSize = currentSize;
+        monitorInfo.lastCheckTime = DateTime.now();
+        _fileMonitorMap[filePath] = monitorInfo;
+        
+        debugPrint('📏 File size changed during check: $fileName '
+                  '($previousSize -> $currentSize bytes). Restarting stability check...');
+        
+        // Reschedule for another 5 seconds
+        _stabilityTimers[filePath] = Timer(const Duration(seconds: 5), () {
+          _performSizeCheck(filePath, storage, false);
+        });
+      } else {
+        // Size is the same
+        if (!isSecondCheck) {
+          // First check passed, wait additional 10 seconds for final verification
+          debugPrint('✅ First stability check passed for: $fileName '
+                    '(size stable: $currentSize bytes). Waiting 10 more seconds...');
+          
+          _stabilityTimers[filePath] = Timer(const Duration(seconds: 10), () {
+            _performSizeCheck(filePath, storage, true);
+          });
+        } else {
+          // Second check passed, file is stable - proceed with upload
+          debugPrint('🎯 File is stable after verification: $fileName '
+                    '(size: $currentSize bytes). Proceeding with upload...');
+          
+          monitorInfo.isStabilityChecking = false;
+          _fileMonitorMap.remove(filePath);
+          _stabilityTimers.remove(filePath);
+          
+          _addToUploadQueue(filePath, storage);
+        }
+      }
+      
+    } catch (e) {
+      debugPrint('❌ Error during size check for ${path.basename(filePath)}: $e');
+      _fileMonitorMap.remove(filePath);
+      _stabilityTimers.remove(filePath);
+    }
   }
 
   /// Start processing the upload queue

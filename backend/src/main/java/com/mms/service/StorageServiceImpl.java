@@ -30,9 +30,9 @@ public class StorageServiceImpl {
     
     @Transactional
     public StorageResponse createStorage(StorageCreateRequest request, String username) {
-        // Check if storage with same path exists for user
-        if (storageRepository.findByUsernameAndPath(username, request.getPath()).isPresent()) {
-            throw new ApiException(HttpStatus.CONFLICT, "Storage with this path already exists for user");
+        // Check if storage with same path exists for user on this device
+        if (storageRepository.findByUsernameAndDeviceIdAndPath(username, request.getDeviceId(), request.getPath()).isPresent()) {
+            throw new ApiException(HttpStatus.CONFLICT, "Storage with this path already exists for user on this device");
         }
         
         Storage storage = new Storage();

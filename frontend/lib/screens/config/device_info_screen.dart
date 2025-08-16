@@ -201,10 +201,11 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
                     const SizedBox(height: 8),
                     const Text(
                       '• Device ID is automatically generated and persisted\n'
-                      '• On Windows: Uses machine GUID or computer/user info\n'
-                      '• On Web: Uses browser fingerprinting with localStorage\n'
+                      '• On Windows App: Uses machine GUID or computer/user info\n'
+                      '• On Web Browser: Uses browser fingerprinting with localStorage\n'
+                      '• Each platform mode gets a unique device ID\n'
                       '• This ID is sent with all storage API requests\n'
-                      '• Each device gets its own storage configurations',
+                      '• Each device/platform gets its own storage configurations',
                       style: TextStyle(fontSize: 14),
                     ),
                   ],

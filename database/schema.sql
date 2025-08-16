@@ -22,7 +22,7 @@ CREATE TABLE storage (
     updated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     username VARCHAR(50) NOT NULL REFERENCES users(username),
     device_id VARCHAR(255) NOT NULL,   -- Device identifier
-    UNIQUE(username, path) -- Prevent duplicate paths per user
+    UNIQUE(username, device_id, path) -- Prevent duplicate paths per user per device
 );
 
 -- Media table

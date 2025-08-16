@@ -83,32 +83,32 @@ class DeviceService {
         
         if (match != null) {
           String machineGuid = match.group(1)!;
-          // Hash the GUID for privacy and consistency
-          return _hashString('mms_windows_$machineGuid');
+          // Hash the GUID for privacy and consistency, include platform mode
+          return _hashString('mms_windows_app_$machineGuid');
         }
       }
       
-      // Fallback: use computer name + username
+      // Fallback: use computer name + username with platform mode
       String computerName = Platform.environment['COMPUTERNAME'] ?? 'unknown';
       String userName = Platform.environment['USERNAME'] ?? 'unknown';
       
-      return _hashString('mms_windows_${computerName}_$userName');
+      return _hashString('mms_windows_app_${computerName}_$userName');
       
     } catch (e) {
       debugPrint('Error getting Windows device ID: $e');
       
-      // Final fallback for Windows
+      // Final fallback for Windows with platform mode
       String computerName = Platform.environment['COMPUTERNAME'] ?? 'unknown';
       String userName = Platform.environment['USERNAME'] ?? 'unknown';
-      return _hashString('mms_windows_fallback_${computerName}_$userName');
+      return _hashString('mms_windows_app_fallback_${computerName}_$userName');
     }
   }
   
   /// Generate web browser fingerprint
   Future<String> _generateWebFingerprint() async {
-    // Combine various browser characteristics
+    // Combine various browser characteristics with platform mode
     List<String> characteristics = [
-      'web', // Platform identifier
+      'web_browser', // Platform identifier with mode
       DateTime.now().millisecondsSinceEpoch.toString(), // Timestamp for uniqueness
       // Note: In a real implementation, you might use packages like:
       // - device_info_plus for more browser details
@@ -128,7 +128,7 @@ class DeviceService {
     }
     
     String fingerprint = characteristics.join('_');
-    return _hashString('mms_web_$fingerprint');
+    return _hashString('mms_web_browser_$fingerprint');
   }
   
   /// Fallback device ID generation
@@ -185,7 +185,7 @@ class DeviceService {
     if (kIsWeb) {
       platform = 'Web Browser';
     } else if (Platform.isWindows) {
-      platform = 'Windows';
+      platform = 'Windows App';
     } else {
       platform = Platform.operatingSystem;
     }

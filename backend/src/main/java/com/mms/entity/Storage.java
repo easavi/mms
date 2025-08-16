@@ -7,7 +7,9 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "storage")
+@Table(name = "storage", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"username", "device_id", "path"})
+})
 public class Storage {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

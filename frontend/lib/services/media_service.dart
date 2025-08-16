@@ -29,6 +29,8 @@ class MediaService {
       if (page != null) queryParams['page'] = page.toString();
       if (size != null) queryParams['size'] = size.toString();
 
+      debugPrint('MediaService: Making API call with params: $queryParams');
+
       final response = await _apiService.get(
         ApiConfig.media,
         queryParameters: queryParams,
@@ -42,8 +44,21 @@ class MediaService {
           : response.data['content'] ?? [];
       
       debugPrint('Processing ${data.length} media items');
+      
+      if (data.isEmpty) {
+        debugPrint('No media items to process, returning empty list');
+        return [];
+      }
+      
+      // Debug first item structure
+      if (data.isNotEmpty) {
+        debugPrint('First item structure: ${data[0]}');
+        debugPrint('First item type: ${data[0].runtimeType}');
+      }
+      
       return data.map((json) {
         try {
+          debugPrint('Processing item: $json');
           return Media.fromJson(json);
         } catch (e) {
           debugPrint('Error parsing media item: $e');
@@ -52,6 +67,7 @@ class MediaService {
         }
       }).toList();
     } catch (e) {
+      debugPrint('MediaService getAllMedia error: $e');
       rethrow;
     }
   }

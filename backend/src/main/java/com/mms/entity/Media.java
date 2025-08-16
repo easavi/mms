@@ -24,11 +24,17 @@ public class Media {
     @Column(name = "file_url", nullable = false, length = 1024)
     private String fileUrl;
 
+    @Column(name = "file_size", nullable = false)
+    private Long fileSize = 0L;
+
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
     @Column(name = "uploaded_at")
     private OffsetDateTime uploadedAt;
+
+    @Column(name = "storage_id")
+    private String storageId;
 
     @ManyToMany
     @JoinTable(
@@ -91,6 +97,14 @@ public class Media {
         this.fileUrl = fileUrl;
     }
 
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
+    }
+
     public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
@@ -105,6 +119,14 @@ public class Media {
 
     public void setUploadedAt(OffsetDateTime uploadedAt) {
         this.uploadedAt = uploadedAt;
+    }
+
+    public String getStorageId() {
+        return storageId;
+    }
+
+    public void setStorageId(String storageId) {
+        this.storageId = storageId;
     }
 
     public Set<Tag> getTags() {

@@ -8,6 +8,7 @@ public class StorageResponse {
     private String type;      // Always "server", but included for completeness
     private String updated;   // Timestamp
     private String username;  // User owning this storage
+    private String deviceId;  // Device identifier
     private Long size;        // Total size in bytes (calculated dynamically)
     private Integer itemsQuantity; // Number of items (calculated dynamically)
     
@@ -15,13 +16,14 @@ public class StorageResponse {
     }
     
     public StorageResponse(String id, String bucket, String path, String type, 
-                          String updated, String username, Long size, Integer itemsQuantity) {
+                          String updated, String username, String deviceId, Long size, Integer itemsQuantity) {
         this.id = id;
         this.bucket = bucket;
         this.path = path;
         this.type = type;
         this.updated = updated;
         this.username = username;
+        this.deviceId = deviceId;
         this.size = size;
         this.itemsQuantity = itemsQuantity;
     }
@@ -72,6 +74,14 @@ public class StorageResponse {
     
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     public Long getSize() {

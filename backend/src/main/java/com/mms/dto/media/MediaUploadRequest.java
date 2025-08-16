@@ -14,16 +14,19 @@ public class MediaUploadRequest {
     private MultipartFile file;
     
     private String[] tags;
+    
+    private String storageId;
 
     public MediaUploadRequest() {
     }
 
-    public MediaUploadRequest(String title, String description, String mediaType, MultipartFile file, String[] tags) {
+    public MediaUploadRequest(String title, String description, String mediaType, MultipartFile file, String[] tags, String storageId) {
         this.title = title;
         this.description = description;
         this.mediaType = mediaType;
         this.file = file;
         this.tags = tags != null ? tags.clone() : null;
+        this.storageId = storageId;
     }
 
     public String getTitle() {
@@ -64,6 +67,14 @@ public class MediaUploadRequest {
 
     public void setTags(String[] tags) {
         this.tags = tags != null ? tags.clone() : null;
+    }
+
+    public String getStorageId() {
+        return storageId;
+    }
+
+    public void setStorageId(String storageId) {
+        this.storageId = storageId;
     }
     
     // Handle tags as comma-separated string (for form submission)

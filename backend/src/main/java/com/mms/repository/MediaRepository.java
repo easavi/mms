@@ -149,4 +149,14 @@ public interface MediaRepository extends JpaRepository<Media, UUID> {
            "LOWER(m.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(m.fileName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     Page<Media> searchByNameOrFileName(@Param("searchTerm") String searchTerm, Pageable pageable);
+    
+    // Storage-related queries
+    @Query("SELECT COUNT(m) FROM Media m WHERE m.storageId = :storageId")
+    Integer countByStorageId(@Param("storageId") String storageId);
+    
+    @Query("SELECT COALESCE(SUM(m.fileSize), 0) FROM Media m WHERE m.storageId = :storageId")
+    Long sumFileSizesByStorageId(@Param("storageId") String storageId);
+    
+    @Query("SELECT m FROM Media m WHERE m.storageId = :storageId")
+    List<Media> findByStorageId(@Param("storageId") String storageId);
 }

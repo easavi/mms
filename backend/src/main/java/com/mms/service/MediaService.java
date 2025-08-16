@@ -101,9 +101,15 @@ public class MediaService {
             media.setMediaType(mediaType);
             media.setFileName(fileName);
             media.setFileUrl(fileUrl);
+            media.setFileSize(file.getSize()); // Set file size
             media.setCreatedAt(OffsetDateTime.now());
             media.setUploadedAt(OffsetDateTime.now());
             media.setTags(tags);
+            
+            // Set storage ID if provided
+            if (request.getStorageId() != null) {
+                media.setStorageId(request.getStorageId());
+            }
             
             // Save to database
             media = mediaRepository.save(media);

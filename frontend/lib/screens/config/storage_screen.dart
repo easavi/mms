@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../models/models.dart';
 import '../../services/storage_service.dart';
-import '../../providers/file_upload_provider.dart';
 import '../../theme/app_theme.dart';
 
 class StorageScreen extends StatefulWidget {
@@ -28,6 +26,7 @@ class _StorageScreenState extends State<StorageScreen> {
   Future<void> _loadStorages() async {
     setState(() => _isLoading = true);
     try {
+      // The storage service now automatically gets the device ID
       final storages = await _storageService.getAllStorage();
       setState(() {
         _storages = storages;
@@ -75,8 +74,8 @@ class _StorageScreenState extends State<StorageScreen> {
     
     if (result != null && result['path'] != null) {
       try {
-        final request = CreateStorageRequest(path: result['path']);
-        final newStorage = await _storageService.createStorage(request);
+        // The storage service now automatically includes the device ID
+        final newStorage = await _storageService.createStorage(result['path']);
         
         setState(() {
           _storages.add(newStorage);
@@ -178,6 +177,7 @@ class _StorageScreenState extends State<StorageScreen> {
           size: storage.size,
           itemsQuantity: storage.itemsQuantity,
           username: storage.username,
+          deviceId: storage.deviceId,
           isEnabled: !storage.isEnabled,
         );
       }

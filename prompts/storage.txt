@@ -1,0 +1,19 @@
+update backend storage to receive the device id
+
+the relation between user and bucket is 1 to 1, which means a user will always have the same bucket (a folder to keep the files, images from that user)
+
+the api /{bucket}/quantity, /{bucket}/size continue to exists
+
+remove the apis /user/{username}/total-items and
+/user/{username}/total-size
+
+storage should only have the apis to create, delete and list, where list is required to receive user and device id
+
+when a file is upload, a tag with the storage id should be added to the record
+
+update the schema to the database with those changes
+
+update the frontend storage screen, it only have to list the storages with the path, quantity, size
+
+quantity api should count how many files which that storage have
+size api should sum the size of the files which that storage have

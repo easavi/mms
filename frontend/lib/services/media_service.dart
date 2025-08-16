@@ -103,15 +103,23 @@ class MediaService {
     required String mediaType,
     String? description,
     List<String>? tags,
+    String? storageId,
   }) async {
     try {
-      final formData = FormData.fromMap({
+      final Map<String, dynamic> formDataMap = {
         'file': await MultipartFile.fromFile(filePath),
         'title': title,
         'mediaType': mediaType,
         'description': description ?? '',
         'tags': tags?.join(',') ?? '',
-      });
+      };
+      
+      // Add storageId if provided
+      if (storageId != null) {
+        formDataMap['storageId'] = storageId;
+      }
+      
+      final formData = FormData.fromMap(formDataMap);
 
       final response = await _apiService.uploadFile(
         ApiConfig.mediaUpload,

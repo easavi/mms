@@ -15,14 +15,17 @@ import com.mms.dto.storage.StorageUpdateRequest;
 import com.mms.entity.Storage;
 import com.mms.exception.ApiException;
 import com.mms.repository.StorageRepository;
+import com.mms.repository.MediaRepository;
 
 @Service
 public class StorageServiceImpl {
     
     private final StorageRepository storageRepository;
+    private final MediaRepository mediaRepository;
     
-    public StorageServiceImpl(StorageRepository storageRepository) {
+    public StorageServiceImpl(StorageRepository storageRepository, MediaRepository mediaRepository) {
         this.storageRepository = storageRepository;
+        this.mediaRepository = mediaRepository;
     }
     
     @Transactional
@@ -35,6 +38,7 @@ public class StorageServiceImpl {
         Storage storage = new Storage();
         storage.setPath(request.getPath());
         storage.setUsername(username);
+        storage.setDeviceId(request.getDeviceId());
         storage.setType("server"); // Always server
         // Bucket will be auto-generated in @PrePersist
         
@@ -51,8 +55,8 @@ public class StorageServiceImpl {
     }
     
     @Transactional(readOnly = true)
-    public List<StorageResponse> getStoragesByUsername(String username) {
-        return storageRepository.findByUsernameOrderByUpdatedDesc(username)
+    public List<StorageResponse> getStoragesByUsernameAndDeviceId(String username, String deviceId) {
+        return storageRepository.findByUsernameAndDeviceIdOrderByUpdatedDesc(username, deviceId)
                 .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
@@ -96,16 +100,23 @@ public class StorageServiceImpl {
     
     @Transactional(readOnly = true)
     public Integer getStorageQuantity(String bucket) {
-        // TODO: Implement actual media count for this storage bucket
-        // This would typically query the media table for files in this bucket
-        return 0;
+        // Find storage by bucket to get the storage ID
+        Storage storage = storageRepository.findByBucket(bucket)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Storage not found"));
+        
+        // Count media files associated with this storage
+        return mediaRepository.countByStorageId(storage.getId().toString());
     }
     
     @Transactional(readOnly = true)
     public Long getStorageSize(String bucket) {
-        // TODO: Implement actual size calculation for this storage bucket
-        // This would typically sum up file sizes from media table for this bucket
-        return 0L;
+        // Find storage by bucket to get the storage ID  
+        Storage storage = storageRepository.findByBucket(bucket)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Storage not found"));
+        
+        // Sum file sizes for media files associated with this storage
+        Long totalSize = mediaRepository.sumFileSizesByStorageId(storage.getId().toString());
+        return totalSize != null ? totalSize : 0L;
     }    
     
     private StorageResponse convertToResponse(Storage storage) {
@@ -116,10 +127,14 @@ public class StorageServiceImpl {
         response.setType(storage.getType());
         response.setUpdated(storage.getUpdated().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         response.setUsername(storage.getUsername());
+        response.setDeviceId(storage.getDeviceId());
         
-        // TODO: Calculate actual size and items quantity from media files
-        response.setSize(0L);
-        response.setItemsQuantity(0);
+        // Calculate actual size and items quantity from media files
+        Integer quantity = mediaRepository.countByStorageId(storage.getId().toString());
+        Long size = mediaRepository.sumFileSizesByStorageId(storage.getId().toString());
+        
+        response.setSize(size != null ? size : 0L);
+        response.setItemsQuantity(quantity != null ? quantity : 0);
         
         return response;
     }

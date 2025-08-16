@@ -36,6 +36,7 @@ class Storage {
   final int size;         // Total size in bytes
   final int itemsQuantity; // Number of items
   final String username;  // User owning this storage
+  final String deviceId;  // Device identifier
   final bool isEnabled;   // Whether storage is enabled (for UI state)
 
   Storage({
@@ -47,6 +48,7 @@ class Storage {
     required this.size,
     required this.itemsQuantity,
     required this.username,
+    required this.deviceId,
     this.isEnabled = true,
   });
 
@@ -78,6 +80,7 @@ class Storage {
       size: parsedSize,
       itemsQuantity: parsedItemsQuantity,
       username: json['username']?.toString() ?? '',
+      deviceId: json['deviceId']?.toString() ?? '',
       isEnabled: json['isEnabled'] ?? true,
     );
   }
@@ -92,6 +95,7 @@ class Storage {
       'size': size,
       'itemsQuantity': itemsQuantity,
       'username': username,
+      'deviceId': deviceId,
       'isEnabled': isEnabled,
     };
   }

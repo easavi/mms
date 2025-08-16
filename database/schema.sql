@@ -21,6 +21,7 @@ CREATE TABLE storage (
     type VARCHAR(255) NOT NULL DEFAULT 'server', -- Always 'server'
     updated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     username VARCHAR(50) NOT NULL REFERENCES users(username),
+    device_id VARCHAR(255) NOT NULL,   -- Device identifier
     UNIQUE(username, path) -- Prevent duplicate paths per user
 );
 
@@ -31,8 +32,10 @@ CREATE TABLE media (
     media_type VARCHAR(255) NOT NULL,
     file_name VARCHAR(255) NOT NULL,
     file_url VARCHAR(1024) NOT NULL,
+    file_size BIGINT DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    storage_id VARCHAR(255)
 );
 
 -- Tags table
@@ -50,7 +53,9 @@ CREATE TABLE media_tags (
 
 -- Create indexes for better performance
 CREATE INDEX idx_storage_username ON storage(username);
+CREATE INDEX idx_storage_device_id ON storage(device_id);
 CREATE INDEX idx_storage_type ON storage(type);
+CREATE INDEX idx_media_storage_id ON media(storage_id);
 CREATE INDEX idx_media_created_at ON media(created_at);
 CREATE INDEX idx_media_uploaded_at ON media(uploaded_at);
 CREATE INDEX idx_media_media_type ON media(media_type);

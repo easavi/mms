@@ -14,6 +14,8 @@ public interface StorageRepository extends JpaRepository<Storage, UUID> {
     
     List<Storage> findByUsername(String username);
     
+    List<Storage> findByUsernameAndDeviceId(String username, String deviceId);
+    
     List<Storage> findByType(String type);
     
     List<Storage> findByUsernameAndType(String username, String type);
@@ -24,6 +26,9 @@ public interface StorageRepository extends JpaRepository<Storage, UUID> {
     
     @Query("SELECT s FROM Storage s WHERE s.username = :username ORDER BY s.updated DESC")
     List<Storage> findByUsernameOrderByUpdatedDesc(@Param("username") String username);
+    
+    @Query("SELECT s FROM Storage s WHERE s.username = :username AND s.deviceId = :deviceId ORDER BY s.updated DESC")
+    List<Storage> findByUsernameAndDeviceIdOrderByUpdatedDesc(@Param("username") String username, @Param("deviceId") String deviceId);
     
     @Query("SELECT COUNT(s) FROM Storage s WHERE s.username = :username")
     long countByUsername(@Param("username") String username);

@@ -43,7 +43,8 @@ public class MediaController {
             @RequestParam(value = "title", required = true) String title,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "mediaType", required = true) String mediaType,
-            @RequestParam(value = "tags", required = false) String[] tags) {
+            @RequestParam(value = "tags", required = false) String[] tags,
+            @RequestParam(value = "storageId", required = false) String storageId) {
         
         // Validate file
         if (file == null || file.isEmpty()) {
@@ -56,7 +57,8 @@ public class MediaController {
         request.setDescription(description);
         request.setMediaType(mediaType);
         request.setFile(file);
-        request.setTags(tags);        
+        request.setTags(tags);
+        request.setStorageId(storageId);
         
         MediaResponse response = mediaService.uploadMedia(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

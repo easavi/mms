@@ -548,6 +548,7 @@ class FileUploadService extends ChangeNotifier {
         mediaType: item.mediaType,
         description: 'Auto-uploaded by File Upload Service',
         tags: ['auto-upload', 'file-watcher'],
+        storageId: item.storageId,
       );
       
       // Update item status

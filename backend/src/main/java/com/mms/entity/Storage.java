@@ -27,13 +27,17 @@ public class Storage {
 
     @Column(nullable = false)
     private String username;
+    
+    @Column(name = "device_id", nullable = false)
+    private String deviceId;
 
     public Storage() {
     }
 
-    public Storage(String path, String username) {
+    public Storage(String path, String username, String deviceId) {
         this.path = path;
         this.username = username;
+        this.deviceId = deviceId;
         this.type = "server"; // Default value
         // Bucket will be auto-generated in @PrePersist
     }
@@ -86,6 +90,14 @@ public class Storage {
         this.username = username;
     }
 
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
     @PrePersist
     protected void onCreate() {
         updated = OffsetDateTime.now();
@@ -109,12 +121,13 @@ public class Storage {
                Objects.equals(bucket, storage.bucket) &&
                Objects.equals(path, storage.path) &&
                Objects.equals(type, storage.type) &&
-               Objects.equals(username, storage.username);
+               Objects.equals(username, storage.username) &&
+               Objects.equals(deviceId, storage.deviceId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, bucket, path, type, username);
+        return Objects.hash(id, bucket, path, type, username, deviceId);
     }
 
     @Override
@@ -126,6 +139,7 @@ public class Storage {
                 ", type='" + type + '\'' +
                 ", updated=" + updated + '\'' +
                 ", username='" + username + '\'' +
+                ", deviceId='" + deviceId + '\'' +
                 '}';
     }
 }

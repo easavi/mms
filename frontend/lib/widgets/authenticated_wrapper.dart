@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -32,23 +34,28 @@ class _AuthenticatedWrapperState extends State<AuthenticatedWrapper> {
     final fileUploadProvider = context.read<FileUploadProvider>();
 
     if (authProvider.isAuthenticated && !_fileUploadInitialized) {
-      try {
-        debugPrint('🚀 Initializing File Upload Service for authenticated user...');
-        await fileUploadProvider.initialize();
-        _fileUploadInitialized = true;
-        debugPrint('✅ File Upload Service initialized successfully');
-      } catch (e) {
-        debugPrint('❌ Failed to initialize File Upload Service: $e');
-        // Show error message to user
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to start file monitoring: $e'),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 5),
-            ),
-          );
+      // Only initialize file upload service on Windows platform
+      if (!kIsWeb && Platform.isWindows) {
+        try {
+          debugPrint('🚀 Initializing File Upload Service for Windows authenticated user...');
+          await fileUploadProvider.initialize();
+          _fileUploadInitialized = true;
+          debugPrint('✅ File Upload Service initialized successfully for Windows');
+        } catch (e) {
+          debugPrint('❌ Failed to initialize File Upload Service: $e');
+          // Show error message to user
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to start file monitoring: $e'),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 5),
+              ),
+            );
+          }
         }
+      } else {
+        debugPrint('🌐 File Upload Service not started - running on ${kIsWeb ? 'Web' : Platform.operatingSystem} platform');
       }
     }
   }
@@ -64,7 +71,7 @@ class _AuthenticatedWrapperState extends State<AuthenticatedWrapper> {
           });
         }
         
-        // Stop file upload service when user logs out
+        // Stop file upload service when user logs out (only if it was initialized)
         if (!authProvider.isAuthenticated && _fileUploadInitialized) {
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             debugPrint('🛑 Stopping File Upload Service for logged out user...');

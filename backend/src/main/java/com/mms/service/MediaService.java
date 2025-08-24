@@ -444,12 +444,33 @@ public class MediaService {
         }
         
         return Arrays.stream(tagNames)
-                .map(name -> tagRepository.findByName(name)
-                        .orElseGet(() -> {
-                            Tag tag = new Tag(name);
-                            return tagRepository.save(tag);
-                        }))
+                .map(this::findOrCreateTag)
                 .collect(Collectors.toSet());
+    }
+    
+    private Tag findOrCreateTag(String name) {
+        // First, try to find existing tag
+        Optional<Tag> existingTag = tagRepository.findByName(name);
+        if (existingTag.isPresent()) {
+            return existingTag.get();
+        }
+        
+        // Tag doesn't exist, try to create it
+        try {
+            Tag tag = new Tag(name);
+            return tagRepository.save(tag);
+        } catch (Exception e) {
+            // If save fails due to duplicate key (race condition), 
+            // try to find the tag again as it was likely created by another thread
+            if (e.getMessage() != null && e.getMessage().contains("duplicate key")) {
+                Optional<Tag> retryTag = tagRepository.findByName(name);
+                if (retryTag.isPresent()) {
+                    return retryTag.get();
+                }
+            }
+            // If it's not a duplicate key error or we still can't find the tag, rethrow
+            throw new RuntimeException("Failed to create or find tag: " + name, e);
+        }
     }
     
     private MediaResponse convertToResponse(Media media) {

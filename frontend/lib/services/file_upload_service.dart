@@ -108,15 +108,21 @@ class FileUploadService extends ChangeNotifier {
   Future<void> start() async {
     if (_isRunning) return;
     
-    debugPrint('🎧 Starting File Upload Service...');
+    // Only start on Windows platform
+    if (kIsWeb || !Platform.isWindows) {
+      debugPrint('🌐 File Upload Service not starting - platform: ${kIsWeb ? 'Web' : Platform.operatingSystem}');
+      return;
+    }
+    
+    debugPrint('🎧 Starting File Upload Service on Windows...');
     _isRunning = true;
     
     try {
-      // Load all enabled storage configurations
+      // Load all enabled storage configurations for this device
       final storages = await _storageService.getAllStorage();
       final enabledStorages = storages.where((storage) => storage.isEnabled).toList();
       
-      debugPrint('Found ${enabledStorages.length} enabled storage paths');
+      debugPrint('Found ${enabledStorages.length} enabled storage paths for this device');
       
       // Start monitoring each enabled storage path
       for (final storage in enabledStorages) {
@@ -126,7 +132,7 @@ class FileUploadService extends ChangeNotifier {
       // Start processing the upload queue
       _startQueueProcessor();
       
-      debugPrint('✅ File Upload Service started successfully');
+      debugPrint('✅ File Upload Service started successfully on Windows');
     } catch (e) {
       debugPrint('❌ Failed to start File Upload Service: $e');
       _isRunning = false;

@@ -38,8 +38,12 @@ class FileUploadProvider extends ChangeNotifier {
     try {
       debugPrint('🚀 Initializing File Upload Service...');
       await _fileUploadService.start();
-      _isInitialized = true;
-      debugPrint('✅ File Upload Service initialized successfully');
+      _isInitialized = _fileUploadService.isRunning; // Only mark as initialized if actually running
+      if (_isInitialized) {
+        debugPrint('✅ File Upload Service initialized successfully');
+      } else {
+        debugPrint('ℹ️ File Upload Service not started (platform not supported)');
+      }
     } catch (e) {
       debugPrint('❌ Failed to initialize File Upload Service: $e');
       rethrow;
@@ -52,8 +56,15 @@ class FileUploadProvider extends ChangeNotifier {
   Future<void> stop() async {
     if (!_isInitialized) return;
     
-    await _fileUploadService.stop();
-    _isInitialized = false;
+    try {
+      await _fileUploadService.stop();
+      _isInitialized = false;
+      debugPrint('✅ File Upload Service stopped successfully');
+    } catch (e) {
+      debugPrint('❌ Error stopping File Upload Service: $e');
+      _isInitialized = false; // Mark as not initialized even if stop failed
+    }
+    
     notifyListeners();
   }
   

@@ -564,8 +564,8 @@ class FileUploadService extends ChangeNotifier {
       
       debugPrint('✅ Successfully uploaded: ${item.fileName} -> ID: ${media.id}');
       
-      // Delete file after successful upload
-      await _deleteFileAfterUpload(file);
+      // Note: File is kept in original location after successful upload
+      debugPrint('📁 File preserved at: ${file.path}');
       
     } catch (e) {
       item.status = UploadStatus.failed;
@@ -577,13 +577,4 @@ class FileUploadService extends ChangeNotifier {
     }
   }
 
-  /// Delete file after successful upload
-  Future<void> _deleteFileAfterUpload(File file) async {
-    try {
-      await file.delete();
-      debugPrint('🗑️ Deleted uploaded file: ${file.path}');
-    } catch (e) {
-      debugPrint('⚠️ Failed to delete file after upload ${file.path}: $e');
-    }
-  }
 }

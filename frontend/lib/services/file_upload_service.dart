@@ -473,9 +473,9 @@ class FileUploadService extends ChangeNotifier {
       
       debugPrint('⏱️ Starting stability check for: $fileName (size: $currentSize bytes)');
       
-      // Schedule first check after 5 seconds
-      _stabilityTimers[filePath] = Timer(const Duration(seconds: 5), () async {
-        await _performSizeCheck(filePath, storage, false);
+      // Schedule first check after 10 seconds
+      _stabilityTimers[filePath] = Timer(const Duration(seconds: 10), () async {
+        await _performSizeCheck(filePath, storage);
       });
       
     } catch (e) {
@@ -486,7 +486,7 @@ class FileUploadService extends ChangeNotifier {
   }
 
   /// Perform the actual size check and decide whether to upload or wait more
-  Future<void> _performSizeCheck(String filePath, Storage storage, bool isSecondCheck) async {
+  Future<void> _performSizeCheck(String filePath, Storage storage) async {
     try {
       final file = File(filePath);
       if (!file.existsSync()) {
@@ -514,31 +514,20 @@ class FileUploadService extends ChangeNotifier {
         debugPrint('📏 File size changed during check: $fileName '
                   '($previousSize -> $currentSize bytes). Restarting stability check...');
         
-        // Reschedule for another 5 seconds
-        _stabilityTimers[filePath] = Timer(const Duration(seconds: 5), () async {
-          await _performSizeCheck(filePath, storage, false);
+        // Reschedule for another 10 seconds
+        _stabilityTimers[filePath] = Timer(const Duration(seconds: 10), () async {
+          await _performSizeCheck(filePath, storage);
         });
       } else {
-        // Size is the same
-        if (!isSecondCheck) {
-          // First check passed, wait additional 10 seconds for final verification
-          debugPrint('✅ First stability check passed for: $fileName '
-                    '(size stable: $currentSize bytes). Waiting 10 more seconds...');
-          
-          _stabilityTimers[filePath] = Timer(const Duration(seconds: 10), () async {
-            await _performSizeCheck(filePath, storage, true);
-          });
-        } else {
-          // Second check passed, file is stable - proceed with upload
-          debugPrint('🎯 File is stable after verification: $fileName '
-                    '(size: $currentSize bytes). Proceeding with upload...');
-          
-          monitorInfo.isStabilityChecking = false;
-          _fileMonitorMap.remove(filePath);
-          _stabilityTimers.remove(filePath);
-          
-          await _addToUploadQueue(filePath, storage);
-        }
+        // Size is stable - proceed with upload
+        debugPrint('🎯 File is stable: $fileName '
+                  '(size: $currentSize bytes). Proceeding with upload...');
+        
+        monitorInfo.isStabilityChecking = false;
+        _fileMonitorMap.remove(filePath);
+        _stabilityTimers.remove(filePath);
+        
+        await _addToUploadQueue(filePath, storage);
       }
       
     } catch (e) {

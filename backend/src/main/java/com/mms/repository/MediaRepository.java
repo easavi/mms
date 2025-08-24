@@ -2,6 +2,7 @@ package com.mms.repository;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -159,4 +160,8 @@ public interface MediaRepository extends JpaRepository<Media, UUID> {
     
     @Query("SELECT m FROM Media m WHERE m.storageId = :storageId")
     List<Media> findByStorageId(@Param("storageId") String storageId);
+    
+    // Find media by file hash
+    @Query("SELECT m FROM Media m WHERE m.fileHash = :fileHash")
+    Optional<Media> findByFileHash(@Param("fileHash") String fileHash);
 }

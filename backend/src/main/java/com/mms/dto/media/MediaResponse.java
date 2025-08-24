@@ -10,6 +10,7 @@ public class MediaResponse {
     private String createdAt;
     private String uploadedAt;
     private String[] tags;
+    private String fileHash;
     
     public MediaResponse() {
     }
@@ -24,6 +25,19 @@ public class MediaResponse {
         this.createdAt = createdAt;
         this.uploadedAt = uploadedAt;
         this.tags = tags != null ? tags.clone() : null;
+    }
+
+    public MediaResponse(String id, String name, String mediaType, String fileName, 
+                           String fileUrl, String createdAt, String uploadedAt, String[] tags, String fileHash) {
+        this.id = id;
+        this.name = name;
+        this.mediaType = mediaType;
+        this.fileName = fileName;
+        this.fileUrl = fileUrl;
+        this.createdAt = createdAt;
+        this.uploadedAt = uploadedAt;
+        this.tags = tags != null ? tags.clone() : null;
+        this.fileHash = fileHash;
     }
     
     public String getId() {
@@ -88,5 +102,13 @@ public class MediaResponse {
     
     public void setTags(String[] tags) {
         this.tags = tags != null ? tags.clone() : null;
+    }
+
+    public String getFileHash() {
+        return fileHash;
+    }
+
+    public void setFileHash(String fileHash) {
+        this.fileHash = fileHash;
     }
 }

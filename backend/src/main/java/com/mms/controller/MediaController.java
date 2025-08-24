@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -44,7 +45,8 @@ public class MediaController {
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "mediaType", required = true) String mediaType,
             @RequestParam(value = "tags", required = false) String[] tags,
-            @RequestParam(value = "storageId", required = false) String storageId) {
+            @RequestParam(value = "storageId", required = false) String storageId,
+            @RequestParam(value = "fileHash", required = false) String fileHash) {
         
         // Validate file
         if (file == null || file.isEmpty()) {
@@ -59,6 +61,7 @@ public class MediaController {
         request.setFile(file);
         request.setTags(tags);
         request.setStorageId(storageId);
+        request.setFileHash(fileHash);
         
         MediaResponse response = mediaService.uploadMedia(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -117,6 +120,20 @@ public class MediaController {
     public ResponseEntity<MediaResponse> getMediaById(@PathVariable UUID id) {
         MediaResponse media = mediaService.getMediaById(id);
         return ResponseEntity.ok(media);
+    }
+
+    @GetMapping("/hash/{fileHash}")
+    public ResponseEntity<MediaResponse> getMediaByHashcode(@PathVariable String fileHash) {
+        MediaResponse media = mediaService.getMediaByHashcode(fileHash);
+        return ResponseEntity.ok(media);
+    }
+
+    @GetMapping("/hash/{fileHash}/exists")
+    public ResponseEntity<Map<String, Boolean>> checkFileHashExists(@PathVariable String fileHash) {
+        boolean exists = mediaService.existsByFileHash(fileHash);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("exists", exists);
+        return ResponseEntity.ok(response);
     }
     
     @PutMapping("/{id}")

@@ -120,6 +120,7 @@ class MediaService {
     String? description,
     List<String>? tags,
     String? storageId,
+    String? fileHash,
   }) async {
     try {
       final Map<String, dynamic> formDataMap = {
@@ -135,6 +136,11 @@ class MediaService {
         formDataMap['storageId'] = storageId;
       }
       
+      // Add fileHash if provided
+      if (fileHash != null) {
+        formDataMap['fileHash'] = fileHash;
+      }
+      
       final formData = FormData.fromMap(formDataMap);
 
       final response = await _apiService.uploadFile(
@@ -145,6 +151,36 @@ class MediaService {
       return Media.fromJson(response.data);
     } catch (e) {
       rethrow;
+    }
+  }
+
+  /// Check if a file with the given hash already exists
+  Future<bool> checkFileHashExists(String fileHash) async {
+    try {
+      final response = await _apiService.get(
+        '${ApiConfig.media}/hash/$fileHash/exists',
+      );
+      
+      return response.data['exists'] ?? false;
+    } catch (e) {
+      // If we get a 404 or any error, assume file doesn't exist
+      debugPrint('Error checking file hash existence: $e');
+      return false;
+    }
+  }
+
+  /// Get media by file hash
+  Future<Media?> getMediaByHash(String fileHash) async {
+    try {
+      final response = await _apiService.get(
+        '${ApiConfig.media}/hash/$fileHash',
+      );
+      
+      return Media.fromJson(response.data);
+    } catch (e) {
+      // If we get a 404 or any error, return null
+      debugPrint('Error getting media by hash: $e');
+      return null;
     }
   }
 

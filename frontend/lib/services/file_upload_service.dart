@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:collection';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'package:mime/mime.dart';
 import 'package:watcher/watcher.dart';
+import 'package:crypto/crypto.dart';
 import '../models/models.dart';
 import '../services/storage_service.dart';
 import '../services/media_service.dart';
@@ -29,6 +31,7 @@ class UploadItem {
   final String mediaType;
   final String storageId;
   final DateTime addedAt;
+  final String fileHash;
   
   UploadStatus status;
   double progress;
@@ -42,6 +45,7 @@ class UploadItem {
     required this.mediaType,
     required this.storageId,
     required this.addedAt,
+    required this.fileHash,
     this.status = UploadStatus.pending,
     this.progress = 0.0,
     this.errorMessage,
@@ -276,7 +280,7 @@ class FileUploadService extends ChangeNotifier {
       try {
         final watcher = DirectoryWatcher(storage.path);
         final subscription = watcher.events.listen(
-          (event) => _handleFileSystemEvent(event, storage),
+          (event) async => await _handleFileSystemEvent(event, storage),
           onError: (error) => debugPrint('❌ Watcher error for ${storage.path}: $error'),
         );
         
@@ -319,7 +323,7 @@ class FileUploadService extends ChangeNotifier {
             if (!kIsWeb && Platform.isWindows) {
               _scheduleFileSizeCheck(entity.path, storage);
             } else {
-              _addToUploadQueue(entity.path, storage);
+              await _addToUploadQueue(entity.path, storage);
             }
             queuedForUploadCount++;
           } else {
@@ -340,7 +344,7 @@ class FileUploadService extends ChangeNotifier {
   }
 
   /// Handle file system events
-  void _handleFileSystemEvent(WatchEvent event, Storage storage) {
+  Future<void> _handleFileSystemEvent(WatchEvent event, Storage storage) async {
     if (event.type == ChangeType.ADD) {
       final filePath = event.path;
       
@@ -351,7 +355,7 @@ class FileUploadService extends ChangeNotifier {
         if (!kIsWeb && Platform.isWindows) {
           _scheduleFileSizeCheck(filePath, storage);
         } else {
-          _addToUploadQueue(filePath, storage);
+          await _addToUploadQueue(filePath, storage);
         }
         
         _processedFiles.add(filePath);
@@ -366,10 +370,22 @@ class FileUploadService extends ChangeNotifier {
   }
 
   /// Add a file to the upload queue
-  void _addToUploadQueue(String filePath, Storage storage) {
+  Future<void> _addToUploadQueue(String filePath, Storage storage) async {
     final fileName = path.basename(filePath);
     final mediaType = _determineMediaType(filePath);
     final uploadId = DateTime.now().millisecondsSinceEpoch.toString();
+    final fileHash = _generateFileHash(filePath);
+    
+    // Check if file with same hash already exists
+    try {
+      final exists = await _mediaService.checkFileHashExists(fileHash);
+      if (exists) {
+        debugPrint('⚠️ File with same hash already exists, skipping upload: $fileName');
+        return;
+      }
+    } catch (e) {
+      debugPrint('⚠️ Error checking file hash existence, proceeding with upload: $e');
+    }
     
     final uploadItem = UploadItem(
       id: uploadId,
@@ -378,12 +394,13 @@ class FileUploadService extends ChangeNotifier {
       mediaType: mediaType,
       storageId: storage.id,
       addedAt: DateTime.now(),
+      fileHash: fileHash,
     );
     
     _uploadItems[uploadId] = uploadItem;
     _uploadQueue.add(uploadItem);
     
-    debugPrint('📋 Added to upload queue: $fileName (type: $mediaType)');
+    debugPrint('📋 Added to upload queue: $fileName (type: $mediaType, hash: ${fileHash.substring(0, 8)}...)');
     
     if (!_isProcessingQueue) {
       _startQueueProcessor();
@@ -401,6 +418,27 @@ class FileUploadService extends ChangeNotifier {
     if (mimeType.startsWith('video/')) return 'video';
     if (mimeType.startsWith('audio/')) return 'audio';
     return 'file';
+  }
+
+  /// Generate file hash using path + modified time + size strategy
+  String _generateFileHash(String filePath) {
+    try {
+      final file = File(filePath);
+      final stat = file.statSync();
+      
+      // Create fingerprint using file path + size + modified time
+      final fingerprint = '${filePath}_${stat.size}_${stat.modified.millisecondsSinceEpoch}';
+      
+      // Generate SHA-256 hash of the fingerprint
+      final bytes = utf8.encode(fingerprint);
+      final digest = sha256.convert(bytes);
+      
+      return digest.toString();
+    } catch (e) {
+      debugPrint('❌ Error generating file hash for $filePath: $e');
+      // Fallback to simple timestamp-based hash
+      return DateTime.now().millisecondsSinceEpoch.toString();
+    }
   }
 
   /// Schedule a file size check to ensure the file is stable before uploading (Windows only)
@@ -436,8 +474,8 @@ class FileUploadService extends ChangeNotifier {
       debugPrint('⏱️ Starting stability check for: $fileName (size: $currentSize bytes)');
       
       // Schedule first check after 5 seconds
-      _stabilityTimers[filePath] = Timer(const Duration(seconds: 5), () {
-        _performSizeCheck(filePath, storage, false);
+      _stabilityTimers[filePath] = Timer(const Duration(seconds: 5), () async {
+        await _performSizeCheck(filePath, storage, false);
       });
       
     } catch (e) {
@@ -448,7 +486,7 @@ class FileUploadService extends ChangeNotifier {
   }
 
   /// Perform the actual size check and decide whether to upload or wait more
-  void _performSizeCheck(String filePath, Storage storage, bool isSecondCheck) {
+  Future<void> _performSizeCheck(String filePath, Storage storage, bool isSecondCheck) async {
     try {
       final file = File(filePath);
       if (!file.existsSync()) {
@@ -477,8 +515,8 @@ class FileUploadService extends ChangeNotifier {
                   '($previousSize -> $currentSize bytes). Restarting stability check...');
         
         // Reschedule for another 5 seconds
-        _stabilityTimers[filePath] = Timer(const Duration(seconds: 5), () {
-          _performSizeCheck(filePath, storage, false);
+        _stabilityTimers[filePath] = Timer(const Duration(seconds: 5), () async {
+          await _performSizeCheck(filePath, storage, false);
         });
       } else {
         // Size is the same
@@ -487,8 +525,8 @@ class FileUploadService extends ChangeNotifier {
           debugPrint('✅ First stability check passed for: $fileName '
                     '(size stable: $currentSize bytes). Waiting 10 more seconds...');
           
-          _stabilityTimers[filePath] = Timer(const Duration(seconds: 10), () {
-            _performSizeCheck(filePath, storage, true);
+          _stabilityTimers[filePath] = Timer(const Duration(seconds: 10), () async {
+            await _performSizeCheck(filePath, storage, true);
           });
         } else {
           // Second check passed, file is stable - proceed with upload
@@ -499,7 +537,7 @@ class FileUploadService extends ChangeNotifier {
           _fileMonitorMap.remove(filePath);
           _stabilityTimers.remove(filePath);
           
-          _addToUploadQueue(filePath, storage);
+          await _addToUploadQueue(filePath, storage);
         }
       }
       
@@ -555,6 +593,7 @@ class FileUploadService extends ChangeNotifier {
         description: 'Auto-uploaded by File Upload Service',
         tags: ['auto-upload', 'file-watcher'],
         storageId: item.storageId,
+        fileHash: item.fileHash,
       );
       
       // Update item status

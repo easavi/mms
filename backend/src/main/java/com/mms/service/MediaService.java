@@ -49,6 +49,11 @@ public class MediaService {
         media.setCreatedAt(request.getCreatedAt());
         media.setTags(tags);
         
+        // Set file hash if provided
+        if (request.getFileHash() != null && !request.getFileHash().trim().isEmpty()) {
+            media.setFileHash(request.getFileHash());
+        }
+        
         media = mediaRepository.save(media);
         return convertToResponse(media);
     }
@@ -109,6 +114,11 @@ public class MediaService {
             // Set storage ID if provided
             if (request.getStorageId() != null) {
                 media.setStorageId(request.getStorageId());
+            }
+            
+            // Set file hash if provided
+            if (request.getFileHash() != null && !request.getFileHash().trim().isEmpty()) {
+                media.setFileHash(request.getFileHash());
             }
             
             // Save to database
@@ -273,6 +283,18 @@ public class MediaService {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found"));
         return convertToResponse(media);
+    }
+    
+    @Transactional(readOnly = true)
+    public MediaResponse getMediaByHashcode(String fileHash) {
+        Media media = mediaRepository.findByFileHash(fileHash)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found with hash: " + fileHash));
+        return convertToResponse(media);
+    }
+    
+    @Transactional(readOnly = true)
+    public boolean existsByFileHash(String fileHash) {
+        return mediaRepository.findByFileHash(fileHash).isPresent();
     }
     
     @Transactional
@@ -486,6 +508,7 @@ public class MediaService {
         response.setTags(media.getTags().stream()
                 .map(Tag::getName)
                 .toArray(String[]::new));
+        response.setFileHash(media.getFileHash());
         return response;
     }
     

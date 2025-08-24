@@ -36,6 +36,9 @@ public class Media {
     @Column(name = "storage_id")
     private String storageId;
 
+    @Column(name = "file_hash", nullable = true, unique = true, length = 64)
+    private String fileHash;
+
     @ManyToMany
     @JoinTable(
         name = "media_tags",
@@ -54,6 +57,16 @@ public class Media {
         this.fileName = fileName;
         this.fileUrl = fileUrl;
         this.createdAt = createdAt;
+        this.tags = new HashSet<>();
+    }
+
+    public Media(String name, String mediaType, String fileName, String fileUrl, OffsetDateTime createdAt, String fileHash) {
+        this.name = name;
+        this.mediaType = mediaType;
+        this.fileName = fileName;
+        this.fileUrl = fileUrl;
+        this.createdAt = createdAt;
+        this.fileHash = fileHash;
         this.tags = new HashSet<>();
     }
 
@@ -127,6 +140,14 @@ public class Media {
 
     public void setStorageId(String storageId) {
         this.storageId = storageId;
+    }
+
+    public String getFileHash() {
+        return fileHash;
+    }
+
+    public void setFileHash(String fileHash) {
+        this.fileHash = fileHash;
     }
 
     public Set<Tag> getTags() {

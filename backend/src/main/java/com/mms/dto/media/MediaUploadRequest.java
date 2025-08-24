@@ -17,6 +17,8 @@ public class MediaUploadRequest {
     
     private String storageId;
 
+    private String fileHash;
+
     public MediaUploadRequest() {
     }
 
@@ -27,6 +29,16 @@ public class MediaUploadRequest {
         this.file = file;
         this.tags = tags != null ? tags.clone() : null;
         this.storageId = storageId;
+    }
+
+    public MediaUploadRequest(String title, String description, String mediaType, MultipartFile file, String[] tags, String storageId, String fileHash) {
+        this.title = title;
+        this.description = description;
+        this.mediaType = mediaType;
+        this.file = file;
+        this.tags = tags != null ? tags.clone() : null;
+        this.storageId = storageId;
+        this.fileHash = fileHash;
     }
 
     public String getTitle() {
@@ -75,6 +87,14 @@ public class MediaUploadRequest {
 
     public void setStorageId(String storageId) {
         this.storageId = storageId;
+    }
+
+    public String getFileHash() {
+        return fileHash;
+    }
+
+    public void setFileHash(String fileHash) {
+        this.fileHash = fileHash;
     }
     
     // Handle tags as comma-separated string (for form submission)

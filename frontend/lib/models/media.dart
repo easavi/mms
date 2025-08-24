@@ -12,6 +12,7 @@ class Media {
   final String? thumbnailUrl;
   final int fileSize; // Default to 0 if not provided by backend
   final String mimeType; // Default to empty string if not provided by backend
+  final String? fileHash; // File hash for unique identification
 
   Media({
     required this.id,
@@ -25,6 +26,7 @@ class Media {
     this.thumbnailUrl,
     required this.fileSize,
     required this.mimeType,
+    this.fileHash,
   });
 
   factory Media.fromJson(Map<String, dynamic> json) {
@@ -81,6 +83,7 @@ class Media {
       thumbnailUrl: json['thumbnailUrl']?.toString(),
       fileSize: parsedFileSize, // Default to 0 since backend doesn't provide this
       mimeType: parsedMimeType, // Derived from file extension
+      fileHash: json['fileHash']?.toString(), // May be null for existing records
     );
   }
 
@@ -97,6 +100,7 @@ class Media {
       'thumbnailUrl': thumbnailUrl,
       'fileSize': fileSize,
       'mimeType': mimeType,
+      'fileHash': fileHash,
     };
   }
 

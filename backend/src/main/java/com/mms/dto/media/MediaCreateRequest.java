@@ -24,6 +24,8 @@ public class MediaCreateRequest {
     
     private String[] tagNames;
     
+    private String fileHash;
+    
     public MediaCreateRequest() {
     }
     
@@ -35,6 +37,17 @@ public class MediaCreateRequest {
         this.fileUrl = fileUrl;
         this.createdAt = createdAt;
         this.tagNames = tagNames;
+    }
+
+    public MediaCreateRequest(String name, String mediaType, String fileName, 
+                             String fileUrl, OffsetDateTime createdAt, String[] tagNames, String fileHash) {
+        this.name = name;
+        this.mediaType = mediaType;
+        this.fileName = fileName;
+        this.fileUrl = fileUrl;
+        this.createdAt = createdAt;
+        this.tagNames = tagNames;
+        this.fileHash = fileHash;
     }
     
     public String getName() {
@@ -83,5 +96,13 @@ public class MediaCreateRequest {
     
     public void setTagNames(String[] tagNames) {
         this.tagNames = tagNames != null ? tagNames.clone() : null;
+    }
+
+    public String getFileHash() {
+        return fileHash;
+    }
+
+    public void setFileHash(String fileHash) {
+        this.fileHash = fileHash;
     }
 }

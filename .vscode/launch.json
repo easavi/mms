@@ -40,7 +40,42 @@
                 "group": "MMS Frontend",
                 "order": 2
             }
+        },    
+        {
+            "name": "frontend (Android)",
+            "cwd": "frontend",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "android",
+            "presentation": {
+                "hidden": false,
+                "group": "MMS Frontend",
+                "order": 3
+            }
         },
+        {
+            "name": "frontend (Android - Auto Device)",
+            "cwd": "frontend",
+            "request": "launch",
+            "type": "dart",
+            "presentation": {
+                "hidden": false,
+                "group": "MMS Frontend",
+                "order": 4
+            }
+        },
+        {
+            "name": "frontend (Android Emulator - emulator-5554)",
+            "cwd": "frontend",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "emulator-5554",
+            "presentation": {
+                "hidden": false,
+                "group": "MMS Frontend",
+                "order": 5
+            }
+        },        
         {
             "type": "java",
             "name": "MMS Listener - Listener Mode",

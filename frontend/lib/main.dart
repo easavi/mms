@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'config/api_config.dart';
 import 'config/environment.dart';
+import 'config/platform_utils.dart';
 import 'providers/auth_provider.dart';
 import 'providers/media_provider.dart';
 import 'providers/file_upload_provider.dart';
@@ -14,7 +14,9 @@ import 'widgets/authenticated_wrapper.dart';
 import 'theme/app_theme.dart';
 
 void main() {
-  setupEnvironment(env: Environment.dev);
+  // Automatically set environment based on platform
+  final env = PlatformUtils.getDefaultEnvironment();
+  setupEnvironment(env: env);
 
   runApp(
     MultiProvider(

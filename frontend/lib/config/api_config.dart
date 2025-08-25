@@ -1,5 +1,6 @@
 enum Environment {
   dev,
+  devMobile,
   prod,
 }
 
@@ -14,6 +15,8 @@ class ApiConfig {
     switch (_environment) {
       case Environment.dev:
         return 'http://localhost:8080';
+      case Environment.devMobile:
+        return 'http://10.0.2.2:8080'; // Android emulator host IP
       case Environment.prod:
         return 'https://your-production-domain.com'; // Replace with your production API domain
     }

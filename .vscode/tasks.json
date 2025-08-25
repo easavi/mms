@@ -26,6 +26,40 @@
 			"problemMatcher": []
 		},
 		{
+			"label": "Run Flutter App - Android",
+			"type": "shell",
+			"command": "flutter run -d android",
+			"group": "build",
+			"isBackground": true,
+			"args": [],
+			"options": {
+				"cwd": "${workspaceFolder}/frontend"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build Flutter App - Android APK",
+			"type": "shell",
+			"command": "flutter build apk",
+			"group": "build",
+			"args": [],
+			"options": {
+				"cwd": "${workspaceFolder}/frontend"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build Flutter App - Android Bundle",
+			"type": "shell",
+			"command": "flutter build appbundle",
+			"group": "build",
+			"args": [],
+			"options": {
+				"cwd": "${workspaceFolder}/frontend"
+			},
+			"problemMatcher": []
+		},
+		{
 			"label": "Build MMS Listener",
 			"type": "shell",
 			"command": "mvn",

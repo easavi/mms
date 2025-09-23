@@ -35,7 +35,7 @@ class _AuthenticatedWrapperState extends State<AuthenticatedWrapper> {
 
     if (authProvider.isAuthenticated && !_fileUploadInitialized) {
       // Only initialize file upload service on Windows platform
-      if (!kIsWeb && Platform.isWindows) {
+      if (!kIsWeb && (Platform.isWindows || Platform.isLinux)) {
         try {
           debugPrint('🚀 Initializing File Upload Service for Windows authenticated user...');
           await fileUploadProvider.initialize();

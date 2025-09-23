@@ -40,6 +40,18 @@
                 "group": "MMS Frontend",
                 "order": 2
             }
+        },
+        {
+            "name": "frontend (Linux)",
+            "cwd": "frontend",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "linux",
+            "presentation": {
+                "hidden": false,
+                "group": "MMS Frontend",
+                "order": 3
+            }
         },    
         {
             "name": "frontend (Android)",
@@ -50,7 +62,7 @@
             "presentation": {
                 "hidden": false,
                 "group": "MMS Frontend",
-                "order": 3
+                "order": 4
             }
         },
         {
@@ -61,7 +73,7 @@
             "presentation": {
                 "hidden": false,
                 "group": "MMS Frontend",
-                "order": 4
+                "order": 5
             }
         },
         {
@@ -73,7 +85,7 @@
             "presentation": {
                 "hidden": false,
                 "group": "MMS Frontend",
-                "order": 5
+                "order": 6
             }
         },        
         {

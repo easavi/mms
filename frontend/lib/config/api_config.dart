@@ -14,7 +14,7 @@ class ApiConfig {
   static String get baseUrl {
     switch (_environment) {
       case Environment.dev:
-        return 'http://localhost:8080';
+        return 'http://30.30.0.70:28080';
       case Environment.devMobile:
         return 'http://10.0.2.2:8080'; // Android emulator host IP
       case Environment.prod:

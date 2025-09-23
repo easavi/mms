@@ -8,19 +8,19 @@ spring:
 # MMS Backend Configuration
 mms:
   backend:
-    url: http://localhost:8080
+    url: http://30.30.0.70:28080
     username: admin
     password: admin123
   
   # Folders to monitor for LISTENER mode (uploads to backend and deletes files)
   folders:
-    - "D:/dev/mms/temp/files"
+    - "/home/ederson/dev/sources/mms/temp/files"
   
   # Folder copy mappings for COPY mode (copies files and preserves originals)
   # In ALL mode, both configurations above are used simultaneously
   folder-copy-mappings:
-    - source: "D:/dev/mms/temp/original"
-      destination: "D:/dev/mms/temp/files"
+    - source: "/home/ederson/dev/sources/mms/temp/original"
+      destination: "/home/ederson/dev/sources/mms/temp/files"
   
   # File patterns to include/exclude (applies to both modes)
   file-patterns:
@@ -29,5 +29,5 @@ mms:
 
 logging:
   level:
-    com.mms.listener: DEBUG
-    org.springframework.web.reactive: DEBUG
+    com.mms.listener: INFO
+    org.springframework.web.reactive: INFO

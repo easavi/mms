@@ -27,6 +27,8 @@ class DeviceService {
         _deviceId = await _getWebDeviceId();
       } else if (Platform.isWindows) {
         _deviceId = await _getWindowsDeviceId();
+      } else if (Platform.isLinux) {
+        _deviceId = await _getLinuxDeviceId();
       } else {
         // Fallback for other platforms
         _deviceId = await _getFallbackDeviceId();
@@ -101,6 +103,55 @@ class DeviceService {
       String computerName = Platform.environment['COMPUTERNAME'] ?? 'unknown';
       String userName = Platform.environment['USERNAME'] ?? 'unknown';
       return _hashString('mms_windows_app_fallback_${computerName}_$userName');
+    }
+  }
+  
+  /// Generate device ID for Linux platform
+  Future<String> _getLinuxDeviceId() async {
+    try {
+      // Try to get machine-id from Linux system
+      final machineIdFile = File('/etc/machine-id');
+      if (await machineIdFile.exists()) {
+        String machineId = await machineIdFile.readAsString();
+        machineId = machineId.trim();
+        if (machineId.isNotEmpty) {
+          // Hash the machine-id for privacy and consistency
+          return _hashString('mms_linux_app_$machineId');
+        }
+      }
+      
+      // Fallback: try /var/lib/dbus/machine-id
+      final dbusMachineIdFile = File('/var/lib/dbus/machine-id');
+      if (await dbusMachineIdFile.exists()) {
+        String machineId = await dbusMachineIdFile.readAsString();
+        machineId = machineId.trim();
+        if (machineId.isNotEmpty) {
+          return _hashString('mms_linux_app_dbus_$machineId');
+        }
+      }
+      
+      // Fallback: use hostname + username
+      ProcessResult hostnameResult = await Process.run('hostname', []);
+      String hostname = 'unknown';
+      if (hostnameResult.exitCode == 0) {
+        hostname = hostnameResult.stdout.toString().trim();
+      }
+      
+      String userName = Platform.environment['USER'] ?? 
+                       Platform.environment['USERNAME'] ?? 
+                       'unknown';
+      
+      return _hashString('mms_linux_app_${hostname}_$userName');
+      
+    } catch (e) {
+      debugPrint('Error getting Linux device ID: $e');
+      
+      // Final fallback for Linux
+      String userName = Platform.environment['USER'] ?? 
+                       Platform.environment['USERNAME'] ?? 
+                       'unknown';
+      String hostname = Platform.environment['HOSTNAME'] ?? 'unknown';
+      return _hashString('mms_linux_app_fallback_${hostname}_$userName');
     }
   }
   
@@ -186,6 +237,8 @@ class DeviceService {
       platform = 'Web Browser';
     } else if (Platform.isWindows) {
       platform = 'Windows App';
+    } else if (Platform.isLinux) {
+      platform = 'Linux App';
     } else {
       platform = Platform.operatingSystem;
     }

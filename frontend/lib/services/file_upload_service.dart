@@ -73,7 +73,7 @@ class FileUploadService extends ChangeNotifier {
   // File watchers for each storage path
   final Map<String, StreamSubscription<WatchEvent>> _watchers = {};
   
-  // File monitoring for stability check (Windows only)
+  // File monitoring for stability check (Windows and Linux)
   final Map<String, FileMonitorInfo> _fileMonitorMap = <String, FileMonitorInfo>{};
   final Map<String, Timer> _stabilityTimers = <String, Timer>{};
   
@@ -112,13 +112,13 @@ class FileUploadService extends ChangeNotifier {
   Future<void> start() async {
     if (_isRunning) return;
     
-    // Only start on Windows platform
-    if (kIsWeb || !Platform.isWindows) {
+    // Only start on Windows and Linux platforms
+    if (kIsWeb || (!Platform.isWindows && !Platform.isLinux)) {
       debugPrint('🌐 File Upload Service not starting - platform: ${kIsWeb ? 'Web' : Platform.operatingSystem}');
       return;
     }
     
-    debugPrint('🎧 Starting File Upload Service on Windows...');
+    debugPrint('🎧 Starting File Upload Service on ${Platform.operatingSystem}...');
     _isRunning = true;
     
     try {
@@ -136,7 +136,7 @@ class FileUploadService extends ChangeNotifier {
       // Start processing the upload queue
       _startQueueProcessor();
       
-      debugPrint('✅ File Upload Service started successfully on Windows');
+      debugPrint('✅ File Upload Service started successfully on ${Platform.operatingSystem}');
     } catch (e) {
       debugPrint('❌ Failed to start File Upload Service: $e');
       _isRunning = false;
@@ -319,8 +319,8 @@ class FileUploadService extends ChangeNotifier {
             // File doesn't exist in backend, add to upload queue
             debugPrint('📤 Queuing existing file for upload: $fileName');
             
-            // Use stability check for Windows platform, direct upload for others
-            if (!kIsWeb && Platform.isWindows) {
+            // Use stability check for Windows and Linux platforms, direct upload for others
+            if (!kIsWeb && (Platform.isWindows || Platform.isLinux)) {
               _scheduleFileSizeCheck(entity.path, storage);
             } else {
               await _addToUploadQueue(entity.path, storage);
@@ -351,8 +351,8 @@ class FileUploadService extends ChangeNotifier {
       if (_shouldProcessFile(filePath) && !_processedFiles.contains(filePath)) {
         debugPrint('📝 New file detected: ${path.basename(filePath)}');
         
-        // Use stability check for Windows platform, direct upload for others
-        if (!kIsWeb && Platform.isWindows) {
+        // Use stability check for Windows and Linux platforms, direct upload for others
+        if (!kIsWeb && (Platform.isWindows || Platform.isLinux)) {
           _scheduleFileSizeCheck(filePath, storage);
         } else {
           await _addToUploadQueue(filePath, storage);
@@ -441,7 +441,7 @@ class FileUploadService extends ChangeNotifier {
     }
   }
 
-  /// Schedule a file size check to ensure the file is stable before uploading (Windows only)
+  /// Schedule a file size check to ensure the file is stable before uploading (Windows and Linux)
   void _scheduleFileSizeCheck(String filePath, Storage storage) {
     try {
       final file = File(filePath);

@@ -39,6 +39,13 @@ public class Media {
     @Column(name = "file_hash", nullable = true, unique = true, length = 64)
     private String fileHash;
 
+    @Column(name = "username", length = 50)
+    private String username;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "username", referencedColumnName = "username", insertable = false, updatable = false)
+    private User user;
+
     @ManyToMany
     @JoinTable(
         name = "media_tags",
@@ -148,6 +155,25 @@ public class Media {
 
     public void setFileHash(String fileHash) {
         this.fileHash = fileHash;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+        if (user != null) {
+            this.username = user.getUsername();
+        }
     }
 
     public Set<Tag> getTags() {

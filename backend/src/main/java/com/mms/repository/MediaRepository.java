@@ -164,4 +164,156 @@ public interface MediaRepository extends JpaRepository<Media, UUID> {
     // Find media by file hash
     @Query("SELECT m FROM Media m WHERE m.fileHash = :fileHash")
     Optional<Media> findByFileHash(@Param("fileHash") String fileHash);
+    
+    // User-filtered queries
+    Page<Media> findByUsernameOrderByCreatedAtDesc(String username, Pageable pageable);
+    Page<Media> findByUsernameOrderByCreatedAtAsc(String username, Pageable pageable);
+    
+    // User + type filter
+    Page<Media> findByUsernameAndMediaTypeOrderByCreatedAtDesc(String username, String mediaType, Pageable pageable);
+    Page<Media> findByUsernameAndMediaTypeOrderByCreatedAtAsc(String username, String mediaType, Pageable pageable);
+    
+    // User + date range filter
+    @Query("SELECT m FROM Media m WHERE m.username = :username AND " +
+           "m.createdAt BETWEEN :startDate AND :endDate ORDER BY m.createdAt DESC")
+    Page<Media> findByUsernameAndCreatedAtBetweenOrderByCreatedAtDesc(
+        @Param("username") String username,
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate,
+        Pageable pageable
+    );
+    
+    @Query("SELECT m FROM Media m WHERE m.username = :username AND " +
+           "m.createdAt BETWEEN :startDate AND :endDate ORDER BY m.createdAt ASC")
+    Page<Media> findByUsernameAndCreatedAtBetweenOrderByCreatedAtAsc(
+        @Param("username") String username,
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate,
+        Pageable pageable
+    );
+    
+    // User + tags filter
+    @Query("SELECT DISTINCT m FROM Media m JOIN m.tags t WHERE " +
+           "m.username = :username AND t.name IN :tagNames ORDER BY m.createdAt DESC")
+    Page<Media> findByUsernameAndTagsNameInOrderByCreatedAtDesc(
+        @Param("username") String username,
+        @Param("tagNames") List<String> tagNames,
+        Pageable pageable
+    );
+    
+    @Query("SELECT DISTINCT m FROM Media m JOIN m.tags t WHERE " +
+           "m.username = :username AND t.name IN :tagNames ORDER BY m.createdAt ASC")
+    Page<Media> findByUsernameAndTagsNameInOrderByCreatedAtAsc(
+        @Param("username") String username,
+        @Param("tagNames") List<String> tagNames,
+        Pageable pageable
+    );
+    
+    // User + type + date range filter
+    @Query("SELECT m FROM Media m WHERE m.username = :username AND " +
+           "m.mediaType = :mediaType AND " +
+           "m.createdAt BETWEEN :startDate AND :endDate ORDER BY m.createdAt DESC")
+    Page<Media> findByUsernameAndMediaTypeAndCreatedAtBetweenOrderByCreatedAtDesc(
+        @Param("username") String username,
+        @Param("mediaType") String mediaType,
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate,
+        Pageable pageable
+    );
+    
+    @Query("SELECT m FROM Media m WHERE m.username = :username AND " +
+           "m.mediaType = :mediaType AND " +
+           "m.createdAt BETWEEN :startDate AND :endDate ORDER BY m.createdAt ASC")
+    Page<Media> findByUsernameAndMediaTypeAndCreatedAtBetweenOrderByCreatedAtAsc(
+        @Param("username") String username,
+        @Param("mediaType") String mediaType,
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate,
+        Pageable pageable
+    );
+    
+    // User + type + tags filter
+    @Query("SELECT DISTINCT m FROM Media m JOIN m.tags t WHERE " +
+           "m.username = :username AND " +
+           "m.mediaType = :mediaType AND " +
+           "t.name IN :tagNames ORDER BY m.createdAt DESC")
+    Page<Media> findByUsernameAndMediaTypeAndTagsNameInOrderByCreatedAtDesc(
+        @Param("username") String username,
+        @Param("mediaType") String mediaType,
+        @Param("tagNames") List<String> tagNames,
+        Pageable pageable
+    );
+    
+    @Query("SELECT DISTINCT m FROM Media m JOIN m.tags t WHERE " +
+           "m.username = :username AND " +
+           "m.mediaType = :mediaType AND " +
+           "t.name IN :tagNames ORDER BY m.createdAt ASC")
+    Page<Media> findByUsernameAndMediaTypeAndTagsNameInOrderByCreatedAtAsc(
+        @Param("username") String username,
+        @Param("mediaType") String mediaType,
+        @Param("tagNames") List<String> tagNames,
+        Pageable pageable
+    );
+    
+    // User + date range + tags filter
+    @Query("SELECT DISTINCT m FROM Media m JOIN m.tags t WHERE " +
+           "m.username = :username AND " +
+           "m.createdAt BETWEEN :startDate AND :endDate AND " +
+           "t.name IN :tagNames ORDER BY m.createdAt DESC")
+    Page<Media> findByUsernameAndCreatedAtBetweenAndTagsNameInOrderByCreatedAtDesc(
+        @Param("username") String username,
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate,
+        @Param("tagNames") List<String> tagNames,
+        Pageable pageable
+    );
+    
+    @Query("SELECT DISTINCT m FROM Media m JOIN m.tags t WHERE " +
+           "m.username = :username AND " +
+           "m.createdAt BETWEEN :startDate AND :endDate AND " +
+           "t.name IN :tagNames ORDER BY m.createdAt ASC")
+    Page<Media> findByUsernameAndCreatedAtBetweenAndTagsNameInOrderByCreatedAtAsc(
+        @Param("username") String username,
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate,
+        @Param("tagNames") List<String> tagNames,
+        Pageable pageable
+    );
+    
+    // User + type + date range + tags filter (full combination)
+    @Query("SELECT DISTINCT m FROM Media m JOIN m.tags t WHERE " +
+           "m.username = :username AND " +
+           "m.mediaType = :mediaType AND " +
+           "m.createdAt BETWEEN :startDate AND :endDate AND " +
+           "t.name IN :tagNames ORDER BY m.createdAt DESC")
+    Page<Media> findByUsernameAndMediaTypeAndCreatedAtBetweenAndTagsNameInOrderByCreatedAtDesc(
+        @Param("username") String username,
+        @Param("mediaType") String mediaType,
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate,
+        @Param("tagNames") List<String> tagNames,
+        Pageable pageable
+    );
+    
+    @Query("SELECT DISTINCT m FROM Media m JOIN m.tags t WHERE " +
+           "m.username = :username AND " +
+           "m.mediaType = :mediaType AND " +
+           "m.createdAt BETWEEN :startDate AND :endDate AND " +
+           "t.name IN :tagNames ORDER BY m.createdAt ASC")
+    Page<Media> findByUsernameAndMediaTypeAndCreatedAtBetweenAndTagsNameInOrderByCreatedAtAsc(
+        @Param("username") String username,
+        @Param("mediaType") String mediaType,
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate,
+        @Param("tagNames") List<String> tagNames,
+        Pageable pageable
+    );
+    
+    // User-specific basic queries
+    List<Media> findByUsername(String username);
+    Optional<Media> findByIdAndUsername(UUID id, String username);
+    
+    // User-specific file hash query
+    @Query("SELECT m FROM Media m WHERE m.fileHash = :fileHash AND m.username = :username")
+    Optional<Media> findByFileHashAndUsername(@Param("fileHash") String fileHash, @Param("username") String username);
 }

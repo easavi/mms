@@ -38,7 +38,7 @@ public class MediaService {
     }
     
     @Transactional
-    public MediaResponse createMedia(MediaCreateRequest request) {
+    public MediaResponse createMedia(MediaCreateRequest request, String username) {
         Set<Tag> tags = processTags(request.getTagNames());
         
         Media media = new Media();
@@ -47,6 +47,7 @@ public class MediaService {
         media.setFileName(request.getFileName());
         media.setFileUrl(request.getFileUrl());
         media.setCreatedAt(request.getCreatedAt());
+        media.setUsername(username);
         media.setTags(tags);
         
         // Set file hash if provided
@@ -59,12 +60,13 @@ public class MediaService {
     }
     
     @Transactional
-    public MediaResponse uploadMedia(MediaUploadRequest request) {
+    public MediaResponse uploadMedia(MediaUploadRequest request, String username) {
         try {
             // Debug logging
             System.out.println("=== MediaService Debug ===");
             System.out.println("Request: " + request);
             System.out.println("Request file: " + (request.getFile() != null ? request.getFile().getOriginalFilename() : "NULL"));
+            System.out.println("Username: " + username);
             System.out.println("=========================");
             
             MultipartFile file = request.getFile();
@@ -109,6 +111,7 @@ public class MediaService {
             media.setFileSize(file.getSize()); // Set file size
             media.setCreatedAt(OffsetDateTime.now());
             media.setUploadedAt(OffsetDateTime.now());
+            media.setUsername(username);
             media.setTags(tags);
             
             // Set storage ID if provided
@@ -164,8 +167,8 @@ public class MediaService {
     }
     
     @Transactional(readOnly = true)
-    public List<MediaResponse> getAllMedia() {
-        return mediaRepository.findAll()
+    public List<MediaResponse> getAllMedia(String username) {
+        return mediaRepository.findByUsername(username)
                 .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
@@ -279,27 +282,116 @@ public class MediaService {
     }
     
     @Transactional(readOnly = true)
-    public MediaResponse getMediaById(UUID id) {
-        Media media = mediaRepository.findById(id)
+    public Page<MediaResponse> getMediaWithFilters(
+            OffsetDateTime startDate, 
+            OffsetDateTime endDate,
+            List<String> tagNames,
+            String mediaType,
+            String sortDirection,
+            Pageable pageable,
+            String username) {
+        
+        boolean ascending = "asc".equalsIgnoreCase(sortDirection);
+        Page<Media> mediaPage;
+        
+        // Determine which filters are active
+        boolean hasDateFilter = startDate != null && endDate != null;
+        boolean hasTagsFilter = tagNames != null && !tagNames.isEmpty();
+        boolean hasMediaTypeFilter = mediaType != null && !mediaType.isEmpty();
+        
+        if (hasMediaTypeFilter && hasDateFilter && hasTagsFilter) {
+            // All three filters: media type + date range + tags + user
+            if (ascending) {
+                mediaPage = mediaRepository.findByUsernameAndMediaTypeAndCreatedAtBetweenAndTagsNameInOrderByCreatedAtAsc(
+                    username, mediaType, startDate, endDate, tagNames, pageable);
+            } else {
+                mediaPage = mediaRepository.findByUsernameAndMediaTypeAndCreatedAtBetweenAndTagsNameInOrderByCreatedAtDesc(
+                    username, mediaType, startDate, endDate, tagNames, pageable);
+            }
+        } else if (hasMediaTypeFilter && hasDateFilter) {
+            // Media type + date range + user
+            if (ascending) {
+                mediaPage = mediaRepository.findByUsernameAndMediaTypeAndCreatedAtBetweenOrderByCreatedAtAsc(
+                    username, mediaType, startDate, endDate, pageable);
+            } else {
+                mediaPage = mediaRepository.findByUsernameAndMediaTypeAndCreatedAtBetweenOrderByCreatedAtDesc(
+                    username, mediaType, startDate, endDate, pageable);
+            }
+        } else if (hasMediaTypeFilter && hasTagsFilter) {
+            // Media type + tags + user
+            if (ascending) {
+                mediaPage = mediaRepository.findByUsernameAndMediaTypeAndTagsNameInOrderByCreatedAtAsc(
+                    username, mediaType, tagNames, pageable);
+            } else {
+                mediaPage = mediaRepository.findByUsernameAndMediaTypeAndTagsNameInOrderByCreatedAtDesc(
+                    username, mediaType, tagNames, pageable);
+            }
+        } else if (hasDateFilter && hasTagsFilter) {
+            // Date range + tags + user
+            if (ascending) {
+                mediaPage = mediaRepository.findByUsernameAndCreatedAtBetweenAndTagsNameInOrderByCreatedAtAsc(
+                    username, startDate, endDate, tagNames, pageable);
+            } else {
+                mediaPage = mediaRepository.findByUsernameAndCreatedAtBetweenAndTagsNameInOrderByCreatedAtDesc(
+                    username, startDate, endDate, tagNames, pageable);
+            }
+        } else if (hasMediaTypeFilter) {
+            // Only media type filter + user
+            if (ascending) {
+                mediaPage = mediaRepository.findByUsernameAndMediaTypeOrderByCreatedAtAsc(username, mediaType, pageable);
+            } else {
+                mediaPage = mediaRepository.findByUsernameAndMediaTypeOrderByCreatedAtDesc(username, mediaType, pageable);
+            }
+        } else if (hasDateFilter) {
+            // Only date range filter + user
+            if (ascending) {
+                mediaPage = mediaRepository.findByUsernameAndCreatedAtBetweenOrderByCreatedAtAsc(
+                    username, startDate, endDate, pageable);
+            } else {
+                mediaPage = mediaRepository.findByUsernameAndCreatedAtBetweenOrderByCreatedAtDesc(
+                    username, startDate, endDate, pageable);
+            }
+        } else if (hasTagsFilter) {
+            // Only tags filter + user
+            if (ascending) {
+                mediaPage = mediaRepository.findByUsernameAndTagsNameInOrderByCreatedAtAsc(username, tagNames, pageable);
+            } else {
+                mediaPage = mediaRepository.findByUsernameAndTagsNameInOrderByCreatedAtDesc(username, tagNames, pageable);
+            }
+        } else {
+            // No filters, just user + sorting
+            if (ascending) {
+                mediaPage = mediaRepository.findByUsernameOrderByCreatedAtAsc(username, pageable);
+            } else {
+                mediaPage = mediaRepository.findByUsernameOrderByCreatedAtDesc(username, pageable);
+            }
+        }
+        
+        return mediaPage.map(this::convertToResponse);
+    }
+    
+    @Transactional(readOnly = true)
+    public MediaResponse getMediaById(UUID id, String username) {
+        Media media = mediaRepository.findByIdAndUsername(id, username)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found"));
         return convertToResponse(media);
     }
     
     @Transactional(readOnly = true)
-    public MediaResponse getMediaByHashcode(String fileHash) {
-        Media media = mediaRepository.findByFileHash(fileHash)
+    public MediaResponse getMediaByHashcode(String fileHash, String username) {
+        Media media = mediaRepository.findByFileHashAndUsername(fileHash, username)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found with hash: " + fileHash));
         return convertToResponse(media);
     }
     
     @Transactional(readOnly = true)
-    public boolean existsByFileHash(String fileHash) {
-        return mediaRepository.findByFileHash(fileHash).isPresent();
+    public boolean existsByFileHash(String fileHash, String username) {
+        return mediaRepository.findByFileHashAndUsername(fileHash, username).isPresent();
     }
     
     @Transactional
-    public MediaResponse updateMedia(UUID id, MediaUpdateRequest request) {
-        Media media = mediaRepository.findById(id)
+    public MediaResponse updateMedia(UUID id, MediaUpdateRequest request, String username) {
+        Media media = mediaRepository.findByIdAndUsername(id, username)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found"));
         
         if (request.getName() != null) {
@@ -327,11 +419,10 @@ public class MediaService {
     }
     
     @Transactional
-    public void deleteMedia(UUID id) {
-        if (!mediaRepository.existsById(id)) {
-            throw new ApiException(HttpStatus.NOT_FOUND, "Media not found");
-        }
-        mediaRepository.deleteById(id);
+    public void deleteMedia(UUID id, String username) {
+        Media media = mediaRepository.findByIdAndUsername(id, username)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found"));
+        mediaRepository.delete(media);
     }
     
     @Transactional(readOnly = true)
@@ -513,9 +604,9 @@ public class MediaService {
     }
     
     @Transactional(readOnly = true)
-    public MediaContentResponse getFileContentById(UUID mediaId) {
-        // Find the media record by ID
-        Media media = mediaRepository.findById(mediaId)
+    public MediaContentResponse getFileContentById(UUID mediaId, String username) {
+        // Find the media record by ID and username
+        Media media = mediaRepository.findByIdAndUsername(mediaId, username)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found"));
         
         try {
@@ -555,7 +646,7 @@ public class MediaService {
     }
 
     @Transactional(readOnly = true)
-    public MediaContentResponse getFileContent(String bucket, String fileId) {
+    public MediaContentResponse getFileContent(String bucket, String fileId, String username) {
         try {
             // Use the file ID as the path directly (it contains the full path: username/mediatype/filename)
             var inputStream = storageService.retrieve(bucket, fileId);
@@ -571,8 +662,8 @@ public class MediaService {
                 fileName = fileId.substring(fileId.lastIndexOf("/") + 1);
             }
             
-            // Try to find media record by searching for the file path in fileUrl
-            Optional<Media> mediaOpt = mediaRepository.findAll().stream()
+            // Try to find media record by searching for the file path in fileUrl AND matching the username
+            Optional<Media> mediaOpt = mediaRepository.findByUsername(username).stream()
                     .filter(media -> media.getFileUrl() != null && media.getFileUrl().contains(fileId))
                     .findFirst();
             
@@ -581,8 +672,8 @@ public class MediaService {
                 fileName = media.getFileName() != null ? media.getFileName() : fileName;
                 contentType = determineContentTypeFromMedia(media.getMediaType(), fileName);
             } else {
-                // Fallback: determine content type from file extension
-                contentType = determineContentTypeFromExtension(fileName);
+                // If no media record found for this user, deny access
+                throw new ApiException(HttpStatus.NOT_FOUND, "File not found or access denied");
             }
             
             return new MediaContentResponse(content, contentType, fileName);
@@ -593,9 +684,9 @@ public class MediaService {
     }
 
     @Transactional(readOnly = true)
-    public MediaContentResponse getThumbnailById(UUID mediaId) {
-        // Find the media record by ID
-        Media media = mediaRepository.findById(mediaId)
+    public MediaContentResponse getThumbnailById(UUID mediaId, String username) {
+        // Find the media record by ID and username
+        Media media = mediaRepository.findByIdAndUsername(mediaId, username)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Media not found"));
         
         // Check if it's an image
@@ -631,12 +722,21 @@ public class MediaService {
     }
 
     @Transactional(readOnly = true)
-    public MediaContentResponse getThumbnail(String bucket, String fileId) {
+    public MediaContentResponse getThumbnail(String bucket, String fileId, String username) {
         try {
             // Check if the original file is an image
             LocalStorageService localStorageService = (LocalStorageService) storageService;
             if (!localStorageService.isImageFile(fileId)) {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Thumbnails are only available for images");
+            }
+            
+            // Verify that the file belongs to the authenticated user
+            Optional<Media> mediaOpt = mediaRepository.findByUsername(username).stream()
+                    .filter(media -> media.getFileUrl() != null && media.getFileUrl().contains(fileId))
+                    .findFirst();
+            
+            if (mediaOpt.isEmpty()) {
+                throw new ApiException(HttpStatus.NOT_FOUND, "File not found or access denied");
             }
             
             // Get thumbnail path
@@ -657,8 +757,10 @@ public class MediaService {
                 fileName = fileId.substring(fileId.lastIndexOf("/") + 1);
             }
             
-            // Determine content type
-            String contentType = determineContentTypeFromExtension(fileName);
+            // Use the media record for better content type determination
+            Media media = mediaOpt.get();
+            fileName = media.getFileName() != null ? media.getFileName() : fileName;
+            String contentType = determineContentTypeFromMedia(media.getMediaType(), fileName);
             
             return new MediaContentResponse(content, contentType, fileName);
             

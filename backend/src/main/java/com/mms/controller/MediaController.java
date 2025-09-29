@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,8 +34,10 @@ public class MediaController {
     }
     
     @PostMapping
-    public ResponseEntity<MediaResponse> createMedia(@Valid @RequestBody MediaCreateRequest request) {
-        MediaResponse response = mediaService.createMedia(request);
+    public ResponseEntity<MediaResponse> createMedia(@Valid @RequestBody MediaCreateRequest request,
+                                                   Authentication authentication) {
+        String username = authentication.getName();
+        MediaResponse response = mediaService.createMedia(request, username);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
     
@@ -46,7 +49,10 @@ public class MediaController {
             @RequestParam(value = "mediaType", required = true) String mediaType,
             @RequestParam(value = "tags", required = false) String[] tags,
             @RequestParam(value = "storageId", required = false) String storageId,
-            @RequestParam(value = "fileHash", required = false) String fileHash) {
+            @RequestParam(value = "fileHash", required = false) String fileHash,
+            Authentication authentication) {
+        
+        String username = authentication.getName();
         
         // Validate file
         if (file == null || file.isEmpty()) {
@@ -63,7 +69,7 @@ public class MediaController {
         request.setStorageId(storageId);
         request.setFileHash(fileHash);
         
-        MediaResponse response = mediaService.uploadMedia(request);
+        MediaResponse response = mediaService.uploadMedia(request, username);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
     
@@ -91,7 +97,10 @@ public class MediaController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            Authentication authentication) {
+        
+        String username = authentication.getName();
         
         // Convert string dates to OffsetDateTime if provided
         OffsetDateTime startDate = null;
@@ -106,31 +115,35 @@ public class MediaController {
         
         Pageable pageable = PageRequest.of(page, size);
         Page<MediaResponse> media = mediaService.getMediaWithFilters(
-                startDate, endDate, tags, type, sortDirection, pageable);
+                startDate, endDate, tags, type, sortDirection, pageable, username);
         return ResponseEntity.ok(media);
     }
     
     @GetMapping("/all")
-    public ResponseEntity<List<MediaResponse>> getAllMedia() {
-        List<MediaResponse> media = mediaService.getAllMedia();
+    public ResponseEntity<List<MediaResponse>> getAllMedia(Authentication authentication) {
+        String username = authentication.getName();
+        List<MediaResponse> media = mediaService.getAllMedia(username);
         return ResponseEntity.ok(media);
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<MediaResponse> getMediaById(@PathVariable UUID id) {
-        MediaResponse media = mediaService.getMediaById(id);
+    public ResponseEntity<MediaResponse> getMediaById(@PathVariable UUID id, Authentication authentication) {
+        String username = authentication.getName();
+        MediaResponse media = mediaService.getMediaById(id, username);
         return ResponseEntity.ok(media);
     }
 
     @GetMapping("/hash/{fileHash}")
-    public ResponseEntity<MediaResponse> getMediaByHashcode(@PathVariable String fileHash) {
-        MediaResponse media = mediaService.getMediaByHashcode(fileHash);
+    public ResponseEntity<MediaResponse> getMediaByHashcode(@PathVariable String fileHash, Authentication authentication) {
+        String username = authentication.getName();
+        MediaResponse media = mediaService.getMediaByHashcode(fileHash, username);
         return ResponseEntity.ok(media);
     }
 
     @GetMapping("/hash/{fileHash}/exists")
-    public ResponseEntity<Map<String, Boolean>> checkFileHashExists(@PathVariable String fileHash) {
-        boolean exists = mediaService.existsByFileHash(fileHash);
+    public ResponseEntity<Map<String, Boolean>> checkFileHashExists(@PathVariable String fileHash, Authentication authentication) {
+        String username = authentication.getName();
+        boolean exists = mediaService.existsByFileHash(fileHash, username);
         Map<String, Boolean> response = new HashMap<>();
         response.put("exists", exists);
         return ResponseEntity.ok(response);
@@ -139,22 +152,26 @@ public class MediaController {
     @PutMapping("/{id}")
     public ResponseEntity<MediaResponse> updateMedia(
             @PathVariable UUID id,
-            @Valid @RequestBody MediaUpdateRequest request) {
-        MediaResponse response = mediaService.updateMedia(id, request);
+            @Valid @RequestBody MediaUpdateRequest request,
+            Authentication authentication) {
+        String username = authentication.getName();
+        MediaResponse response = mediaService.updateMedia(id, request, username);
         return ResponseEntity.ok(response);
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMedia(@PathVariable UUID id) {
-        mediaService.deleteMedia(id);
+    public ResponseEntity<Void> deleteMedia(@PathVariable UUID id, Authentication authentication) {
+        String username = authentication.getName();
+        mediaService.deleteMedia(id, username);
         return ResponseEntity.noContent().build();
     }
     
     @GetMapping("/content/{id}")
-    public ResponseEntity<byte[]> getFileContent(@PathVariable UUID id) {
+    public ResponseEntity<byte[]> getFileContent(@PathVariable UUID id, Authentication authentication) {
         
         try {
-            MediaContentResponse mediaContent = mediaService.getFileContentById(id);
+            String username = authentication.getName();
+            MediaContentResponse mediaContent = mediaService.getFileContentById(id, username);
             return ResponseEntity.ok()
                     .header("Content-Type", mediaContent.getContentType())
                     .header("Content-Disposition", "inline; filename=\"" + mediaContent.getFileName() + "\"")
@@ -168,10 +185,12 @@ public class MediaController {
     @GetMapping("/content")
     public ResponseEntity<byte[]> getFileContentByBucketAndId(
             @RequestParam String bucket,
-            @RequestParam String fileId) {
+            @RequestParam String fileId,
+            Authentication authentication) {
         
         try {
-            MediaContentResponse mediaContent = mediaService.getFileContent(bucket, fileId);
+            String username = authentication.getName();
+            MediaContentResponse mediaContent = mediaService.getFileContent(bucket, fileId, username);
             return ResponseEntity.ok()
                     .header("Content-Type", mediaContent.getContentType())
                     .header("Content-Disposition", "inline; filename=\"" + mediaContent.getFileName() + "\"")
@@ -183,9 +202,10 @@ public class MediaController {
     }
 
     @GetMapping("/thumbnail/{id}")
-    public ResponseEntity<byte[]> getThumbnail(@PathVariable UUID id) {
+    public ResponseEntity<byte[]> getThumbnail(@PathVariable UUID id, Authentication authentication) {
         try {
-            MediaContentResponse thumbnailContent = mediaService.getThumbnailById(id);
+            String username = authentication.getName();
+            MediaContentResponse thumbnailContent = mediaService.getThumbnailById(id, username);
             return ResponseEntity.ok()
                     .header("Content-Type", thumbnailContent.getContentType())
                     .header("Content-Disposition", "inline; filename=\"thumb_" + thumbnailContent.getFileName() + "\"")
@@ -199,10 +219,12 @@ public class MediaController {
     @GetMapping("/thumbnail")
     public ResponseEntity<byte[]> getThumbnailByBucketAndId(
             @RequestParam String bucket,
-            @RequestParam String fileId) {
+            @RequestParam String fileId,
+            Authentication authentication) {
         
         try {
-            MediaContentResponse thumbnailContent = mediaService.getThumbnail(bucket, fileId);
+            String username = authentication.getName();
+            MediaContentResponse thumbnailContent = mediaService.getThumbnail(bucket, fileId, username);
             return ResponseEntity.ok()
                     .header("Content-Type", thumbnailContent.getContentType())
                     .header("Content-Disposition", "inline; filename=\"thumb_" + thumbnailContent.getFileName() + "\"")
